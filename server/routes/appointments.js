@@ -22,17 +22,19 @@ router.get("/:appointmentId", async (req, res) => {
 
 // Create new appointment
 router.post("/new", async (req, res) => {
+  // check if id is unique
   try {
-    const { name } = req.body;
+    const { name, availableDates } = req.body;
     const appointment = await Appointment.create({
       appointmentId: randomString.generate(7),
       name,
+      availableDates,
     });
   } catch {
     res.status(400).json({ message: "Invalid appointment" });
   }
   console.log(req.body);
-  res.json({ message: "New appointment added" });
+  res.status(200).json({ message: "New appointment added" });
 });
 
 // Make new answer

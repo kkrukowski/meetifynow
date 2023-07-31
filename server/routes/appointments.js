@@ -1,3 +1,4 @@
+const { time } = require("console");
 const express = require("express");
 const router = express.Router();
 
@@ -6,6 +7,7 @@ const Appointment = require("../models/appointments").Appointment;
 const Answer = require("../models/appointments").Answer;
 
 const randomString = require("randomstring");
+const moment = require("moment");
 
 // Get all appointments
 router.get("/:appointmentId", async (req, res) => {
@@ -25,16 +27,38 @@ router.post("/new", async (req, res) => {
   // check if id is unique
   try {
     const { name, availableDates } = req.body;
+
+    //Validate name data
+    if (!name) {
+      return res
+        .status(400)
+        .json({ message: "Invalid or missing 'name' data" });
+    } else if (typeof name !== "string") {
+      return res.status(400).json({ message: "Invalid name data" });
+    }
+
+    // Validate date data
+    if (!availableDates) {
+      return res
+        .status(400)
+        .json({ message: "Invalid or missing 'availableDates' data" });
+    } else {
+      availableDates.forEach((date) => {
+        if (!isNaN(date)) {
+          return res.status(400).json({ message: "Invalid date data" });
+        }
+      });
+    }
+
     const appointment = await Appointment.create({
       appointmentId: randomString.generate(7),
       name,
       availableDates,
     });
-  } catch {
+    res.status(200).json({ message: "New appointment added", appointment });
+  } catch (err) {
     res.status(400).json({ message: "Invalid appointment" });
   }
-  console.log(req.body);
-  res.status(200).json({ message: "New appointment added" });
 });
 
 // Make new answer

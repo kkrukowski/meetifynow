@@ -21,6 +21,7 @@ class TimeSelectionTable extends Component {
         } else {
           selectionMode = true;
           timecell.classList.add("selected");
+          getSelectedTimecellsData();
         }
       });
 
@@ -52,6 +53,17 @@ class TimeSelectionTable extends Component {
       ) as NodeListOf<HTMLInputElement>;
       return selectedTimecells;
     };
+
+    const getSelectedTimecellsData = () => {
+      const selectedTimecells = getSelectedTimecells();
+      let selectedTimecellsData: any = [];
+      selectedTimecells.forEach((selectedTimecell) => {
+        const dateTime = selectedTimecell.getAttribute("data-date");
+        const date = new Date(parseInt(dateTime!));
+        selectedTimecellsData.push(date);
+      });
+      return selectedTimecellsData;
+    };
   }
 
   render() {
@@ -66,7 +78,7 @@ class TimeSelectionTable extends Component {
     const days = [date, date2, date3, date4];
     const time = {
       from: 8,
-      to: 9,
+      to: 18,
     };
 
     // Days headings
@@ -87,8 +99,9 @@ class TimeSelectionTable extends Component {
       let timeCells: any = [];
       for (let j = 0; j < daysLen; j++) {
         const dateTime = days[j].setHours(i, 0, 0, 0);
-        console.log(dateTime);
-        timeCells.push(<td key={dateTime} id="time--cell"></td>);
+        timeCells.push(
+          <td key={dateTime} data-date={dateTime} id="time--cell"></td>
+        );
       }
 
       tableRows.push(
@@ -100,15 +113,18 @@ class TimeSelectionTable extends Component {
     }
 
     return (
-      <table className="time__seclection--table">
-        <thead>
-          <tr>
-            <th></th>
-            {daysHeadings}
-          </tr>
-        </thead>
-        <tbody>{tableRows}</tbody>
-      </table>
+      <section className="time__selection">
+        <table className="time__seclection--table">
+          <thead>
+            <tr>
+              <th></th>
+              {daysHeadings}
+            </tr>
+          </thead>
+          <tbody>{tableRows}</tbody>
+        </table>
+        <button></button>
+      </section>
     );
   }
 }

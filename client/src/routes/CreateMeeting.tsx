@@ -1,18 +1,35 @@
 import { set } from "mongoose";
 import React, { useState } from "react";
+
+import axios from "axios";
+
 import "../assets/css/createMeeting.css";
 
 export default function CreateMeeting() {
   // Name
   const [meetingName, setMeetingName] = useState("");
 
+  // Time
+  const [startTime, setStartTime] = useState("08:00");
+  const [endTime, setEndTime] = useState("09:00");
+
+  const handleStartTimeChange = (e: { target: { value: string } }) => {
+    const input = document.getElementById("startTime") as HTMLInputElement;
+    setStartTime(e.target.value);
+    input.value = e.target.value;
+    console.log("Start: " + startTime);
+  };
+
+  const handleEndTimeChange = (e: { target: { value: string } }) => {
+    setEndTime(e.target.value);
+    console.log("End: " + endTime);
+  };
+
   // CALENDAR
   // Selecting dates
   const [selectedDates, setSelectedDates] = useState<number[]>([]);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
-
-  console.log(selectedDates);
 
   const toggleTimecell = (date: number) => {
     if (selectedDates.includes(date)) {
@@ -122,6 +139,25 @@ export default function CreateMeeting() {
     "Grudzień",
   ];
 
+  // Create meeting
+  const createMeeting = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
+    axios
+      .post("http://localhost:5000/meet/new", {
+        meetName: meetingName,
+        dates: selectedDates,
+        startTime: startTime,
+        endTime: endTime,
+      })
+      .then(function (response) {
+        console.log(response);
+      })
+      .catch(function (error) {
+        console.log(error.response.data.message);
+        console.log(error);
+      });
+  };
+
   return (
     <section>
       <h1>Utwórz nowe spotkanie</h1>
@@ -131,6 +167,7 @@ export default function CreateMeeting() {
           type="text"
           placeholder="Meeting name"
           onChange={(e) => setMeetingName(e.target.value)}
+          required
         />
         <div>
           <h3>Wybierz dni</h3>
@@ -164,7 +201,23 @@ export default function CreateMeeting() {
         </div>
         <div>
           <h3>Wybierz przedział godzin</h3>
+          <input
+            type="time"
+            id="startTime"
+            value={startTime}
+            required
+            onChange={handleStartTimeChange}
+          />
+          <span> -&gt; </span>
+          <input
+            type="time"
+            id="endTime"
+            value={endTime}
+            required
+            onChange={handleEndTimeChange}
+          />
         </div>
+        <button onClick={createMeeting}>Utwórz spotkanie</button>
       </form>
     </section>
   );

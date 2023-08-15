@@ -10,8 +10,10 @@ const Answer = mongoose.model("Answer", AnswerSchema);
 
 const AppointmentSchema = new mongoose.Schema({
   appointmentId: { type: String, required: true },
-  name: { type: String, required: true },
-  availableDates: [Date],
+  meetName: { type: String, required: true },
+  dates: [Number],
+  startTime: { type: String, required: true },
+  endTime: { type: String, required: true },
   answers: [AnswerSchema],
 });
 

@@ -11,6 +11,7 @@ const moment = require("moment");
 
 // Get all appointments
 router.get("/:appointmentId", async (req, res) => {
+  // Co jak nie znajdzie?
   try {
     const { appointmentId } = req.params;
     const appointment = await Appointment.findOne({
@@ -24,38 +25,45 @@ router.get("/:appointmentId", async (req, res) => {
 
 // Create new appointment
 router.post("/new", async (req, res) => {
+  console.log("New appointment");
   // check if id is unique
   try {
-    const { name, availableDates } = req.body;
+    const { meetName, dates, startTime, endTime } = req.body;
+
+    console.log(req.body);
 
     //Validate name data
-    if (!name) {
+    if (!meetName) {
       return res
         .status(400)
         .json({ message: "Invalid or missing 'name' data" });
-    } else if (typeof name !== "string") {
+    } else if (typeof meetName !== "string") {
       return res.status(400).json({ message: "Invalid name data" });
     }
 
     // Validate date data
-    if (!availableDates) {
+    if (!dates) {
       return res
         .status(400)
         .json({ message: "Invalid or missing 'availableDates' data" });
-    } else {
-      availableDates.forEach((date) => {
-        if (!isNaN(date)) {
-          return res.status(400).json({ message: "Invalid date data" });
-        }
-      });
     }
+    // } else {
+    //   dates.forEach((date) => {
+    //     if (!isNaN(date)) {
+    //       return res.status(400).json({ message: "Invalid date data" });
+    //     }
+    //   });
+    // }
 
-    const appointment = await Appointment.create({
+    const newMeet = new Appointment({
       appointmentId: randomString.generate(7),
-      name,
-      availableDates,
+      meetName,
+      dates,
+      startTime,
+      endTime,
     });
-    res.status(200).json({ message: "New appointment added", appointment });
+    await newMeet.save();
+    res.status(200).json({ message: "New appointment added", newMeet });
   } catch (err) {
     res.status(400).json({ message: "Invalid appointment" });
   }

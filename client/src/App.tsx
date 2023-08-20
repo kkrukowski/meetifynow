@@ -1,13 +1,48 @@
-import { Route, Routes } from "react-router-dom";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import { Route, Routes, useParams } from "react-router-dom";
 import AnswerMeeting from "./routes/AnswerMeeting";
+import AnswerNotFound from "./routes/AnswerNotFound";
 import CreateMeeting from "./routes/CreateMeeting";
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/meet/:id" element={<AnswerMeeting />} />
+      <Route path="/meet/:id" element={<RenderAnswerMeeting />} />
       <Route path="/meet/new" element={<CreateMeeting />} />
       <Route path="*" element={<div>404</div>} />
     </Routes>
   );
+}
+
+function RenderAnswerMeeting() {
+  const { id } = useParams<{ id: string }>();
+  const [isLoading, setIsLoading] = useState(true);
+  const [isMeetingFound, setIsMeetingFound] = useState(false);
+
+  useEffect(() => {
+    axios
+      .get(import.meta.env.VITE_SERVER_URL + `/meet/${id}`)
+      .then((res) => {
+        if (res.status === 200) {
+          setIsMeetingFound(true);
+        }
+      })
+      .catch((err) => {
+        setIsMeetingFound(false);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [id]);
+
+  if (isLoading) {
+    return <p>Loading..</p>;
+  }
+
+  if (isMeetingFound) {
+    return <AnswerMeeting />;
+  }
+
+  return <AnswerNotFound />;
 }

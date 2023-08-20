@@ -11,13 +11,17 @@ const moment = require("moment");
 
 // Get all appointments
 router.get("/:appointmentId", async (req, res) => {
-  // Co jak nie znajdzie?
   try {
     const { appointmentId } = req.params;
     const appointment = await Appointment.findOne({
       appointmentId,
     });
-    res.json(appointment);
+
+    if (appointment === null) {
+      res.status(400).json({ message: "Appointment not found" });
+    } else {
+      res.status(200).json(appointment);
+    }
   } catch {
     res.status(400).json({ message: "Invalid appointment" });
   }

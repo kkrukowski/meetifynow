@@ -1,19 +1,13 @@
 import axios from "axios";
 import { set } from "mongoose";
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import AnswerNotFound from "./AnswerNotFound";
 
+import { error } from "console";
+import { useParams } from "react-router-dom";
 import "../assets/css/answerMeeting.css";
 
 export default function AnswerMeeting() {
-  const { id } = useParams<{ id: string }>();
-
-  useEffect(() => {
-    axios.get(import.meta.env.VITE_SERVER_URL + `/meet/${id}`).then((res) => {
-      console.log(res);
-    });
-  });
-
   const [selectedTimecells, setSelectedTimecells] = useState<number[]>([]);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);

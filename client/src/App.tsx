@@ -19,12 +19,14 @@ function RenderAnswerMeeting() {
   const { id } = useParams<{ id: string }>();
   const [isLoading, setIsLoading] = useState(true);
   const [isMeetingFound, setIsMeetingFound] = useState(false);
+  const [meetingData, setMeetingData] = useState<any>({});
 
   useEffect(() => {
     axios
       .get(import.meta.env.VITE_SERVER_URL + `/meet/${id}`)
       .then((res) => {
         if (res.status === 200) {
+          setMeetingData(res.data);
           setIsMeetingFound(true);
         }
       })
@@ -41,7 +43,7 @@ function RenderAnswerMeeting() {
   }
 
   if (isMeetingFound) {
-    return <AnswerMeeting />;
+    return <AnswerMeeting {...meetingData} />;
   }
 
   return <AnswerNotFound />;

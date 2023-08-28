@@ -7,20 +7,16 @@ import { error } from "console";
 import { useParams } from "react-router-dom";
 import "../assets/css/answerMeeting.css";
 
-export default function AnswerMeeting() {
+export default function AnswerMeeting(props: any) {
   const [selectedTimecells, setSelectedTimecells] = useState<number[]>([]);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
+  const [username, setUsername] = useState("");
+  const answers = props.answers;
+  console.log(answers);
 
-  const date = new Date();
-  date.setDate(date.getDate() + 1);
-  const date2 = new Date();
-  date2.setDate(date2.getDate() + 2);
-  const date3 = new Date();
-  date3.setDate(date3.getDate() + 3);
-  const date4 = new Date();
-  date4.setDate(date4.getDate() + 4);
-  const days = [date, date2, date3, date4];
+  const dates = props.dates;
+  const days = dates.map((date: string) => new Date(date));
 
   const toggleTimecell = (dateTime: number) => {
     if (selectedTimecells.includes(dateTime)) {
@@ -58,6 +54,7 @@ export default function AnswerMeeting() {
       const timeRow = [];
       for (let j = 0; j < days.length; j++) {
         const dateTime: number = days[j].setHours(i, 0, 0, 0);
+
         timeRow.push(
           <td
             key={dateTime}
@@ -65,7 +62,9 @@ export default function AnswerMeeting() {
             onMouseDown={() => toggleTimecell(dateTime)}
             onMouseUp={() => setIsMouseDown(false)}
             onMouseOver={() => handleMouseOver(dateTime)}
-            className={selectedTimecells.includes(dateTime) ? "selected" : ""}
+            className={`${
+              selectedTimecells.includes(dateTime) ? "selected" : ""
+            } ${isAnswered(dateTime) ? "answered" : ""}`}
           ></td>
         );
       }
@@ -81,22 +80,46 @@ export default function AnswerMeeting() {
     return timeCells;
   };
 
+  const isAnswered = (datetime: Number) => {
+    return answers.some((answer: any) => answer.dates.includes(datetime));
+  };
+
   const renderDaysHeadings = () => {
-    return days.map((day) => (
+    return days.map((day: Date) => (
       <th key={day.getDate()}>{day.getDate() + "." + (day.getMonth() + 1)}</th>
     ));
   };
 
-  const readSelectedTimecells = () => {
-    const selectedTimecellsDates = selectedTimecells.map((dt) => new Date(dt));
-    const selectedTimecellsDatesString = selectedTimecellsDates.map((dt) =>
-      dt.toLocaleString()
-    );
-    console.log(selectedTimecellsDatesString);
+  // const readSelectedTimecells = () => {
+  //   const selectedTimecellsDates = selectedTimecells.map((dt) => new Date(dt));
+  //   const selectedTimecellsDatesString = selectedTimecellsDates.map((dt) =>
+  //     dt.toLocaleString()
+  //   );
+  //   console.log(username);
+  //   console.log(selectedTimecellsDatesString);
+  // };
+
+  const sendAnswer = async () => {
+    axios
+      .post(import.meta.env.VITE_SERVER_URL + `/meet/${props.appointmentId}`, {
+        username: username,
+        dates: selectedTimecells,
+      })
+      .then((res) => {
+        console.log(res);
+      })
+      .catch((err) => {
+        console.log(err);
+      });
   };
 
   return (
     <section className="time__selection">
+      <input
+        type="text"
+        onChange={(e) => setUsername(e.target.value)}
+        placeholder="Nazwa"
+      />
       <table className="time__seclection--table">
         <thead>
           <tr>
@@ -106,7 +129,7 @@ export default function AnswerMeeting() {
         </thead>
         <tbody>{renderTimeCells()}</tbody>
       </table>
-      <button onClick={readSelectedTimecells}>Przykładowy przycisk</button>
+      <button onClick={sendAnswer}>Przykładowy przycisk</button>
     </section>
   );
 }

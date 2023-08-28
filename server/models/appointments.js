@@ -2,8 +2,7 @@ const mongoose = require("mongoose");
 
 const AnswerSchema = new mongoose.Schema({
   username: { type: String, required: true },
-  offline: [Date],
-  online: [Date],
+  dates: [Number],
 });
 
 const Answer = mongoose.model("Answer", AnswerSchema);

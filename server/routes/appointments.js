@@ -51,13 +51,6 @@ router.post("/new", async (req, res) => {
         .status(400)
         .json({ message: "Invalid or missing 'availableDates' data" });
     }
-    // } else {
-    //   dates.forEach((date) => {
-    //     if (!isNaN(date)) {
-    //       return res.status(400).json({ message: "Invalid date data" });
-    //     }
-    //   });
-    // }
 
     const newMeet = new Appointment({
       appointmentId: randomString.generate(7),
@@ -77,8 +70,8 @@ router.post("/new", async (req, res) => {
 router.post("/:appointmentId", async (req, res) => {
   try {
     const { appointmentId } = req.params;
-    const { username } = req.body;
-    const answer = new Answer({ username });
+    const { username, dates } = req.body;
+    const answer = new Answer({ username, dates });
     await Appointment.findOneAndUpdate(
       { appointmentId },
       { $push: { answers: answer } }

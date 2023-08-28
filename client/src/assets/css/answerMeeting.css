@@ -9,3 +9,7 @@ td {
 td.selected {
   background-color: greenyellow;
 }
+
+td.answered {
+  background-color: red;
+}

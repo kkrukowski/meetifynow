@@ -1,10 +1,8 @@
 import axios from "axios";
-import { set } from "mongoose";
 import React, { useEffect, useState } from "react";
-import AnswerNotFound from "./AnswerNotFound";
 
-import { error } from "console";
-import { useParams } from "react-router-dom";
+import { Input } from "../components/Input";
+
 import "../assets/css/answerMeeting.css";
 
 export default function AnswerMeeting(props: any) {
@@ -13,6 +11,29 @@ export default function AnswerMeeting(props: any) {
   const [selectionMode, setSelectionMode] = useState(false);
   const [username, setUsername] = useState("");
   const answers = props.answers;
+
+  const availabilityInfoNonMerged = answers.flatMap((answer: any) => {
+    return answer.dates.map((date: number) => {
+      return {
+        date: date,
+        username: answer.username,
+      };
+    });
+  });
+
+  const availabilityInfo = availabilityInfoNonMerged.reduce(
+    (acc: any, curr: any) => {
+      if (acc[curr.date]) {
+        acc[curr.date].push(curr.username);
+      } else {
+        acc[curr.date] = [curr.username];
+      }
+      return acc;
+    },
+    {}
+  );
+
+  console.log(availabilityInfo);
   console.log(answers);
 
   const dates = props.dates;
@@ -54,17 +75,19 @@ export default function AnswerMeeting(props: any) {
       const timeRow = [];
       for (let j = 0; j < days.length; j++) {
         const dateTime: number = days[j].setHours(i, 0, 0, 0);
-
         timeRow.push(
           <td
             key={dateTime}
             data-date={dateTime}
+            date-votes={
+              availabilityInfo[dateTime] ? availabilityInfo[dateTime].length : 0
+            }
             onMouseDown={() => toggleTimecell(dateTime)}
             onMouseUp={() => setIsMouseDown(false)}
             onMouseOver={() => handleMouseOver(dateTime)}
-            className={`${
+            className={`${isAnswered(dateTime) ? "answered" : ""} ${
               selectedTimecells.includes(dateTime) ? "selected" : ""
-            } ${isAnswered(dateTime) ? "answered" : ""}`}
+            }`}
           ></td>
         );
       }
@@ -90,46 +113,50 @@ export default function AnswerMeeting(props: any) {
     ));
   };
 
-  // const readSelectedTimecells = () => {
-  //   const selectedTimecellsDates = selectedTimecells.map((dt) => new Date(dt));
-  //   const selectedTimecellsDatesString = selectedTimecellsDates.map((dt) =>
-  //     dt.toLocaleString()
-  //   );
-  //   console.log(username);
-  //   console.log(selectedTimecellsDatesString);
-  // };
+  const sendAnswer = async (e: { preventDefault: () => void }) => {
+    e.preventDefault();
 
-  const sendAnswer = async () => {
-    axios
-      .post(import.meta.env.VITE_SERVER_URL + `/meet/${props.appointmentId}`, {
-        username: username,
-        dates: selectedTimecells,
-      })
-      .then((res) => {
-        console.log(res);
-      })
-      .catch((err) => {
-        console.log(err);
-      });
+    if (username.length > 0) {
+      axios
+        .post(
+          import.meta.env.VITE_SERVER_URL + `/meet/${props.appointmentId}`,
+          {
+            username: username,
+            dates: selectedTimecells,
+          }
+        )
+        .then((res) => {
+          console.log(res);
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
   };
 
   return (
     <section className="time__selection">
-      <input
-        type="text"
-        onChange={(e) => setUsername(e.target.value)}
-        placeholder="Nazwa"
-      />
-      <table className="time__seclection--table">
-        <thead>
-          <tr>
-            <th></th>
-            {renderDaysHeadings()}
-          </tr>
-        </thead>
-        <tbody>{renderTimeCells()}</tbody>
-      </table>
-      <button onClick={sendAnswer}>Przykładowy przycisk</button>
+      <form>
+        <Input
+          label="name"
+          type="text"
+          id="name"
+          onChange={(e: { target: { value: React.SetStateAction<string> } }) =>
+            setUsername(e.target.value)
+          }
+          placeholder="Twoja nazwa"
+        />
+        <table className="time__seclection--table">
+          <thead>
+            <tr>
+              <th></th>
+              {renderDaysHeadings()}
+            </tr>
+          </thead>
+          <tbody>{renderTimeCells()}</tbody>
+        </table>
+        <button onClick={sendAnswer}>Przykładowy przycisk</button>
+      </form>
     </section>
   );
 }

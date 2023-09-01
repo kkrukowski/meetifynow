@@ -3,12 +3,16 @@ import React, { useEffect, useState } from "react";
 
 import { Input } from "../components/Input";
 
+import { set } from "mongoose";
 import "../assets/css/answerMeeting.css";
 
 export default function AnswerMeeting(props: any) {
   const [selectedTimecells, setSelectedTimecells] = useState<number[]>([]);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
+  const [lookedUpDatetime, setLookedUpDatetime] = useState<number>();
+  const [lookedUpDate, setLookedUpDate] = useState<string>();
+  const [lookedUpTime, setLookedUpTime] = useState<string>();
   const [username, setUsername] = useState("");
   const answers = props.answers;
 
@@ -67,6 +71,14 @@ export default function AnswerMeeting(props: any) {
     }
   };
 
+  const convertDatetimeToDate = (datetime: number) => {
+    const date = new Date(datetime);
+    const convertedDate = date.getDate() + "." + (date.getMonth() + 1);
+    const convertedTime = date.getHours() + ":00";
+    setLookedUpDate(convertedDate);
+    setLookedUpTime(convertedTime);
+  };
+
   const renderTimeCells = () => {
     const time = { from: 8, to: 18 };
     const timeCells = [];
@@ -84,7 +96,11 @@ export default function AnswerMeeting(props: any) {
             }
             onMouseDown={() => toggleTimecell(dateTime)}
             onMouseUp={() => setIsMouseDown(false)}
-            onMouseOver={() => handleMouseOver(dateTime)}
+            onMouseOver={() => {
+              handleMouseOver(dateTime);
+              setLookedUpDatetime(dateTime);
+              convertDatetimeToDate(dateTime);
+            }}
             className={`${isAnswered(dateTime) ? "answered" : ""} ${
               selectedTimecells.includes(dateTime) ? "selected" : ""
             }`}
@@ -134,29 +150,51 @@ export default function AnswerMeeting(props: any) {
     }
   };
 
+  const renderAvailabilityInfo = () => {
+    if (lookedUpDatetime) {
+      if (!availabilityInfo[lookedUpDatetime]) {
+        return <li>Nikt nie jest dostępny w tym terminie</li>;
+      } else {
+        return availabilityInfo[lookedUpDatetime]?.map((username: string) => (
+          <li key={username}>{username}</li>
+        ));
+      }
+    } else {
+      return <li>Najedź na godzinę, aby zobaczyć dostępność</li>;
+    }
+  };
+
   return (
-    <section className="time__selection">
-      <form>
-        <Input
-          label="name"
-          type="text"
-          id="name"
-          onChange={(e: { target: { value: React.SetStateAction<string> } }) =>
-            setUsername(e.target.value)
-          }
-          placeholder="Twoja nazwa"
-        />
-        <table className="time__seclection--table">
-          <thead>
-            <tr>
-              <th></th>
-              {renderDaysHeadings()}
-            </tr>
-          </thead>
-          <tbody>{renderTimeCells()}</tbody>
-        </table>
-        <button onClick={sendAnswer}>Przykładowy przycisk</button>
-      </form>
-    </section>
+    <main className="flex">
+      <section className="availability__info w-1/2">
+        <h3>
+          Dostepność w dniu {lookedUpDate} o {lookedUpTime}:
+        </h3>
+        <ul>{renderAvailabilityInfo()}</ul>
+      </section>
+      <section className="time__selection w-1/2">
+        <form>
+          <Input
+            label="name"
+            type="text"
+            id="name"
+            onChange={(e: {
+              target: { value: React.SetStateAction<string> };
+            }) => setUsername(e.target.value)}
+            placeholder="Twoja nazwa"
+          />
+          <table className="time__seclection--table">
+            <thead>
+              <tr>
+                <th></th>
+                {renderDaysHeadings()}
+              </tr>
+            </thead>
+            <tbody>{renderTimeCells()}</tbody>
+          </table>
+          <button onClick={sendAnswer}>Przykładowy przycisk</button>
+        </form>
+      </section>
+    </main>
   );
 }

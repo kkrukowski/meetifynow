@@ -14,6 +14,7 @@ export default function AnswerMeeting(props: any) {
   const [lookedUpDate, setLookedUpDate] = useState<string>();
   const [lookedUpTime, setLookedUpTime] = useState<string>();
   const [username, setUsername] = useState("");
+  const [availableCount, setAvailableCount] = useState(0);
   const answers = props.answers;
 
   const availabilityInfoNonMerged = answers.flatMap((answer: any) => {
@@ -103,7 +104,7 @@ export default function AnswerMeeting(props: any) {
             }}
             className={`${isAnswered(dateTime) ? "answered" : ""} ${
               selectedTimecells.includes(dateTime) ? "selected" : ""
-            }`}
+            } "rounded"`}
           ></td>
         );
       }
@@ -164,11 +165,22 @@ export default function AnswerMeeting(props: any) {
     }
   };
 
+  useEffect(() => {
+    if (lookedUpDatetime) {
+      if (availabilityInfo[lookedUpDatetime]?.length > 0)
+        setAvailableCount(availabilityInfo[lookedUpDatetime]?.length);
+      else setAvailableCount(0);
+    } else setAvailableCount(0);
+  });
+
   return (
-    <main className="flex">
-      <section className="availability__info w-1/2">
+    <main className="flex w-[800px]">
+      <section className="availability__info w-1/2 mr-10">
         <h3>
-          Dostepność w dniu {lookedUpDate} o {lookedUpTime}:
+          {availableCount}/{answers.length}
+        </h3>
+        <h3>
+          {lookedUpDate} {lookedUpTime}
         </h3>
         <ul>{renderAvailabilityInfo()}</ul>
       </section>

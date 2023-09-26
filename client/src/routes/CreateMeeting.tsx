@@ -83,7 +83,11 @@ export default function CreateMeeting() {
               onMouseDown={() => toggleTimecell(+date)}
               onMouseUp={() => setIsMouseDown(false)}
               onMouseOver={() => handleMouseOver(+date)}
-              className={selectedDates.includes(+date) ? "selected" : ""}
+              className={`h-10 w-10 font-medium text-center ${
+                selectedDates.includes(+date)
+                  ? "bg-primary rounded-lg text-light selected"
+                  : ""
+              }`}
             >
               {day}
             </td>
@@ -159,65 +163,79 @@ export default function CreateMeeting() {
   };
 
   return (
-    <section>
-      <h1>Utwórz nowe spotkanie</h1>
-      <form id="create-meeting-form">
-        <h3>Nazwij spotkanie</h3>
+    <section className="flex flex-col justify-center">
+      <h1 className="text-4xl font-bold mb-10">Utwórz nowe spotkanie</h1>
+      <form id="create-meeting-form" className="flex flex-col justify-center">
+        {/* Meeting name input */}
         <input
           type="text"
-          placeholder="Meeting name"
+          placeholder="Nazwa spotkania"
           onChange={(e) => setMeetingName(e.target.value)}
           required
         />
-        <div>
-          <h3>Wybierz dni</h3>
-          <table className="date__selection--table">
-            <thead>
-              <tr>
-                <th colSpan={7}>
-                  {monthName[month]} {year}
-                </th>
-              </tr>
-              <tr>
-                <th>Pon</th>
-                <th>Wt</th>
-                <th>Śr</th>
-                <th>Czw</th>
-                <th>Pt</th>
-                <th>Sb</th>
-                <th>Nd</th>
-              </tr>
-            </thead>
-            <tbody>{showCalendar(month, year)}</tbody>
-            <tbody>
-              <tr>
-                <td colSpan={7}>
-                  <button onClick={prevMonth}>{monthName[month - 1]}</button>
-                  <button onClick={nextMonth}>{monthName[month + 1]}</button>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+        {/* Choose date */}
+        <div className="flex justify-center">
+          <div>
+            <h3>Wybierz dni</h3>
+            <table className="date__selection--table border-separate border-spacing-0.5">
+              <thead>
+                <tr>
+                  <th colSpan={7}>
+                    <div className="flex justify-between items-center">
+                      <button
+                        onClick={prevMonth}
+                        className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors"
+                      >
+                        &lt;
+                      </button>
+                      <span>{monthName[month] + " " + year}</span>
+                      <button
+                        onClick={nextMonth}
+                        className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors"
+                      >
+                        &gt;
+                      </button>
+                    </div>
+                  </th>
+                </tr>
+                <tr>
+                  <th className="font-medium text-gray">Pon</th>
+                  <th className="font-medium text-gray">Wt</th>
+                  <th className="font-medium text-gray">Śr</th>
+                  <th className="font-medium text-gray">Czw</th>
+                  <th className="font-medium text-gray">Pt</th>
+                  <th className="font-medium text-gray">Sb</th>
+                  <th className="font-medium text-gray">Nd</th>
+                </tr>
+              </thead>
+              <tbody>{showCalendar(month, year)}</tbody>
+            </table>
+          </div>
+          <div>
+            <h3>Wybierz przedział godzin</h3>
+            <input
+              type="time"
+              id="startTime"
+              value={startTime}
+              required
+              onChange={handleStartTimeChange}
+            />
+            <span> -&gt; </span>
+            <input
+              type="time"
+              id="endTime"
+              value={endTime}
+              required
+              onChange={handleEndTimeChange}
+            />
+          </div>
         </div>
-        <div>
-          <h3>Wybierz przedział godzin</h3>
-          <input
-            type="time"
-            id="startTime"
-            value={startTime}
-            required
-            onChange={handleStartTimeChange}
-          />
-          <span> -&gt; </span>
-          <input
-            type="time"
-            id="endTime"
-            value={endTime}
-            required
-            onChange={handleEndTimeChange}
-          />
-        </div>
-        <button onClick={createMeeting}>Utwórz spotkanie</button>
+        <button
+          className="bg-primary hover:bg-primary-hover active:bg-primary-active text-light font-medium w-fit px-4 py-2 rounded-lg mt-5 self-center transition-colors"
+          onClick={createMeeting}
+        >
+          Utwórz spotkanie
+        </button>
       </form>
     </section>
   );

@@ -6,7 +6,3 @@ td {
   cursor: pointer;
   user-select: none;
 }
-
-td.selected {
-  background-color: greenyellow;
-}

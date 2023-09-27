@@ -1,5 +1,11 @@
 import { set } from "mongoose";
 import React, { useState } from "react";
+import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import { Button } from "../components/Button";
+import Heading from "../components/Heading";
+import { Input } from "../components/Input";
+import { Timepicker } from "../components/Timepicker";
+import Title from "../components/Title";
 
 import axios from "axios";
 
@@ -164,78 +170,66 @@ export default function CreateMeeting() {
 
   return (
     <section className="flex flex-col justify-center">
-      <h1 className="text-4xl font-bold mb-10">Utwórz nowe spotkanie</h1>
+      <Title text="Utwórz nowe spotkanie" />
       <form id="create-meeting-form" className="flex flex-col justify-center">
         {/* Meeting name input */}
-        <input
+        <Input
+          label="Nazwa spotkania"
           type="text"
-          placeholder="Nazwa spotkania"
-          onChange={(e) => setMeetingName(e.target.value)}
-          required
+          id="meeting__name"
+          placeholder="📝 Nazwa spotkania"
+          onChange={(e: { target: { value: React.SetStateAction<string> } }) =>
+            setMeetingName(e.target.value)
+          }
         />
         {/* Choose date */}
-        <div className="flex justify-center">
-          <div>
-            <h3>Wybierz dni</h3>
-            <table className="date__selection--table border-separate border-spacing-0.5">
-              <thead>
-                <tr>
-                  <th colSpan={7}>
-                    <div className="flex justify-between items-center">
-                      <button
-                        onClick={prevMonth}
-                        className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors"
-                      >
-                        &lt;
-                      </button>
-                      <span>{monthName[month] + " " + year}</span>
-                      <button
-                        onClick={nextMonth}
-                        className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors"
-                      >
-                        &gt;
-                      </button>
-                    </div>
-                  </th>
-                </tr>
-                <tr>
-                  <th className="font-medium text-gray">Pon</th>
-                  <th className="font-medium text-gray">Wt</th>
-                  <th className="font-medium text-gray">Śr</th>
-                  <th className="font-medium text-gray">Czw</th>
-                  <th className="font-medium text-gray">Pt</th>
-                  <th className="font-medium text-gray">Sb</th>
-                  <th className="font-medium text-gray">Nd</th>
-                </tr>
-              </thead>
-              <tbody>{showCalendar(month, year)}</tbody>
-            </table>
-          </div>
-          <div>
-            <h3>Wybierz przedział godzin</h3>
-            <input
-              type="time"
-              id="startTime"
-              value={startTime}
-              required
-              onChange={handleStartTimeChange}
-            />
-            <span> -&gt; </span>
-            <input
-              type="time"
-              id="endTime"
-              value={endTime}
-              required
-              onChange={handleEndTimeChange}
-            />
+        <div className="flex flex-col justify-center my-5">
+          <Heading text="📅 Wybierz datę i czas spotkania" />
+          <div className="flex">
+            <div>
+              <table className="date__selection--table border-separate border-spacing-0.5">
+                <thead>
+                  <tr>
+                    <th colSpan={7}>
+                      <div className="flex justify-between items-center">
+                        <button
+                          onClick={prevMonth}
+                          className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
+                        >
+                          <IoChevronBack />
+                        </button>
+                        <span>{monthName[month] + " " + year}</span>
+                        <button
+                          onClick={nextMonth}
+                          className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
+                        >
+                          <IoChevronForward />
+                        </button>
+                      </div>
+                    </th>
+                  </tr>
+                  <tr>
+                    <th className="font-medium text-gray">Pon</th>
+                    <th className="font-medium text-gray">Wt</th>
+                    <th className="font-medium text-gray">Śr</th>
+                    <th className="font-medium text-gray">Czw</th>
+                    <th className="font-medium text-gray">Pt</th>
+                    <th className="font-medium text-gray">Sb</th>
+                    <th className="font-medium text-gray">Nd</th>
+                  </tr>
+                </thead>
+                <tbody>{showCalendar(month, year)}</tbody>
+              </table>
+            </div>
+            <div className="w-px bg-gray rounded-lg mx-14"></div>
+            <div className="flex items-center">
+              <Timepicker from={true} onChange={handleStartTimeChange} />
+              <span className="m-4"> - </span>
+              <Timepicker from={false} onChange={handleEndTimeChange} />
+            </div>
           </div>
         </div>
-        <button
-          className="bg-primary hover:bg-primary-hover active:bg-primary-active text-light font-medium w-fit px-4 py-2 rounded-lg mt-5 self-center transition-colors"
-          onClick={createMeeting}
-        >
-          Utwórz spotkanie
-        </button>
+        <Button text="Utwórz spotkanie" onClick={createMeeting} />
       </form>
     </section>
   );

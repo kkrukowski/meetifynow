@@ -1,0 +1,7 @@
+function Heading(props: { text: string; className?: string }) {
+  const headingStyle = "text-2xl font-medium mb-5";
+
+  return <h3 className={headingStyle + " " + props.className}>{props.text}</h3>;
+}
+
+export default Heading;

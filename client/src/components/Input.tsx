@@ -22,7 +22,7 @@ export const Input = ({
   return (
     <div className="flex flex-col w-full gap-2">
       <div className="flex justify-between">
-        <label htmlFor={id} className="font-medium text-gray capitalize">
+        <label htmlFor={id} className="font-medium text-gray">
           {label}
         </label>
       </div>

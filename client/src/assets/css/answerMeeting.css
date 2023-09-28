@@ -5,7 +5,3 @@
 td {
   cursor: pointer;
 }
-
-td.answered {
-  background-color: red;
-}

@@ -1,9 +1,11 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 
+import { Button } from "../components/Button";
+import Heading from "../components/Heading";
 import { Input } from "../components/Input";
+import Title from "../components/Title";
 
-import { set } from "mongoose";
 import "../assets/css/answerMeeting.css";
 
 export default function AnswerMeeting(props: any) {
@@ -16,6 +18,8 @@ export default function AnswerMeeting(props: any) {
   const [username, setUsername] = useState("");
   const [availableCount, setAvailableCount] = useState(0);
   const answers = props.answers;
+  const answersCount = props.answers.length;
+  const meetName = props.meetName;
 
   const availabilityInfoNonMerged = answers.flatMap((answer: any) => {
     return answer.dates.map((date: number) => {
@@ -37,9 +41,6 @@ export default function AnswerMeeting(props: any) {
     },
     {}
   );
-
-  console.log(availabilityInfo);
-  console.log(answers);
 
   const dates = props.dates;
   const days = dates.map((date: string) => new Date(date));
@@ -74,8 +75,16 @@ export default function AnswerMeeting(props: any) {
 
   const convertDatetimeToDate = (datetime: number) => {
     const date = new Date(datetime);
-    const convertedDate = date.getDate() + "." + (date.getMonth() + 1);
-    const convertedTime = date.getHours() + ":00";
+    const convertedDate =
+      date.getDate().toString().padStart(2, "0") +
+      "." +
+      (date.getMonth() + 1).toString().padStart(2, "0") +
+      " " +
+      daysNaming[date.getDay()];
+    const convertedTime =
+      date.getHours().toString().padStart(2, "0") +
+      ":" +
+      date.getMinutes().toString().padStart(2, "0");
     setLookedUpDate(convertedDate);
     setLookedUpTime(convertedTime);
   };
@@ -85,36 +94,61 @@ export default function AnswerMeeting(props: any) {
     const timeCells = [];
 
     for (let i = time.from; i <= time.to; i++) {
-      const timeRow = [];
-      for (let j = 0; j < days.length; j++) {
-        const dateTime: number = days[j].setHours(i, 0, 0, 0);
-        timeRow.push(
-          <td
-            key={dateTime}
-            data-date={dateTime}
-            date-votes={
-              availabilityInfo[dateTime] ? availabilityInfo[dateTime].length : 0
-            }
-            onMouseDown={() => toggleTimecell(dateTime)}
-            onMouseUp={() => setIsMouseDown(false)}
-            onMouseOver={() => {
-              handleMouseOver(dateTime);
-              setLookedUpDatetime(dateTime);
-              convertDatetimeToDate(dateTime);
-            }}
-            className={`${isAnswered(dateTime) ? "answered" : ""} ${
-              selectedTimecells.includes(dateTime) ? "selected" : ""
-            } "rounded"`}
-          ></td>
-        );
-      }
+      let timeRows = [];
+      for (let h = 0; h < 2; h++) {
+        let timeRow = [];
+        for (let j = 0; j < days.length; j++) {
+          const dateTime = days[j].setHours(i, h == 0 ? 0 : 30, 0, 0);
 
-      timeCells.push(
-        <tr key={i}>
-          <th>{i}:00</th>
-          {timeRow}
-        </tr>
-      );
+          timeRow.push(
+            <td
+              key={dateTime}
+              data-date={dateTime}
+              date-votes={
+                availabilityInfo[dateTime]
+                  ? availabilityInfo[dateTime].length
+                  : 0
+              }
+              onMouseDown={() => toggleTimecell(dateTime)}
+              onMouseUp={() => setIsMouseDown(false)}
+              onMouseOver={() => {
+                handleMouseOver(dateTime);
+                setLookedUpDatetime(dateTime);
+                convertDatetimeToDate(dateTime);
+              }}
+              className={`rounded-lg h-6 w-12 transition-colors ${
+                isAnswered(dateTime)
+                  ? `${
+                      selectedTimecells.includes(dateTime)
+                        ? "bg-primary selected"
+                        : `${
+                            availabilityInfo[dateTime].length == answersCount
+                              ? "bg-gold answered hover:bg-primary-hover active:bg-primary-active"
+                              : "bg-green answered hover:bg-primary-hover active:bg-primary-active"
+                          }`
+                    }`
+                  : `${
+                      selectedTimecells.includes(dateTime)
+                        ? "bg-primary selected hover:bg-primary-hover active:bg-primary-active"
+                        : "border border-gray hover:border-none hover:bg-primary-hover active:bg-primary-active"
+                    }`
+              }`}
+            ></td>
+          );
+        }
+        if (h == 0) {
+          timeCells.push(
+            <tr key={i + "00"}>
+              <th rowSpan={2} className="text-right align-top">
+                {i.toString().padStart(2, "0")}:00
+              </th>
+              {timeRow}
+            </tr>
+          );
+        } else if (h == 1) {
+          timeCells.push(<tr key={i + "30"}>{timeRow}</tr>);
+        }
+      }
     }
 
     return timeCells;
@@ -124,9 +158,18 @@ export default function AnswerMeeting(props: any) {
     return answers.some((answer: any) => answer.dates.includes(datetime));
   };
 
+  const daysNaming = ["Nd", "Pon", "Wt", "Śr", "Czw", "Pt", "Sob"];
+
   const renderDaysHeadings = () => {
     return days.map((day: Date) => (
-      <th key={day.getDate()}>{day.getDate() + "." + (day.getMonth() + 1)}</th>
+      <th key={day.getDate()}>
+        <p className="text-sm font-medium">
+          {day.getDate().toString().padStart(2, "0") +
+            "." +
+            (day.getMonth() + 1).toString().padStart(2, "0")}
+        </p>
+        <p>{daysNaming[day.getDay()]}</p>
+      </th>
     ));
   };
 
@@ -167,46 +210,52 @@ export default function AnswerMeeting(props: any) {
 
   useEffect(() => {
     if (lookedUpDatetime) {
-      if (availabilityInfo[lookedUpDatetime]?.length > 0)
+      if (availabilityInfo[lookedUpDatetime]?.length > 0) {
         setAvailableCount(availabilityInfo[lookedUpDatetime]?.length);
-      else setAvailableCount(0);
+      } else setAvailableCount(0);
     } else setAvailableCount(0);
   });
 
   return (
-    <main className="flex w-[800px]">
-      <section className="availability__info w-1/2 mr-10">
-        <h3>
-          {availableCount}/{answers.length}
-        </h3>
-        <h3>
-          {lookedUpDate} {lookedUpTime}
-        </h3>
-        <ul>{renderAvailabilityInfo()}</ul>
-      </section>
-      <section className="time__selection w-1/2">
-        <form>
-          <Input
-            label="name"
-            type="text"
-            id="name"
-            onChange={(e: {
-              target: { value: React.SetStateAction<string> };
-            }) => setUsername(e.target.value)}
-            placeholder="Twoja nazwa"
-          />
-          <table className="time__seclection--table">
-            <thead>
-              <tr>
-                <th></th>
-                {renderDaysHeadings()}
-              </tr>
-            </thead>
-            <tbody>{renderTimeCells()}</tbody>
-          </table>
-          <button onClick={sendAnswer}>Przykładowy przycisk</button>
-        </form>
-      </section>
+    <main className="flex flex-col w-[800px]">
+      <Title text={meetName} />
+      <div className="flex">
+        <section className="availability__info w-1/2 mr-10">
+          <p>
+            {lookedUpDate} {lookedUpTime}
+          </p>
+          {lookedUpDate ? (
+            <Heading text={`${availableCount}/${answersCount}`} />
+          ) : (
+            ""
+          )}
+
+          <ul>{renderAvailabilityInfo()}</ul>
+        </section>
+        <section className="time__selection w-1/2">
+          <form className="flex flex-col justify-center">
+            <Input
+              label="Twoje imie"
+              type="text"
+              id="name"
+              onChange={(e: {
+                target: { value: React.SetStateAction<string> };
+              }) => setUsername(e.target.value)}
+              placeholder="Twoje imie"
+            />
+            <table className="time__seclection--table w-fit mt-5 border-separate border-spacing-0.5 self-center">
+              <thead>
+                <tr>
+                  <th></th>
+                  {renderDaysHeadings()}
+                </tr>
+              </thead>
+              <tbody>{renderTimeCells()}</tbody>
+            </table>
+            <Button text="Wyślij" onClick={sendAnswer} />
+          </form>
+        </section>
+      </div>
     </main>
   );
 }

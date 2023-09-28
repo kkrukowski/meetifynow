@@ -169,7 +169,7 @@ export default function CreateMeeting() {
   };
 
   return (
-    <section className="flex flex-col justify-center">
+    <main className="flex flex-col justify-center">
       <Title text="Utwórz nowe spotkanie" />
       <form id="create-meeting-form" className="flex flex-col justify-center">
         {/* Meeting name input */}
@@ -231,6 +231,6 @@ export default function CreateMeeting() {
         </div>
         <Button text="Utwórz spotkanie" onClick={createMeeting} />
       </form>
-    </section>
+    </main>
   );
 }

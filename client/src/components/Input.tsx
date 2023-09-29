@@ -4,8 +4,10 @@ type Props = {
   label: string;
   type: string;
   id: string;
+  register: any;
   placeholder: string;
-  errorText?: string;
+  options?: any;
+  errorText?: string | undefined | null;
   error?: boolean;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
@@ -14,7 +16,9 @@ export const Input = ({
   label,
   type,
   id,
+  register,
   placeholder,
+  options,
   error,
   errorText,
   onChange,
@@ -28,6 +32,7 @@ export const Input = ({
       </div>
       <input
         id={id}
+        {...register(id, { ...options })}
         type={type}
         className={
           `w-full p-3 font-medium border border-gray focus:outline-none focus:ring focus:border-primary rounded-lg placeholder:opacity-60 transition-all` +

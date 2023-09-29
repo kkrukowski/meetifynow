@@ -6,6 +6,7 @@ export const Timepicker = (props: {
     <select
       id={props.from ? "timepicker__from" : "timepicker__to"}
       className="p-2 text-lg border border-gray rounded-lg focus:outline-none focus:ring focus:border-primary transition-all"
+      defaultValue={props.from ? "08:00" : "09:00"}
     >
       <option value="00:30">00:30</option>
       <option value="01:00">01:00</option>
@@ -22,13 +23,9 @@ export const Timepicker = (props: {
       <option value="06:30">06:30</option>
       <option value="07:00">07:00</option>
       <option value="07:30">07:30</option>
-      <option value="08:00" selected={props.from}>
-        08:00
-      </option>
+      <option value="08:00">08:00</option>
       <option value="08:30">08:30</option>
-      <option value="09:00" selected={!props.from}>
-        09:00
-      </option>
+      <option value="09:00">09:00</option>
       <option value="09:30">09:30</option>
       <option value="10:00">10:00</option>
       <option value="10:30">10:30</option>

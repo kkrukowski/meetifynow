@@ -1,7 +1,7 @@
 export const Button = (props: {
   text: string;
   className?: string;
-  onClick: React.MouseEventHandler<HTMLButtonElement>;
+  onClick?: React.MouseEventHandler<HTMLButtonElement>;
 }) => {
   return (
     <button

@@ -1,12 +1,13 @@
 export const Timepicker = (props: {
   from: boolean;
-  onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }) => {
   return (
     <select
       id={props.from ? "timepicker__from" : "timepicker__to"}
       className="p-2 text-lg border border-gray rounded-lg focus:outline-none focus:ring focus:border-primary transition-all"
       defaultValue={props.from ? "08:00" : "09:00"}
+      onChange={props.onChange}
     >
       <option value="00:30">00:30</option>
       <option value="01:00">01:00</option>

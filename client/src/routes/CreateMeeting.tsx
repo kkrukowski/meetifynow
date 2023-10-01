@@ -23,17 +23,15 @@ export default function CreateMeeting() {
   // Time
   const [startTime, setStartTime] = useState("08:00");
   const [endTime, setEndTime] = useState("09:00");
+  const [timeError, setTimeError] = useState(false);
+  const [timeErrorText, setTimeErrorText] = useState("");
 
   const handleStartTimeChange = (e: { target: { value: string } }) => {
-    const input = document.getElementById("startTime") as HTMLInputElement;
     setStartTime(e.target.value);
-    input.value = e.target.value;
-    console.log("Start: " + startTime);
   };
 
   const handleEndTimeChange = (e: { target: { value: string } }) => {
     setEndTime(e.target.value);
-    console.log("End: " + endTime);
   };
 
   // CALENDAR
@@ -41,6 +39,7 @@ export default function CreateMeeting() {
   const [selectedDates, setSelectedDates] = useState<number[]>([]);
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
+  const [dateError, setDateError] = useState(false);
 
   const toggleTimecell = (date: number) => {
     if (selectedDates.includes(date)) {
@@ -154,22 +153,66 @@ export default function CreateMeeting() {
     "Grudzień",
   ];
 
+  const daysName = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"];
+
   // Create meeting
   const createMeeting: SubmitHandler<Inputs> = async () => {
-    axios
-      .post("http://localhost:5000/meet/new", {
-        meetName: meetingName,
-        dates: selectedDates,
-        startTime: startTime,
-        endTime: endTime,
-      })
-      .then(function (response) {
-        console.log(response);
-      })
-      .catch(function (error) {
-        console.log(error.response.data.message);
-        console.log(error);
-      });
+    validateTime();
+    validateDate();
+    if (validateTime() && validateDate()) {
+      axios
+        .post("http://localhost:5000/meet/new", {
+          meetName: meetingName,
+          dates: selectedDates,
+          startTime: startTime,
+          endTime: endTime,
+        })
+        .then(function (response) {
+          console.log(response);
+        })
+        .catch(function (error) {
+          console.log(error.response.data.message);
+          console.log(error);
+        });
+    }
+  };
+
+  // VALIDATION
+  // Date validation
+  const validateDate = () => {
+    if (selectedDates.length < 1) {
+      setDateError(true);
+      return false;
+    } else {
+      setDateError(false);
+      return true;
+    }
+  };
+
+  // Time validation
+  const validateTime = () => {
+    const now = new Date();
+    const nowDateTime = now.toISOString();
+    const nowDate = nowDateTime.split("T")[0];
+    const startTimeConverted = new Date(nowDate + "T" + startTime);
+    const endTimeConverted = new Date(nowDate + "T" + endTime);
+
+    console.log(
+      startTimeConverted,
+      endTimeConverted,
+      startTimeConverted >= endTimeConverted
+    );
+    if (startTimeConverted >= endTimeConverted) {
+      setTimeError(true);
+      setTimeErrorText(
+        "Godzina zakończenia musi być późniejsza niż rozpoczęcia."
+      );
+      return false;
+    } else {
+      setTimeError(false);
+      setTimeErrorText("");
+      return true;
+    }
   };
 
   // Form validation
@@ -189,7 +232,6 @@ export default function CreateMeeting() {
     handleSubmit,
     formState: { errors },
   } = useForm({ resolver: yupResolver(formSchema) });
-  console.log(errors);
 
   return (
     <main className="flex flex-col justify-center">
@@ -216,47 +258,57 @@ export default function CreateMeeting() {
         <div className="flex flex-col justify-center my-5">
           <Heading text="📅 Wybierz datę i czas spotkania" />
           <div className="flex">
-            <table className="date__selection--table border-separate border-spacing-0.5">
-              <thead>
-                <tr>
-                  <th colSpan={7}>
-                    <div className="flex justify-between items-center">
-                      <button
-                        onClick={prevMonth}
-                        className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
-                      >
-                        <IoChevronBack />
-                      </button>
-                      <span>{monthName[month] + " " + year}</span>
-                      <button
-                        onClick={nextMonth}
-                        className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
-                      >
-                        <IoChevronForward />
-                      </button>
-                    </div>
-                  </th>
-                </tr>
-                <tr>
-                  <th className="font-medium text-gray">Pon</th>
-                  <th className="font-medium text-gray">Wt</th>
-                  <th className="font-medium text-gray">Śr</th>
-                  <th className="font-medium text-gray">Czw</th>
-                  <th className="font-medium text-gray">Pt</th>
-                  <th className="font-medium text-gray">Sb</th>
-                  <th className="font-medium text-gray">Nd</th>
-                </tr>
-              </thead>
-              <tbody>{showCalendar(month, year)}</tbody>
-            </table>
+            <div>
+              <table
+                className={`date__selection--table border border-2 border-separate border-spacing-0.5 box-content p-2 ${
+                  dateError ? "rounded-lg border-red" : "border-transparent"
+                }`}
+              >
+                <thead>
+                  <tr>
+                    <th colSpan={7}>
+                      <div className="flex justify-between items-center">
+                        <button
+                          onClick={prevMonth}
+                          className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
+                        >
+                          <IoChevronBack />
+                        </button>
+                        <span>{monthName[month] + " " + year}</span>
+                        <button
+                          onClick={nextMonth}
+                          className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
+                        >
+                          <IoChevronForward />
+                        </button>
+                      </div>
+                    </th>
+                  </tr>
+                  <tr>
+                    {daysName.map((day) => (
+                      <th className="font-medium text-gray">{day}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>{showCalendar(month, year)}</tbody>
+              </table>
+            </div>
             <div className="w-px bg-gray rounded-lg mx-14"></div>
-            <div className="flex items-center">
-              <Timepicker from={true} onChange={handleStartTimeChange} />
-              <span className="m-4"> - </span>
-              <Timepicker from={false} onChange={handleEndTimeChange} />
+            <div className="flex flex-col justify-center items-center w-fit">
+              <div className="self-center">
+                <Timepicker from={true} onChange={handleStartTimeChange} />
+                <span className="m-4"> - </span>
+                <Timepicker from={false} onChange={handleEndTimeChange} />
+              </div>
             </div>
           </div>
         </div>
+        <p className="text-sm relative mt-2 text-red font-medium">
+          {dateError ? "Wybierz datę spotkania." : ""}
+        </p>
+        <p className="text-sm relative mt-2 text-red font-medium w-11/12 whitespace-pre-wrap">
+          {timeError ? timeErrorText : ""}
+        </p>
         <Button text="Utwórz spotkanie" />
       </form>
     </main>

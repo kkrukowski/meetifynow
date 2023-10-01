@@ -1,5 +1,8 @@
+import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { SubmitHandler, useForm } from "react-hook-form";
+import * as yup from "yup";
 
 import { Button } from "../components/Button";
 import Heading from "../components/Heading";
@@ -216,6 +219,18 @@ export default function AnswerMeeting(props: any) {
     } else setAvailableCount(0);
   });
 
+  const formSchema = yup.object().shape({
+    name: yup.string().required("Twoje imie jest wymagane."),
+  });
+
+  type Inputs = {
+    name: string;
+  };
+
+  const { register, formState: errors } = useForm<Inputs>({
+    resolver: yupResolver(formSchema),
+  });
+
   return (
     <main className="flex flex-col w-[800px]">
       <Title text={meetName} />
@@ -238,6 +253,7 @@ export default function AnswerMeeting(props: any) {
               label="Twoje imie"
               type="text"
               id="name"
+              register={register}
               onChange={(e: {
                 target: { value: React.SetStateAction<string> };
               }) => setUsername(e.target.value)}

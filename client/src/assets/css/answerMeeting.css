@@ -1,7 +1,3 @@
 .time__seclection--table {
   user-select: none;
 }
-
-td {
-  cursor: pointer;
-}

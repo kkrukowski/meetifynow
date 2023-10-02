@@ -21,7 +21,9 @@ export default function AnswerMeeting(props: any) {
   const [username, setUsername] = useState("");
   const [availableCount, setAvailableCount] = useState(0);
   const answers = props.answers;
+  const answeredUsernames = answers.map((answer: any) => answer.username);
   const answersCount = props.answers.length;
+  const [highestAvailableCount, setHighestAvailableCount] = useState(0);
   const meetName = props.meetName;
 
   const availabilityInfoNonMerged = answers.flatMap((answer: any) => {
@@ -97,11 +99,17 @@ export default function AnswerMeeting(props: any) {
     const timeCells = [];
 
     for (let i = time.from; i <= time.to; i++) {
-      let timeRows = [];
       for (let h = 0; h < 2; h++) {
         let timeRow = [];
         for (let j = 0; j < days.length; j++) {
           const dateTime = days[j].setHours(i, h == 0 ? 0 : 30, 0, 0);
+
+          if (
+            availabilityInfo[dateTime] &&
+            availabilityInfo[dateTime].length > highestAvailableCount
+          ) {
+            setHighestAvailableCount(availabilityInfo[dateTime].length);
+          }
 
           timeRow.push(
             <td
@@ -125,7 +133,8 @@ export default function AnswerMeeting(props: any) {
                       selectedTimecells.includes(dateTime)
                         ? "bg-primary selected"
                         : `${
-                            availabilityInfo[dateTime].length == answersCount
+                            availabilityInfo[dateTime].length ==
+                            highestAvailableCount
                               ? "bg-gold answered hover:bg-primary-hover active:bg-primary-active"
                               : "bg-green answered hover:bg-primary-hover active:bg-primary-active"
                           }`
@@ -176,9 +185,7 @@ export default function AnswerMeeting(props: any) {
     ));
   };
 
-  const sendAnswer = async (e: { preventDefault: () => void }) => {
-    e.preventDefault();
-
+  const sendAnswer: SubmitHandler<Inputs> = async () => {
     if (username.length > 0) {
       axios
         .post(
@@ -202,9 +209,25 @@ export default function AnswerMeeting(props: any) {
       if (!availabilityInfo[lookedUpDatetime]) {
         return <li>Nikt nie jest dostępny w tym terminie</li>;
       } else {
-        return availabilityInfo[lookedUpDatetime]?.map((username: string) => (
-          <li key={username}>{username}</li>
-        ));
+        const availableUsernames = availabilityInfo[lookedUpDatetime] || [];
+        const unavailableUsernames = answeredUsernames.filter(
+          (username: string) => !availableUsernames.includes(username)
+        );
+        const listOfAvailableUsernames = availableUsernames?.map(
+          (username: string) => <li key={username}>{username}</li>
+        );
+        const listOfUnavailableUsernames = unavailableUsernames?.map(
+          (username: string) => (
+            <li key={username} className="text-gray">
+              <s>{username}</s>
+            </li>
+          )
+        );
+        const listOfUsernames = [
+          listOfAvailableUsernames,
+          listOfUnavailableUsernames,
+        ];
+        return listOfUsernames;
       }
     } else {
       return <li>Najedź na godzinę, aby zobaczyć dostępność</li>;
@@ -227,7 +250,11 @@ export default function AnswerMeeting(props: any) {
     name: string;
   };
 
-  const { register, formState: errors } = useForm<Inputs>({
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<Inputs>({
     resolver: yupResolver(formSchema),
   });
 
@@ -248,12 +275,17 @@ export default function AnswerMeeting(props: any) {
           <ul>{renderAvailabilityInfo()}</ul>
         </section>
         <section className="time__selection w-1/2">
-          <form className="flex flex-col justify-center">
+          <form
+            className="flex flex-col justify-center"
+            onSubmit={handleSubmit(sendAnswer)}
+          >
             <Input
               label="Twoje imie"
               type="text"
               id="name"
               register={register}
+              error={errors.name ? true : false}
+              errorText={errors.name?.message?.toString()}
               onChange={(e: {
                 target: { value: React.SetStateAction<string> };
               }) => setUsername(e.target.value)}
@@ -268,7 +300,7 @@ export default function AnswerMeeting(props: any) {
               </thead>
               <tbody>{renderTimeCells()}</tbody>
             </table>
-            <Button text="Wyślij" onClick={sendAnswer} />
+            <Button text="Wyślij" />
           </form>
         </section>
       </div>

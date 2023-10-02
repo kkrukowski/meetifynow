@@ -71,21 +71,26 @@ export default function CreateMeeting() {
 
   // Rendering calerdar
   const showCalendar = (month: number, year: number) => {
-    console.log(month, year);
-
-    const firstDay = new Date(year, month).getDay() - 1;
-    const daysInMonth = 32 - new Date(year, month, 32).getDate();
-    const weeksInCalendar = Math.ceil((daysInMonth + firstDay) / 7);
+    var firstDay = new Date(year, month, 1).getDay();
+    if (firstDay === 0) {
+      firstDay = 7;
+    }
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    const daysInMonth = lastDayOfMonth.getDate();
+    const daysUntilFirstMonday = (7 - ((firstDay + 6) % 7)) % 7;
+    const remainingDays = daysInMonth - daysUntilFirstMonday;
+    const weeksInMonth = 1 + Math.ceil(remainingDays / 7);
 
     let tableRows = [];
     let day = 1;
     let e = 0;
 
-    for (let i = 0; i < weeksInCalendar; i++) {
+    const dateNow = new Date();
+    for (let i = 0; i < weeksInMonth; i++) {
       let tableCells = [];
       for (let j = 0; j < 7; j++) {
         const date = new Date(year, month, day);
-        if (day <= daysInMonth && (i > 0 || j >= firstDay)) {
+        if (day <= daysInMonth && (i > 0 || j >= firstDay - 1)) {
           tableCells.push(
             <td
               key={"d" + day}
@@ -93,10 +98,22 @@ export default function CreateMeeting() {
               onMouseDown={() => toggleTimecell(+date)}
               onMouseUp={() => setIsMouseDown(false)}
               onMouseOver={() => handleMouseOver(+date)}
-              className={`h-10 w-10 font-medium text-center ${
+              className={`h-10 w-10 font-medium text-center cursor-pointer ${
                 selectedDates.includes(+date)
-                  ? "bg-primary rounded-lg text-light selected"
-                  : ""
+                  ? `${
+                      dateNow.getDay() + 1 == day &&
+                      dateNow.getMonth() == month &&
+                      dateNow.getFullYear() == year
+                        ? "border border-2 border-dark bg-primary text-light rounded-lg selected"
+                        : "bg-primary rounded-lg text-light selected"
+                    }`
+                  : `${
+                      dateNow.getDay() + 1 == day &&
+                      dateNow.getMonth() == month &&
+                      dateNow.getFullYear() == year
+                        ? "border border-2 border-primary rounded-lg"
+                        : ""
+                    }`
               }`}
             >
               {day}

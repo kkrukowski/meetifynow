@@ -2,14 +2,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 
 import { Button } from "../components/Button";
 import Heading from "../components/Heading";
 import { Input } from "../components/Input";
 import Title from "../components/Title";
-
-import "../assets/css/answerMeeting.css";
 
 export default function AnswerMeeting(props: any) {
   const [selectedTimecells, setSelectedTimecells] = useState<number[]>([]);
@@ -20,11 +19,11 @@ export default function AnswerMeeting(props: any) {
   const [lookedUpTime, setLookedUpTime] = useState<string>();
   const [username, setUsername] = useState("");
   const [availableCount, setAvailableCount] = useState(0);
-  const answers = props.answers;
+  const [answers, setAnswers] = useState<any>(props.answers);
+  const [meetName, setMeetName] = useState(props.meetName);
   const answeredUsernames = answers.map((answer: any) => answer.username);
   const answersCount = props.answers.length;
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);
-  const meetName = props.meetName;
 
   const availabilityInfoNonMerged = answers.flatMap((answer: any) => {
     return answer.dates.map((date: number) => {
@@ -185,6 +184,11 @@ export default function AnswerMeeting(props: any) {
     ));
   };
 
+  function clearFormData() {
+    setUsername("");
+    setSelectedTimecells([]);
+  }
+
   const sendAnswer: SubmitHandler<Inputs> = async () => {
     if (username.length > 0) {
       axios
@@ -196,7 +200,17 @@ export default function AnswerMeeting(props: any) {
           }
         )
         .then((res) => {
-          console.log(res);
+          clearFormData();
+          axios
+            .get(
+              import.meta.env.VITE_SERVER_URL + `/meet/${props.appointmentId}`
+            )
+            .then((res) => {
+              if (res.status === 200) {
+                setAnswers(res.data.answers);
+                setMeetName(res.data.meetName);
+              }
+            });
         })
         .catch((err) => {
           console.log(err);

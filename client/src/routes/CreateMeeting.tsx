@@ -3,6 +3,7 @@ import { set } from "mongoose";
 import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
+import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 
 // Components
@@ -173,6 +174,7 @@ export default function CreateMeeting() {
   const daysName = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"];
 
   // Create meeting
+  const navigate = useNavigate();
   const createMeeting: SubmitHandler<Inputs> = async () => {
     validateTime();
     validateDate();
@@ -186,9 +188,11 @@ export default function CreateMeeting() {
         })
         .then(function (response) {
           console.log(response);
+          const meetId = response.data.newMeet.appointmentId;
+          const meetUrl = `/meet/${meetId}`;
+          navigate(meetUrl);
         })
         .catch(function (error) {
-          console.log(error.response.data.message);
           console.log(error);
         });
     }

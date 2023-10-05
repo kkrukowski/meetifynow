@@ -295,7 +295,9 @@ export default function CreateMeeting() {
                         >
                           <IoChevronBack />
                         </button>
-                        <span>{monthName[month] + " " + year}</span>
+                        <span className="text-dark">
+                          {monthName[month] + " " + year}
+                        </span>
                         <button
                           onClick={nextMonth}
                           className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"

@@ -150,7 +150,7 @@ export default function AnswerMeeting(props: any) {
         if (h == 0) {
           timeCells.push(
             <tr key={i + "00"}>
-              <th rowSpan={2} className="text-right align-top">
+              <th rowSpan={2} className="text-right text-dark align-top">
                 {i.toString().padStart(2, "0")}:00
               </th>
               {timeRow}
@@ -174,12 +174,12 @@ export default function AnswerMeeting(props: any) {
   const renderDaysHeadings = () => {
     return days.map((day: Date) => (
       <th key={day.getDate()}>
-        <p className="text-sm font-medium">
+        <p className="text-sm text-dark font-medium">
           {day.getDate().toString().padStart(2, "0") +
             "." +
             (day.getMonth() + 1).toString().padStart(2, "0")}
         </p>
-        <p>{daysNaming[day.getDay()]}</p>
+        <p className="text-dark">{daysNaming[day.getDay()]}</p>
       </th>
     ));
   };
@@ -221,7 +221,9 @@ export default function AnswerMeeting(props: any) {
   const renderAvailabilityInfo = () => {
     if (lookedUpDatetime) {
       if (!availabilityInfo[lookedUpDatetime]) {
-        return <li>Nikt nie jest dostępny w tym terminie</li>;
+        return (
+          <li className="text-dark">Nikt nie jest dostępny w tym terminie</li>
+        );
       } else {
         const availableUsernames = availabilityInfo[lookedUpDatetime] || [];
         const unavailableUsernames = answeredUsernames.filter(

@@ -14,7 +14,7 @@ module.exports = {
         "light-hover": "#e4f4ff",
         "light-active": "#d4ecff",
         gray: "#8e8e8e",
-        dark: "#1c1c1c",
+        dark: "#00263b",
         red: "#FF6B73",
         green: "#38B453",
         gold: "#FFC107",

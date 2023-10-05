@@ -5,7 +5,7 @@ export const Timepicker = (props: {
   return (
     <select
       id={props.from ? "timepicker__from" : "timepicker__to"}
-      className="p-2 text-lg border border-gray rounded-lg focus:outline-none focus:ring focus:border-primary transition-all"
+      className="p-2 text-lg text-dark border border-gray rounded-lg focus:outline-none focus:ring focus:border-primary transition-all"
       defaultValue={props.from ? "08:00" : "09:00"}
       onChange={props.onChange}
     >

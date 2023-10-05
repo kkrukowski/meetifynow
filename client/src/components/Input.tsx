@@ -35,7 +35,7 @@ export const Input = ({
         {...register(id, { ...options })}
         type={type}
         className={
-          `w-full p-3 font-medium border border-gray focus:outline-none focus:ring focus:border-primary rounded-lg placeholder:opacity-60 transition-all` +
+          `w-full p-3 text-dark font-medium border border-gray focus:outline-none focus:ring focus:border-primary rounded-lg placeholder:opacity-60 transition-all` +
           (error ? " border-red focus:ring-red/50 focus:border-red" : "")
         }
         placeholder={placeholder}

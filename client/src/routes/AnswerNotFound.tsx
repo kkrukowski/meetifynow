@@ -1,7 +1,9 @@
+import Title from "../components/Title";
+
 export default function AnswetNotFound() {
   return (
     <div>
-      <h1>Answer not found</h1>
+      <Title text="Nie znaleziono takiego spotkania 😥" />
     </div>
   );
 }

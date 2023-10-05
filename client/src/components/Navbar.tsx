@@ -1,5 +1,4 @@
-import time2meetLogo from "../assets/imgs/time2meet-logo.svg";
-import { default as Link, default as LinkButton } from "./LinkButton";
+import time2meetLogo from "../assets/imgs/time2meet-logo.png";
 
 export default function Navbar() {
   return (

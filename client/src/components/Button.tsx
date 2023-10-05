@@ -1,6 +1,7 @@
 export const Button = (props: {
   text: string;
   className?: string;
+  to?: string;
   onClick?: any;
 }) => {
   return (

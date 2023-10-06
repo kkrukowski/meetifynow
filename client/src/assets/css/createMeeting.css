@@ -1,8 +1,0 @@
-.date__selection--table {
-  user-select: none;
-}
-
-td {
-  cursor: pointer;
-  user-select: none;
-}

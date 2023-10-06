@@ -5,7 +5,7 @@ import Title from "../components/Title";
 export default function HomePage() {
   return (
     <main className="w-full md:max-w-xl lg:max-w-5xl mt-10 lg:mt-0 p-5 md:p-10 flex flex-col lg:flex-row items-center">
-      <div className="flex flex-col items-center">
+      <div className="flex flex-col items-center lg:items-start">
         <Title text="Planowanie spotkań nigdy nie było prostsze!" />
         <p className="mb-5 text-dark">
           time2meet to platforma do prostego planowania spotkań niewymagająca

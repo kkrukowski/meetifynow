@@ -15,8 +15,6 @@ import Title from "../components/Title";
 
 import axios from "axios";
 
-import "../assets/css/createMeeting.css";
-
 export default function CreateMeeting() {
   // Name
   const [meetingName, setMeetingName] = useState("");
@@ -276,8 +274,8 @@ export default function CreateMeeting() {
           }
         />
         {/* Choose date */}
-        <div className="flex flex-col justify-center my-5">
-          <Heading text="📅 Wybierz datę i czas spotkania" />
+        <Heading text="📅 Wybierz datę i czas spotkania" className="my-5" />
+        <div className="flex justify-center mb-5">
           <div className="flex flex-col lg:flex-row items-center">
             <div>
               <table

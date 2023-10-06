@@ -95,7 +95,8 @@ export default function AnswerMeeting(props: any) {
 
   const renderTimeCells = () => {
     const time = { from: 8, to: 18 };
-    const timeCells = [];
+    var timeCells: any = [];
+    var hoursData = [];
 
     for (let i = time.from; i <= time.to; i++) {
       for (let h = 0; h < 2; h++) {
@@ -149,15 +150,22 @@ export default function AnswerMeeting(props: any) {
         }
         if (h == 0) {
           timeCells.push(
-            <tr key={i + "00"}>
-              <th rowSpan={2} className="text-right text-dark align-top">
+            <tr key={i + "00"} className="cursor-pointer">
+              <th
+                rowSpan={2}
+                className="text-right text-dark align-top bg-light sticky left-0"
+              >
                 {i.toString().padStart(2, "0")}:00
               </th>
               {timeRow}
             </tr>
           );
         } else if (h == 1) {
-          timeCells.push(<tr key={i + "30"}>{timeRow}</tr>);
+          timeCells.push(
+            <tr key={i + "30"} className="cursor-pointer">
+              {timeRow}
+            </tr>
+          );
         }
       }
     }
@@ -292,7 +300,7 @@ export default function AnswerMeeting(props: any) {
         </section>
         <section className="time__selection w-1/2">
           <form
-            className="flex flex-col justify-center"
+            className="flex flex-col justify-center items-center"
             onSubmit={handleSubmit(sendAnswer)}
           >
             <Input
@@ -307,15 +315,18 @@ export default function AnswerMeeting(props: any) {
               }) => setUsername(e.target.value)}
               placeholder="Twoje imie"
             />
-            <table className="time__seclection--table w-fit mt-5 border-separate border-spacing-0.5 self-center">
-              <thead>
-                <tr>
-                  <th></th>
-                  {renderDaysHeadings()}
-                </tr>
-              </thead>
-              <tbody>{renderTimeCells()}</tbody>
-            </table>
+            {/* https://stackoverflow.com/questions/74158422/thead-background-color-without-border */}
+            <div className="overflow-auto h-full max-h-[500px] w-full max-w-[500px] mt-5">
+              <table className="time__seclection--table w-fit mt-5 border-separate self-center overflow-auto">
+                <thead className="sticky bg-light top-0 z-10">
+                  <tr>
+                    <th></th>
+                    {renderDaysHeadings()}
+                  </tr>
+                </thead>
+                <tbody>{renderTimeCells()}</tbody>
+              </table>
+            </div>
             <Button text="Wyślij" />
           </form>
         </section>

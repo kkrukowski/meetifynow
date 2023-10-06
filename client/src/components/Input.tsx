@@ -24,7 +24,7 @@ export const Input = ({
   onChange,
 }: Props) => {
   return (
-    <div className="flex flex-col w-full gap-2">
+    <div className="flex flex-col w-[300px] gap-2">
       <div className="flex justify-between">
         <label htmlFor={id} className="font-medium text-gray">
           {label}

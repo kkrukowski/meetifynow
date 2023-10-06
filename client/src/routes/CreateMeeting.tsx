@@ -255,7 +255,7 @@ export default function CreateMeeting() {
   } = useForm({ resolver: yupResolver(formSchema) });
 
   return (
-    <main className="flex flex-col justify-center">
+    <main className="flex flex-col px-5 py-10 md:p-10 mt-10 lg:m-0 justify-center">
       <Title text="Utwórz nowe spotkanie" />
       <form
         id="create-meeting-form"
@@ -278,7 +278,7 @@ export default function CreateMeeting() {
         {/* Choose date */}
         <div className="flex flex-col justify-center my-5">
           <Heading text="📅 Wybierz datę i czas spotkania" />
-          <div className="flex">
+          <div className="flex flex-col lg:flex-row items-center">
             <div>
               <table
                 className={`date__selection--table border border-2 border-separate border-spacing-0.5 box-content p-2 ${
@@ -316,7 +316,7 @@ export default function CreateMeeting() {
                 <tbody>{showCalendar(month, year)}</tbody>
               </table>
             </div>
-            <div className="w-px bg-gray rounded-lg mx-14"></div>
+            <div className="w-full lg:w-px h-px lg:h-full bg-gray rounded-lg my-5 lg:mx-14"></div>
             <div className="flex flex-col justify-center items-center w-fit">
               <div className="self-center">
                 <Timepicker from={true} onChange={handleStartTimeChange} />

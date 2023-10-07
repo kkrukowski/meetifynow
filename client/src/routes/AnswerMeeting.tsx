@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
@@ -8,6 +8,7 @@ import * as yup from "yup";
 import { Button } from "../components/Button";
 import Heading from "../components/Heading";
 import { Input } from "../components/Input";
+import SwitchButton from "../components/SwitchButton";
 import Title from "../components/Title";
 
 export default function AnswerMeeting(props: any) {
@@ -24,6 +25,29 @@ export default function AnswerMeeting(props: any) {
   const answeredUsernames = answers.map((answer: any) => answer.username);
   const answersCount = props.answers.length;
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);
+  const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
+
+  // Get window size info
+  const [windowSize, setWindowSize] = useState([
+    window.innerWidth,
+    window.innerHeight,
+  ]);
+
+  useEffect(() => {
+    const handleWindowResize = () => {
+      setWindowSize([window.innerWidth, window.innerHeight]);
+    };
+
+    window.addEventListener("resize", handleWindowResize);
+
+    return () => {
+      window.removeEventListener("resize", handleWindowResize);
+    };
+  }, []);
+
+  const isMobile = () => {
+    return windowSize[0] < 1280;
+  };
 
   const availabilityInfoNonMerged = answers.flatMap((answer: any) => {
     return answer.dates.map((date: number) => {
@@ -46,6 +70,12 @@ export default function AnswerMeeting(props: any) {
     {}
   );
 
+  // Mobile answering mode
+  const toggleAnsweringMode = () => {
+    setMobileAnsweringMode(!mobileAnsweringMode);
+  };
+
+  // Answering functionallity
   const dates = props.dates;
   const days = dates.map((date: string) => new Date(date));
 
@@ -77,6 +107,7 @@ export default function AnswerMeeting(props: any) {
     }
   };
 
+  // Table rendering
   const convertDatetimeToDate = (datetime: number) => {
     const date = new Date(datetime);
     const convertedDate =
@@ -112,40 +143,52 @@ export default function AnswerMeeting(props: any) {
           }
 
           timeRow.push(
-            <td
-              key={dateTime}
-              data-date={dateTime}
-              date-votes={
-                availabilityInfo[dateTime]
-                  ? availabilityInfo[dateTime].length
-                  : 0
-              }
-              onMouseDown={() => toggleTimecell(dateTime)}
-              onMouseUp={() => setIsMouseDown(false)}
-              onMouseOver={() => {
-                handleMouseOver(dateTime);
-                setLookedUpDatetime(dateTime);
-                convertDatetimeToDate(dateTime);
-              }}
-              className={`rounded-lg h-6 w-12 transition-colors ${
-                isAnswered(dateTime)
-                  ? `${
-                      selectedTimecells.includes(dateTime)
-                        ? "bg-primary selected"
-                        : `${
-                            availabilityInfo[dateTime].length ==
-                            highestAvailableCount
-                              ? "bg-gold answered hover:bg-primary-hover active:bg-primary-active"
-                              : "bg-green answered hover:bg-primary-hover active:bg-primary-active"
-                          }`
-                    }`
-                  : `${
-                      selectedTimecells.includes(dateTime)
-                        ? "bg-primary selected hover:bg-primary-hover active:bg-primary-active"
-                        : "border border-gray hover:border-none hover:bg-primary-hover active:bg-primary-active"
-                    }`
-              }`}
-            ></td>
+            <td key={dateTime}>
+              <div
+                data-date={dateTime}
+                date-votes={
+                  availabilityInfo[dateTime]
+                    ? availabilityInfo[dateTime].length
+                    : 0
+                }
+                onMouseDown={() => {
+                  if ((isMobile() && mobileAnsweringMode) || !isMobile()) {
+                    toggleTimecell(dateTime);
+                  } else if (isMobile() && !mobileAnsweringMode) {
+                    setLookedUpDatetime(dateTime);
+                  }
+                }}
+                onMouseUp={() => {
+                  if ((isMobile() && mobileAnsweringMode) || !isMobile())
+                    setIsMouseDown(false);
+                }}
+                onMouseOver={() => {
+                  if (!isMobile()) {
+                    handleMouseOver(dateTime);
+                    setLookedUpDatetime(dateTime);
+                    convertDatetimeToDate(dateTime);
+                  }
+                }}
+                className={`rounded-lg h-12 w-24 lg:h-6 lg:w-12 transition-colors  ${
+                  isAnswered(dateTime)
+                    ? `${
+                        selectedTimecells.includes(dateTime)
+                          ? "bg-primary selected"
+                          : `${
+                              availabilityInfo[dateTime].length ==
+                              highestAvailableCount
+                                ? "bg-gold answered hover:bg-primary-hover active:bg-primary-active"
+                                : "bg-green answered hover:bg-primary-hover active:bg-primary-active"
+                            }`
+                      }`
+                    : `${
+                        selectedTimecells.includes(dateTime)
+                          ? "bg-primary selected hover:bg-primary-hover active:bg-primary-active"
+                          : "border border-gray hover:border-none hover:bg-primary-hover active:bg-primary-active"
+                      }`
+                }`}
+              ></div>
+            </td>
           );
         }
         if (h == 0) {
@@ -153,7 +196,7 @@ export default function AnswerMeeting(props: any) {
             <tr key={i + "00"} className="cursor-pointer">
               <th
                 rowSpan={2}
-                className="text-right text-dark align-top bg-light sticky left-0"
+                className="text-right text-dark align-top bg-light sticky left-0 pr-2"
               >
                 {i.toString().padStart(2, "0")}:00
               </th>
@@ -181,7 +224,7 @@ export default function AnswerMeeting(props: any) {
 
   const renderDaysHeadings = () => {
     return days.map((day: Date) => (
-      <th key={day.getDate()}>
+      <th key={day.getDate()} className="bg-light sticky top-0 z-10">
         <p className="text-sm text-dark font-medium">
           {day.getDate().toString().padStart(2, "0") +
             "." +
@@ -266,6 +309,7 @@ export default function AnswerMeeting(props: any) {
     } else setAvailableCount(0);
   });
 
+  // Forms
   const formSchema = yup.object().shape({
     name: yup.string().required("Twoje imie jest wymagane."),
   });
@@ -283,51 +327,71 @@ export default function AnswerMeeting(props: any) {
   });
 
   return (
-    <main className="flex flex-col w-[800px]">
+    <main className="flex flex-col p-5 lg:p-10 h-screen w-full lg:w-[800px] mt-20 lg:m-0">
       <Title text={meetName} />
-      <div className="flex">
-        <section className="availability__info w-1/2 mr-10">
-          <p>
-            {lookedUpDate} {lookedUpTime}
-          </p>
-          {lookedUpDate ? (
-            <Heading text={`${availableCount}/${answersCount}`} />
-          ) : (
-            ""
-          )}
+      <div className="flex items-center flex-col-reverse lg:flex-row">
+        {!mobileAnsweringMode && (
+          <section className="availability__info w-full lg:w-1/2 lg:mr-10">
+            <p>
+              {lookedUpDate} {lookedUpTime}
+            </p>
+            {lookedUpDate ? (
+              <Heading text={`${availableCount}/${answersCount}`} />
+            ) : (
+              ""
+            )}
 
-          <ul>{renderAvailabilityInfo()}</ul>
-        </section>
-        <section className="time__selection w-1/2">
+            <ul>{renderAvailabilityInfo()}</ul>
+          </section>
+        )}
+
+        <section className="time__selection lg:w-1/2">
+          <div className="flex items-center justify-center">
+            <span className="text-2xl">✅</span>
+            <SwitchButton
+              isAnsweringMode={mobileAnsweringMode}
+              toggleAnsweringMode={toggleAnsweringMode}
+            />
+            <span className="text-2xl">📅</span>
+          </div>
           <form
             className="flex flex-col justify-center items-center"
             onSubmit={handleSubmit(sendAnswer)}
           >
-            <Input
-              label="Twoje imie"
-              type="text"
-              id="name"
-              register={register}
-              error={errors.name ? true : false}
-              errorText={errors.name?.message?.toString()}
-              onChange={(e: {
-                target: { value: React.SetStateAction<string> };
-              }) => setUsername(e.target.value)}
-              placeholder="Twoje imie"
-            />
-            {/* https://stackoverflow.com/questions/74158422/thead-background-color-without-border */}
-            <div className="overflow-auto h-full max-h-[500px] w-full max-w-[500px] mt-5">
-              <table className="time__seclection--table w-fit mt-5 border-separate self-center overflow-auto">
-                <thead className="sticky bg-light top-0 z-10">
-                  <tr>
-                    <th></th>
-                    {renderDaysHeadings()}
-                  </tr>
-                </thead>
-                <tbody>{renderTimeCells()}</tbody>
-              </table>
+            <div className="flex flex-col-reverse lg:flex-col items-center lg:items-start">
+              {((mobileAnsweringMode && isMobile()) || !isMobile()) && (
+                <Input
+                  label="Twoje imie"
+                  type="text"
+                  id="name"
+                  register={register}
+                  error={errors.name ? true : false}
+                  errorText={errors.name?.message?.toString()}
+                  onChange={(e: {
+                    target: { value: React.SetStateAction<string> };
+                  }) => setUsername(e.target.value)}
+                  placeholder="Twoje imie"
+                />
+              )}
+              <div
+                className={`overflow-auto h-full max-h-[400px] lg:max-h-[500px] w-full max-w-[360px] lg:max-w-[500px] mt-5 ${
+                  isMobile() && "mb-5"
+                }`}
+              >
+                <table className="time__seclection--table w-fit lg:mt-5 self-center overflow-auto select-none">
+                  <thead>
+                    <tr>
+                      <th className="bg-light sticky top-0 left-0 z-20"></th>
+                      {renderDaysHeadings()}
+                    </tr>
+                  </thead>
+                  <tbody>{renderTimeCells()}</tbody>
+                </table>
+              </div>
             </div>
-            <Button text="Wyślij" />
+            {((mobileAnsweringMode && isMobile()) || !isMobile()) && (
+              <Button text="Wyślij" />
+            )}
           </form>
         </section>
       </div>

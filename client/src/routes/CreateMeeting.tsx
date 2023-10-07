@@ -253,7 +253,7 @@ export default function CreateMeeting() {
   } = useForm({ resolver: yupResolver(formSchema) });
 
   return (
-    <main className="flex flex-col px-5 py-10 md:p-10 mt-10 lg:m-0 justify-center">
+    <main className="flex flex-col px-5 py-10 md:p-10 mt-20 lg:m-0 justify-center">
       <Title text="Utwórz nowe spotkanie" />
       <form
         id="create-meeting-form"

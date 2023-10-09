@@ -327,9 +327,9 @@ export default function AnswerMeeting(props: any) {
   });
 
   return (
-    <main className="flex flex-col p-5 lg:p-10 h-screen w-full lg:w-[800px] mt-20 lg:m-0">
+    <main className="flex flex-col p-5 pt-20 lg:p-10 h-screen w-full lg:w-[800px] overflow-hidden">
       <Title text={meetName} />
-      <div className="flex items-center flex-col-reverse lg:flex-row">
+      <div className="flex flex-1 items-center flex-col-reverse lg:flex-row">
         {!mobileAnsweringMode && (
           <section className="availability__info w-full lg:w-1/2 lg:mr-10">
             <p>
@@ -345,7 +345,7 @@ export default function AnswerMeeting(props: any) {
           </section>
         )}
 
-        <section className="time__selection lg:w-1/2">
+        <section className="flex flex-col h-full time__selection lg:w-1/2">
           <div className="flex items-center justify-center">
             <span className="text-2xl">✅</span>
             <SwitchButton
@@ -355,30 +355,32 @@ export default function AnswerMeeting(props: any) {
             <span className="text-2xl">📅</span>
           </div>
           <form
-            className="flex flex-col justify-center items-center"
+            className="flex flex-1 flex-col justify-center items-center"
             onSubmit={handleSubmit(sendAnswer)}
           >
-            <div className="flex flex-col-reverse lg:flex-col items-center lg:items-start">
+            <div className="flex flex-auto flex-col-reverse place-content-start lg:flex-col items-center lg:items-start">
               {((mobileAnsweringMode && isMobile()) || !isMobile()) && (
-                <Input
-                  label="Twoje imie"
-                  type="text"
-                  id="name"
-                  register={register}
-                  error={errors.name ? true : false}
-                  errorText={errors.name?.message?.toString()}
-                  onChange={(e: {
-                    target: { value: React.SetStateAction<string> };
-                  }) => setUsername(e.target.value)}
-                  placeholder="Twoje imie"
-                />
+                <div className="">
+                  <Input
+                    label="Twoje imie"
+                    type="text"
+                    id="name"
+                    register={register}
+                    error={errors.name ? true : false}
+                    errorText={errors.name?.message?.toString()}
+                    onChange={(e: {
+                      target: { value: React.SetStateAction<string> };
+                    }) => setUsername(e.target.value)}
+                    placeholder="Twoje imie"
+                  />
+                </div>
               )}
               <div
-                className={`overflow-auto h-full max-h-[400px] lg:max-h-[500px] w-full max-w-[360px] lg:max-w-[500px] mt-5 ${
+                className={`overflow-auto h-[250px] h-smd:h-[300px] h-md:h-[350px] h-mdl:h-[400px] h-hd:g-[450px] lg:max-h-[500px] w-full max-w-[360px] lg:max-w-[500px] mt-5 ${
                   isMobile() && "mb-5"
                 }`}
               >
-                <table className="time__seclection--table w-fit lg:mt-5 self-center overflow-auto select-none">
+                <table className="time__seclection--table w-fit lg:mt-5 self-center select-none">
                   <thead>
                     <tr>
                       <th className="bg-light sticky top-0 left-0 z-20"></th>

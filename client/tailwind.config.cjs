@@ -19,6 +19,14 @@ module.exports = {
         green: "#38B453",
         gold: "#FFC107",
       },
+      screens: {
+        "h-sm": { raw: "(min-height: 640px)" },
+        "h-smd": { raw: "(min-height: 700px)" },
+        "h-md": { raw: "(min-height: 768px)" },
+        "h-mdl": { raw: "(min-height: 800px)" },
+        "h-hd": { raw: "(min-height: 840px)" },
+        "h-lg": { raw: "(min-height: 1024px)" },
+      },
     },
     fontFamily: {
       poppins: ["Poppins", "sans-serif"],

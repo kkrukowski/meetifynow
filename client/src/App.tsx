@@ -11,7 +11,7 @@ import HomePage from "./routes/HomePage";
 export default function App() {
   return (
     <Routes>
-      <Route exact path="/" element={<HomePage />} />
+      <Route path="/" element={<HomePage />} />
       <Route path="/meet/:id" element={<RenderAnswerMeeting />} />
       <Route path="/meet/new" element={<CreateMeeting />} />
       <Route path="*" element={<div>404</div>} />

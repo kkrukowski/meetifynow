@@ -13,8 +13,13 @@ const compression = require("compression");
 mongoose.connect(process.env.DB_CONN_URI).catch((err: any) => console.log(err));
 
 // App
+const corsOptions = {
+  origin: process.env.CLIENT_URL,
+  credentials: true,
+};
+
 app.use(express.json());
-app.use(cors({ credentials: true }));
+app.use(cors(corsOptions));
 app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());

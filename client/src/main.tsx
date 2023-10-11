@@ -6,8 +6,8 @@ import Navbar from "./components/Navbar";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <HashRouter basename="/">
+  <BrowserRouter>
     <Navbar />
     <App />
-  </HashRouter>
+  </BrowserRouter>
 );

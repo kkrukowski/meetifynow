@@ -9,6 +9,7 @@ type Props = {
   options?: any;
   errorText?: string | undefined | null;
   error?: boolean;
+  value?: string;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
@@ -22,6 +23,7 @@ export const Input = ({
   error,
   errorText,
   onChange,
+  value,
 }: Props) => {
   return (
     <div className="flex flex-col w-[300px] gap-2">
@@ -40,6 +42,7 @@ export const Input = ({
         }
         placeholder={placeholder}
         onChange={onChange}
+        value={value}
       />
       <p className="text-sm relative -top-1 text-red font-medium">
         {errorText}

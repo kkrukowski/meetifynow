@@ -22,6 +22,10 @@ export default function AnswerMeeting(props: any) {
   const [availableCount, setAvailableCount] = useState(0);
   const [answers, setAnswers] = useState<any>(props.answers);
   const [meetName, setMeetName] = useState(props.meetName);
+  const meetTime = {
+    from: new Date("1970-01-01T" + props.startTime).getHours(),
+    to: new Date("1970-01-01T" + props.endTime).getHours(),
+  };
   const answeredUsernames = answers.map((answer: any) => answer.username);
   const answersCount = props.answers.length;
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);
@@ -46,7 +50,7 @@ export default function AnswerMeeting(props: any) {
   }, []);
 
   const isMobile = () => {
-    return windowSize[0] < 1280;
+    return windowSize[0] < 1024;
   };
 
   const availabilityInfoNonMerged = answers.flatMap((answer: any) => {
@@ -125,11 +129,10 @@ export default function AnswerMeeting(props: any) {
   };
 
   const renderTimeCells = () => {
-    const time = { from: 8, to: 18 };
     var timeCells: any = [];
     var hoursData = [];
 
-    for (let i = time.from; i <= time.to; i++) {
+    for (let i = meetTime.from; i <= meetTime.to; i++) {
       for (let h = 0; h < 2; h++) {
         let timeRow = [];
         for (let j = 0; j < days.length; j++) {
@@ -156,6 +159,7 @@ export default function AnswerMeeting(props: any) {
                     toggleTimecell(dateTime);
                   } else if (isMobile() && !mobileAnsweringMode) {
                     setLookedUpDatetime(dateTime);
+                    convertDatetimeToDate(dateTime);
                   }
                 }}
                 onMouseUp={() => {
@@ -297,6 +301,9 @@ export default function AnswerMeeting(props: any) {
         return listOfUsernames;
       }
     } else {
+      if (isMobile()) {
+        return <li>Kliknij na godzinę, aby zobaczyć dostępność</li>;
+      }
       return <li>Najedź na godzinę, aby zobaczyć dostępność</li>;
     }
   };
@@ -327,10 +334,10 @@ export default function AnswerMeeting(props: any) {
   });
 
   return (
-    <main className="flex flex-col p-5 pt-20 lg:p-10 h-screen w-full lg:w-[800px] overflow-hidden">
+    <main className="flex flex-col lg:justify-center p-5 pt-20 lg:p-10 h-screen w-full lg:w-[800px] overflow-hidden">
       <Title text={meetName} />
-      <div className="flex flex-1 items-center flex-col-reverse lg:flex-row">
-        {!mobileAnsweringMode && (
+      <div className="flex flex-1 lg:flex-none justify-end items-center lg:items-start flex-col-reverse lg:justify-start lg:flex-row">
+        {((!mobileAnsweringMode && isMobile()) || !isMobile()) && (
           <section className="availability__info w-full lg:w-1/2 lg:mr-10">
             <p>
               {lookedUpDate} {lookedUpTime}
@@ -341,26 +348,31 @@ export default function AnswerMeeting(props: any) {
               ""
             )}
 
-            <ul>{renderAvailabilityInfo()}</ul>
+            <ul className="overflow-auto max-h-[100px] h-hd:max-h-[300px]">
+              {renderAvailabilityInfo()}
+            </ul>
           </section>
         )}
 
-        <section className="flex flex-col h-full time__selection lg:w-1/2">
-          <div className="flex items-center justify-center">
-            <span className="text-2xl">✅</span>
-            <SwitchButton
-              isAnsweringMode={mobileAnsweringMode}
-              toggleAnsweringMode={toggleAnsweringMode}
-            />
-            <span className="text-2xl">📅</span>
-          </div>
+        <section className="flex flex-col time__selection lg:w-1/2">
+          {isMobile() && (
+            <div className="flex items-center justify-center">
+              <span className="text-2xl">✅</span>
+              <SwitchButton
+                isAnsweringMode={mobileAnsweringMode}
+                toggleAnsweringMode={toggleAnsweringMode}
+              />
+              <span className="text-2xl">📅</span>
+            </div>
+          )}
+
           <form
-            className="flex flex-1 flex-col justify-center items-center"
+            className="flex flex-1 flex-col place-content-start items-center"
             onSubmit={handleSubmit(sendAnswer)}
           >
-            <div className="flex flex-auto flex-col-reverse place-content-start lg:flex-col items-center lg:items-start">
+            <div className="flex flex-col-reverse lg:flex-col items-center lg:items-start">
               {((mobileAnsweringMode && isMobile()) || !isMobile()) && (
-                <div className="">
+                <div>
                   <Input
                     label="Twoje imie"
                     type="text"
@@ -371,12 +383,13 @@ export default function AnswerMeeting(props: any) {
                     onChange={(e: {
                       target: { value: React.SetStateAction<string> };
                     }) => setUsername(e.target.value)}
+                    value={username}
                     placeholder="Twoje imie"
                   />
                 </div>
               )}
               <div
-                className={`overflow-auto h-[250px] h-smd:h-[300px] h-md:h-[350px] h-mdl:h-[400px] h-hd:g-[450px] lg:max-h-[500px] w-full max-w-[360px] lg:max-w-[500px] mt-5 ${
+                className={`overflow-auto max-h-[250px] h-smd:max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[500px] w-full max-w-[360px] md:max-w-[700px] lg:max-w-[500px] mt-5 ${
                   isMobile() && "mb-5"
                 }`}
               >

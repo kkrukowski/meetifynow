@@ -30,6 +30,8 @@ export default function AnswerMeeting(props: any) {
   const answersCount = props.answers.length;
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);
   const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
+  console.log("XD");
+  console.log(import.meta.env.SERVER_URL);
 
   // Get window size info
   const [windowSize, setWindowSize] = useState([
@@ -248,7 +250,7 @@ export default function AnswerMeeting(props: any) {
     if (username.length > 0) {
       axios
         .post(
-          import.meta.env.SERVER_URL + `/meet/${props.appointmentId}`,
+          import.meta.env.VITE_SERVER_URL + `/meet/${props.appointmentId}`,
           {
             username: username,
             dates: selectedTimecells,
@@ -258,7 +260,7 @@ export default function AnswerMeeting(props: any) {
           clearFormData();
           axios
             .get(
-              import.meta.env.SERVER_URL + `/meet/${props.appointmentId}`
+              import.meta.env.VITE_SERVER_URL + `/meet/${props.appointmentId}`
             )
             .then((res) => {
               if (res.status === 200) {

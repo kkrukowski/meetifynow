@@ -178,7 +178,7 @@ export default function CreateMeeting() {
     validateDate();
     if (validateTime() && validateDate()) {
       axios
-        .post(import.meta.env.SERVER_URL + "/meet/new", {
+        .post(process.env.VITE_SERVER_URL + "/meet/new", {
           meetName: meetingName,
           dates: selectedDates,
           startTime: startTime,

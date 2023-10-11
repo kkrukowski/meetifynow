@@ -27,7 +27,7 @@ function RenderAnswerMeeting() {
 
   useEffect(() => {
     axios
-      .get(import.meta.env.SERVER_URL + `/meet/${id}`)
+      .get(import.meta.env.VITE_SERVER_URL + `/meet/${id}`)
       .then((res) => {
         if (res.status === 200) {
           setMeetingData(res.data);

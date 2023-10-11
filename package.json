@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "main": "server/src/index.ts",
   "scripts": {
-    "watch": "tsc -w",
     "install-server": "cd server && npm install",
     "server": "nodemon --watch ./**/*.ts --exec ts-node ./server/server.ts",
     "install-client": "cd client && npm install",

@@ -1,11 +1,17 @@
-import React from "react";
-import ReactDOM from "react-dom/client";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import Navbar from "./components/Navbar";
-import "./index.css";
 import axios from "axios";
-import { useEffect, useState } from "react";
-import { Route, Routes, useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import ReactDOM from "react-dom/client";
+import {
+  Route,
+  RouterProvider,
+  createBrowserRouter,
+  createRoutesFromElements,
+  useParams,
+} from "react-router-dom";
+import "./index.css";
+
+// Layout
+import RootLayout from "./layouts/RootLayout";
 
 // Views
 import AnswerMeeting from "./routes/AnswerMeeting";
@@ -14,18 +20,22 @@ import CreateMeeting from "./routes/CreateMeeting";
 import HomePage from "./routes/HomePage";
 import NotFound from "./routes/NotFound";
 
-const router = createBrowserRouter([{
-  path: "/", element: <HomePage />, errorElement: <NotFound />, children: [{
-    path: "meet/:id", element: <CreateMeeting />
-  }, {
-    path: "meet", element: <CreateMeeting />
-  }
-]
-}]);
-
+const router = createBrowserRouter(
+  createRoutesFromElements(
+    <Route path="/" element={<RootLayout />}>
+      <Route index element={<HomePage />} />
+      <Route path="meet">
+        <Route path="new" element={<CreateMeeting />} />
+        <Route path=":id" element={<RenderAnswerMeeting />} />
+      </Route>
+    </Route>
+  )
+);
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <RouterProvider router={router}/>
+  <React.StrictMode>
+    <RouterProvider router={router} />
+  </React.StrictMode>
 );
 
 function RenderAnswerMeeting() {

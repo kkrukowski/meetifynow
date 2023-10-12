@@ -6,7 +6,7 @@ import Navbar from "./components/Navbar";
 import "./index.css";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-  <BrowserRouter>
+  <BrowserRouter basename="/">
     <Navbar />
     <App />
   </BrowserRouter>

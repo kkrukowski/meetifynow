@@ -1,5 +1,6 @@
 {
   "name": "vite-mern-template",
+  "homepage": "https://time2meet.onrender.com/",
   "version": "1.0.0",
   "type": "module",
   "repository": "https://github.com/apicgg/vite-mern-template.git",

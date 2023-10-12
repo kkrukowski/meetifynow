@@ -2,6 +2,7 @@
   "name": "vite-mern-template",
   "version": "1.0.0",
   "main": "server/src/index.ts",
+  "homepage": "https://time2meet.onrender.com/",
   "scripts": {
     "install-server": "cd server && npm install",
     "server": "nodemon --watch ./**/*.ts --exec ts-node ./server/server.ts",
@@ -41,6 +42,6 @@
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.1",
     "tslib": "^2.6.1",
-    "typescript": "^5.1.6"
+    "typescript": "^5.2.2"
   }
 }

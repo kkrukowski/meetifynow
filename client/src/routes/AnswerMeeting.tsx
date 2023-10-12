@@ -389,7 +389,7 @@ export default function AnswerMeeting(props: any) {
                 </div>
               )}
               <div
-                className={`overflow-auto max-h-[250px] h-smd:max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[500px] w-full max-w-[360px] md:max-w-[700px] lg:max-w-[500px] mt-5 ${
+                className={`overflow-auto max-h-[250px] h-smd:max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[500px] w-full max-w-[360px] md:max-w-[700px] lg:max-w-[350px] mt-5 ${
                   isMobile() && "mb-5"
                 }`}
               >

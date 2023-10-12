@@ -178,7 +178,7 @@ export default function CreateMeeting() {
     validateDate();
     if (validateTime() && validateDate()) {
       axios
-        .post(process.env.VITE_SERVER_URL + "/meet/new", {
+        .post(import.meta.env.VITE_SERVER_URL + "/meet/new", {
           meetName: meetingName,
           dates: selectedDates,
           startTime: startTime,
@@ -273,7 +273,7 @@ export default function CreateMeeting() {
           <div className="flex flex-col lg:flex-row items-center">
             <div>
               <table
-                className={`date__selection--table border border-2 border-separate border-spacing-0.5 box-content p-2 ${
+                className={`date__selection--table border border-2 border-separate border-spacing-0.5 box-content p-2 select-none ${
                   dateError ? "rounded-lg border-red" : "border-transparent"
                 }`}
               >

@@ -1,5 +1,6 @@
 const express = require("express");
 const app = express();
+const PORT = process.env.PORT || 5000;
 
 const mongoose = require("mongoose");
 require("dotenv").config();
@@ -10,7 +11,7 @@ const cookieParser = require("cookie-parser");
 const compression = require("compression");
 
 // Database
-mongoose.connect(process.env.DB_CONN_URI).catch((err: any) => console.log(err));
+mongoose.connect(process.env.DB_CONN_URI);
 
 // App
 const corsOptions = {
@@ -28,4 +29,6 @@ app.use(bodyParser.json());
 const appointments = require("./routes/appointments");
 app.use("/meet/", appointments);
 
-export default app;
+app.listen(PORT, () => {
+  console.log("Server Listening on PORT:", PORT);
+});

@@ -185,7 +185,6 @@ export default function CreateMeeting() {
           endTime: endTime,
         })
         .then(function (response) {
-          console.log(response);
           const meetId = response.data.newMeet.appointmentId;
           const meetUrl = `/meet/${meetId}`;
           navigate(meetUrl);
@@ -216,11 +215,6 @@ export default function CreateMeeting() {
     const startTimeConverted = new Date(nowDate + "T" + startTime);
     const endTimeConverted = new Date(nowDate + "T" + endTime);
 
-    console.log(
-      startTimeConverted,
-      endTimeConverted,
-      startTimeConverted >= endTimeConverted
-    );
     if (startTimeConverted >= endTimeConverted) {
       setTimeError(true);
       setTimeErrorText(

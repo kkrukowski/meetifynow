@@ -30,8 +30,6 @@ export default function AnswerMeeting(props: any) {
   const answersCount = props.answers.length;
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);
   const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
-  console.log("XD");
-  console.log(import.meta.env.SERVER_URL);
 
   // Get window size info
   const [windowSize, setWindowSize] = useState([

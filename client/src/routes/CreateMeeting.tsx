@@ -233,7 +233,8 @@ export default function CreateMeeting() {
     meeting__name: yup
       .string()
       .required("Nazwa spotkania jest wymagana.")
-      .min(4, "Nazwa spotkania musi mieć co najmniej 4 znaki."),
+      .min(4, "Nazwa spotkania musi mieć co najmniej 4 znaki.")
+      .max(50, "Nazwa spotkania może mieć maksymalnie 50 znaków."),
   });
 
   type Inputs = {

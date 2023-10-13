@@ -1,4 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import moment from "moment";
 import { set } from "mongoose";
 import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -88,26 +89,33 @@ export default function CreateMeeting() {
     for (let i = 0; i < weeksInMonth; i++) {
       let tableCells = [];
       for (let j = 0; j < 7; j++) {
-        const date = new Date(year, month, day);
+        // const date = new Date(year, month, day).getTime();
+        const date = moment
+          .utc()
+          .date(day)
+          .month(month)
+          .year(year)
+          .startOf("day")
+          .valueOf();
         if (day <= daysInMonth && (i > 0 || j >= firstDay - 1)) {
           tableCells.push(
             <td
               key={"d" + day}
-              data-date={+date}
-              onMouseDown={() => toggleTimecell(+date)}
+              data-date={date}
+              onMouseDown={() => toggleTimecell(date)}
               onMouseUp={() => setIsMouseDown(false)}
-              onMouseOver={() => handleMouseOver(+date)}
+              onMouseOver={() => handleMouseOver(date)}
               className={`h-10 w-10 font-medium text-center cursor-pointer ${
-                selectedDates.includes(+date)
+                selectedDates.includes(date)
                   ? `${
-                      dateNow.getDay() + 1 == day &&
+                      dateNow.getDate() == day &&
                       dateNow.getMonth() == month &&
                       dateNow.getFullYear() == year
                         ? "border border-2 border-dark bg-primary text-light rounded-lg selected"
                         : "bg-primary rounded-lg text-light selected"
                     }`
                   : `${
-                      dateNow.getDay() + 1 == day &&
+                      dateNow.getDate() == day &&
                       dateNow.getMonth() == month &&
                       dateNow.getFullYear() == year
                         ? "border border-2 border-primary rounded-lg"

@@ -7,14 +7,14 @@
 <div align="center" dir="auto">
 <p dir="auto">
 <strong>
-<a href="">Incomming..</a>
+<a href="https://time2meet.onrender.com/">Website</a>
 </strong>
 </p>
 </div>
 
 ## ⌚ Time spent
 
-Total time in this project - 30h
+Total time in programming this project - 45h
 
 
 ## 👨‍💻 Technologies

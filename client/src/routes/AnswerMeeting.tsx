@@ -1,5 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
+import moment from "moment-timezone";
 import React, { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
@@ -30,6 +31,7 @@ export default function AnswerMeeting(props: any) {
   const answersCount = answers.length;
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);
   const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
+  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   // Get window size info
   const [windowSize, setWindowSize] = useState([
@@ -81,7 +83,7 @@ export default function AnswerMeeting(props: any) {
 
   // Answering functionallity
   const dates = props.dates;
-  const days = dates.map((date: string) => new Date(date));
+  const days = dates.map((date: string) => moment.utc(date));
 
   const toggleTimecell = (dateTime: number) => {
     if (selectedTimecells.includes(dateTime)) {
@@ -113,17 +115,17 @@ export default function AnswerMeeting(props: any) {
 
   // Table rendering
   const convertDatetimeToDate = (datetime: number) => {
-    const date = new Date(datetime);
+    const date = moment.utc(datetime);
     const convertedDate =
-      date.getDate().toString().padStart(2, "0") +
+      date.date().toString().padStart(2, "0") +
       "." +
-      (date.getMonth() + 1).toString().padStart(2, "0") +
+      (date.month() + 1).toString().padStart(2, "0") +
       " " +
-      daysNaming[date.getDay()];
+      daysNaming[date.day()];
     const convertedTime =
-      date.getHours().toString().padStart(2, "0") +
+      date.hour().toString().padStart(2, "0") +
       ":" +
-      date.getMinutes().toString().padStart(2, "0");
+      date.minute().toString().padStart(2, "0");
     setLookedUpDate(convertedDate);
     setLookedUpTime(convertedTime);
   };
@@ -135,8 +137,13 @@ export default function AnswerMeeting(props: any) {
       for (let h = 0; h < 2; h++) {
         let timeRow = [];
         for (let j = 0; j < days.length; j++) {
-          const dateTime = days[j].setHours(i, h == 0 ? 0 : 30, 0, 0);
-          const isEndOfWeek = new Date(dateTime).getDay() == 0;
+          const dateTime = days[j]
+            .hour(i)
+            .minute(h == 0 ? 0 : 30)
+            .valueOf();
+
+          console.log(dateTime);
+          const isEndOfWeek = moment.utc(dateTime).day() == 0;
 
           if (
             availabilityInfo[dateTime] &&
@@ -241,15 +248,17 @@ export default function AnswerMeeting(props: any) {
   const renderDaysHeadings = () => {
     return days.map((day: Date) => (
       <th
-        key={day.getDate()}
-        className={`bg-light sticky top-0 z-10 ${day.getDay() == 0 && "pr-4"}`}
+        key={moment.utc(day).date()}
+        className={`bg-light sticky top-0 z-10 ${
+          moment.utc(day).day() == 0 && "pr-4"
+        }`}
       >
         <p className="text-sm text-dark font-medium">
-          {day.getDate().toString().padStart(2, "0") +
+          {moment.utc(day).date().toString().padStart(2, "0") +
             "." +
-            (day.getMonth() + 1).toString().padStart(2, "0")}
+            (moment.utc(day).month() + 1).toString().padStart(2, "0")}
         </p>
-        <p className="text-dark">{daysNaming[day.getDay()]}</p>
+        <p className="text-dark">{daysNaming[moment.utc(day).day()]}</p>
       </th>
     ));
   };

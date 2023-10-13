@@ -5,7 +5,7 @@
   "homepage": "https://time2meet.onrender.com/",
   "scripts": {
     "install-server": "cd server && npm install",
-    "server": "nodemon --watch ./**/*.ts --exec ts-node ./server/server.ts",
+    "server": "nodemon --watch ./**/*.ts --exec ts-node ./server/app.ts",
     "install-client": "cd client && npm install",
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "test": "jest --watch --verbose"

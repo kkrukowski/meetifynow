@@ -16,7 +16,7 @@ module.exports = {
         gray: "#8e8e8e",
         dark: "#00263b",
         red: "#FF6B73",
-        green: "#38B453",
+        green: "#43cc61",
         gold: "#FFC107",
       },
       screens: {
@@ -26,6 +26,15 @@ module.exports = {
         "h-mdl": { raw: "(min-height: 800px)" },
         "h-hd": { raw: "(min-height: 840px)" },
         "h-lg": { raw: "(min-height: 1024px)" },
+      },
+      keyframes: {
+        "cell-select": {
+          "0%, 100%": { backgroundColor: "none" },
+          "50%": { backgroundColor: "#0086C0" },
+        },
+      },
+      animation: {
+        "cell-select": "cell-select 500ms ease-in-out",
       },
     },
     fontFamily: {

@@ -130,13 +130,13 @@ export default function AnswerMeeting(props: any) {
 
   const renderTimeCells = () => {
     var timeCells: any = [];
-    var hoursData = [];
 
     for (let i = meetTime.from; i <= meetTime.to; i++) {
       for (let h = 0; h < 2; h++) {
         let timeRow = [];
         for (let j = 0; j < days.length; j++) {
           const dateTime = days[j].setHours(i, h == 0 ? 0 : 30, 0, 0);
+          const isEndOfWeek = new Date(dateTime).getDay() == 0;
 
           if (
             availabilityInfo[dateTime] &&
@@ -173,22 +173,32 @@ export default function AnswerMeeting(props: any) {
                     convertDatetimeToDate(dateTime);
                   }
                 }}
-                className={`rounded-lg h-12 w-24 lg:h-6 lg:w-12 transition-colors  ${
+                className={`rounded-lg h-12 w-24 lg:h-6 lg:w-12 transition-colors ${
+                  isEndOfWeek && "mr-4"
+                } ${
                   isAnswered(dateTime)
                     ? `${
                         selectedTimecells.includes(dateTime)
                           ? "bg-primary selected"
-                          : `${
+                          : `answered  ${
+                              !isMobile() &&
+                              "active:animate-cell-select hover:bg-primary-hover"
+                            } ${
                               availabilityInfo[dateTime].length ==
                               highestAvailableCount
-                                ? "bg-gold answered hover:bg-primary-hover active:bg-primary-active"
-                                : "bg-green answered hover:bg-primary-hover active:bg-primary-active"
+                                ? "bg-gold"
+                                : "bg-green"
                             }`
                       }`
-                    : `${
+                    : `selected ${
+                        !isMobile() &&
+                        "active:animate-cell-select hover:bg-primary-hover"
+                      } ${
                         selectedTimecells.includes(dateTime)
-                          ? "bg-primary selected hover:bg-primary-hover active:bg-primary-active"
-                          : "border border-gray hover:border-none hover:bg-primary-hover active:bg-primary-active"
+                          ? "bg-primary"
+                          : `border border-gray ${
+                              !isMobile() && "hover:border-none"
+                            }`
                       }`
                 }`}
               ></div>
@@ -228,7 +238,10 @@ export default function AnswerMeeting(props: any) {
 
   const renderDaysHeadings = () => {
     return days.map((day: Date) => (
-      <th key={day.getDate()} className="bg-light sticky top-0 z-10">
+      <th
+        key={day.getDate()}
+        className={`bg-light sticky top-0 z-10 ${day.getDay() == 0 && "pr-4"}`}
+      >
         <p className="text-sm text-dark font-medium">
           {day.getDate().toString().padStart(2, "0") +
             "." +

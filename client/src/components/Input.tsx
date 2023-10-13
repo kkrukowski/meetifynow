@@ -43,6 +43,7 @@ export const Input = ({
         placeholder={placeholder}
         onChange={onChange}
         value={value}
+        autoComplete="off"
       />
       <p className="text-sm relative -top-1 text-red font-medium">
         {errorText}

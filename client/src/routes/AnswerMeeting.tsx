@@ -27,7 +27,7 @@ export default function AnswerMeeting(props: any) {
     to: new Date("1970-01-01T" + props.endTime).getHours(),
   };
   const answeredUsernames = answers.map((answer: any) => answer.username);
-  const answersCount = props.answers.length;
+  const answersCount = answers.length;
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);
   const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
 
@@ -191,13 +191,15 @@ export default function AnswerMeeting(props: any) {
                             }`
                       }`
                     : `selected ${
-                        !isMobile() &&
+                        ((isMobile() && !mobileAnsweringMode) || !isMobile()) &&
                         "active:animate-cell-select hover:bg-primary-hover"
                       } ${
                         selectedTimecells.includes(dateTime)
                           ? "bg-primary"
                           : `border border-gray ${
-                              !isMobile() && "hover:border-none"
+                              ((isMobile() && !mobileAnsweringMode) ||
+                                !isMobile()) &&
+                              "hover:border-none"
                             }`
                       }`
                 }`}
@@ -331,7 +333,10 @@ export default function AnswerMeeting(props: any) {
 
   // Forms
   const formSchema = yup.object().shape({
-    name: yup.string().required("Twoje imie jest wymagane."),
+    name: yup
+      .string()
+      .required("Twoje imie jest wymagane.")
+      .max(20, "Imie może mieć maksymalnie 20 znaków."),
   });
 
   type Inputs = {

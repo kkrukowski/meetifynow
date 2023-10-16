@@ -14,7 +14,7 @@
 
 ## ⌚ Time spent
 
-Total time in programming this project - 45h
+Total time in programming this project - 50h
 
 
 ## 👨‍💻 Technologies
@@ -24,6 +24,7 @@ Project is created with:
 * TypeScript: v5.0.4
 * Tailwind: v3.3.3
 * yup: v1.3.1
+* Vitest: v0.34.6
 * Express.js: v4.18.2
 * MongoDB
 * Mongoose: v7.4.1

@@ -1,5 +1,5 @@
 import CalendarImg from "../assets/imgs/calendar.svg";
-import { Button } from "../components/Button";
+import Button from "../components/Button";
 import Title from "../components/Title";
 
 export default function HomePage() {

@@ -8,10 +8,10 @@ import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 
 // Components
-import { Button } from "../components/Button";
+import Button from "../components/Button";
 import Heading from "../components/Heading";
-import { Input } from "../components/Input";
-import { Timepicker } from "../components/Timepicker";
+import Input from "../components/Input";
+import Timepicker from "../components/Timepicker";
 import Title from "../components/Title";
 
 import axios from "axios";

@@ -3,12 +3,11 @@ import axios from "axios";
 import moment from "moment-timezone";
 import React, { useEffect, useRef, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 
-import { Button } from "../components/Button";
+import Button from "../components/Button";
 import Heading from "../components/Heading";
-import { Input } from "../components/Input";
+import Input from "../components/Input";
 import SwitchButton from "../components/SwitchButton";
 import Title from "../components/Title";
 
@@ -31,7 +30,6 @@ export default function AnswerMeeting(props: any) {
   const answersCount = answers.length;
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);
   const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
-  const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
   // Get window size info
   const [windowSize, setWindowSize] = useState([
@@ -82,7 +80,7 @@ export default function AnswerMeeting(props: any) {
   };
 
   // Answering functionallity
-  const dates = props.dates;
+  const dates = props.dates.sort();
   const days = dates.map((date: string) => moment.utc(date));
 
   const toggleTimecell = (dateTime: number) => {
@@ -142,7 +140,6 @@ export default function AnswerMeeting(props: any) {
             .minute(h == 0 ? 0 : 30)
             .valueOf();
 
-          console.log(dateTime);
           const isEndOfWeek = moment.utc(dateTime).day() == 0;
 
           if (
@@ -263,40 +260,6 @@ export default function AnswerMeeting(props: any) {
     ));
   };
 
-  function clearFormData() {
-    setUsername("");
-    setSelectedTimecells([]);
-  }
-
-  const sendAnswer: SubmitHandler<Inputs> = async () => {
-    if (username.length > 0) {
-      axios
-        .post(
-          import.meta.env.VITE_SERVER_URL + `/meet/${props.appointmentId}`,
-          {
-            username: username,
-            dates: selectedTimecells,
-          }
-        )
-        .then((res) => {
-          clearFormData();
-          axios
-            .get(
-              import.meta.env.VITE_SERVER_URL + `/meet/${props.appointmentId}`
-            )
-            .then((res) => {
-              if (res.status === 200) {
-                setAnswers(res.data.answers);
-                setMeetName(res.data.meetName);
-              }
-            });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  };
-
   const renderAvailabilityInfo = () => {
     if (lookedUpDatetime) {
       if (!availabilityInfo[lookedUpDatetime]) {
@@ -329,6 +292,40 @@ export default function AnswerMeeting(props: any) {
         return <li>Kliknij na godzinę, aby zobaczyć dostępność</li>;
       }
       return <li>Najedź na godzinę, aby zobaczyć dostępność</li>;
+    }
+  };
+
+  function clearFormData() {
+    setUsername("");
+    setSelectedTimecells([]);
+  }
+
+  const sendAnswer: SubmitHandler<Inputs> = async () => {
+    if (username.length > 0) {
+      axios
+        .post(
+          import.meta.env.VITE_SERVER_URL + `/meet/${props.appointmentId}`,
+          {
+            username: username,
+            dates: selectedTimecells,
+          }
+        )
+        .then((res) => {
+          clearFormData();
+          axios
+            .get(
+              import.meta.env.VITE_SERVER_URL + `/meet/${props.appointmentId}`
+            )
+            .then((res) => {
+              if (res.status === 200) {
+                setAnswers(res.data.answers);
+                setMeetName(res.data.meetName);
+              }
+            });
+        })
+        .catch((err) => {
+          console.log(err);
+        });
     }
   };
 

@@ -13,7 +13,7 @@ type Props = {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
-export const Input = ({
+const Input = ({
   label,
   type,
   id,
@@ -51,3 +51,5 @@ export const Input = ({
     </div>
   );
 };
+
+export default Input;

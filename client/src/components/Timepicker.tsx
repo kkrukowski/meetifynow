@@ -1,4 +1,4 @@
-export const Timepicker = (props: {
+const Timepicker = (props: {
   from: boolean;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }) => {
@@ -36,3 +36,5 @@ export const Timepicker = (props: {
     </select>
   );
 };
+
+export default Timepicker;

@@ -18,7 +18,7 @@ import AnswerMeeting from "./routes/AnswerMeeting";
 import AnswerNotFound from "./routes/AnswerNotFound";
 import CreateMeeting from "./routes/CreateMeeting";
 import HomePage from "./routes/HomePage";
-import NotFound from "./routes/NotFound";
+import LoadingAnswerMeeting from "./routes/LoadingAnswerMeeting";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -62,7 +62,7 @@ function RenderAnswerMeeting() {
   }, [id]);
 
   if (isLoading) {
-    return <p>Loading..</p>;
+    return <LoadingAnswerMeeting />;
   }
 
   if (isMeetingFound) {

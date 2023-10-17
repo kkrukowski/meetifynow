@@ -6,6 +6,7 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 
 import Button from "../components/Button";
+import CopyLinkButton from "../components/CopyLinkButton";
 import Heading from "../components/Heading";
 import Input from "../components/Input";
 import SwitchButton from "../components/SwitchButton";
@@ -363,6 +364,7 @@ export default function AnswerMeeting(props: any) {
       <div className="flex flex-1 lg:flex-none justify-end items-center lg:items-start flex-col-reverse lg:justify-start lg:flex-row">
         {((!mobileAnsweringMode && isMobile()) || !isMobile()) && (
           <section className="availability__info w-full lg:w-1/2 lg:mr-10">
+            <CopyLinkButton link="xd" />
             <p>
               {lookedUpDate} {lookedUpTime}
             </p>

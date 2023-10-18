@@ -19,7 +19,8 @@ module.exports = {
         gray: "#8e8e8e",
         dark: "#004466",
         red: "#FF6B73",
-        green: "#43cc61",
+        green: "#8eeda3",
+        "light-green": "#27b346",
         gold: "#FFC107",
       },
       screens: {

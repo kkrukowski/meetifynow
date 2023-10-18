@@ -192,7 +192,7 @@ export default function AnswerMeeting(props: any) {
                             } ${
                               availabilityInfo[dateTime].length ==
                               highestAvailableCount
-                                ? "bg-gold"
+                                ? "bg-light-green"
                                 : "bg-green"
                             }`
                       }`
@@ -287,6 +287,7 @@ export default function AnswerMeeting(props: any) {
           listOfAvailableUsernames,
           listOfUnavailableUsernames,
         ];
+
         return listOfUsernames;
       }
     } else {

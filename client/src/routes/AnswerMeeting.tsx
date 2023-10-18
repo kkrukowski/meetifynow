@@ -31,6 +31,7 @@ export default function AnswerMeeting(props: any) {
   const answersCount = answers.length;
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);
   const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
+  const currentUrl = window.location.href;
 
   // Get window size info
   const [windowSize, setWindowSize] = useState([
@@ -364,7 +365,6 @@ export default function AnswerMeeting(props: any) {
       <div className="flex flex-1 lg:flex-none justify-end items-center lg:items-start flex-col-reverse lg:justify-start lg:flex-row">
         {((!mobileAnsweringMode && isMobile()) || !isMobile()) && (
           <section className="availability__info w-full lg:w-1/2 lg:mr-10">
-            <CopyLinkButton link="xd" />
             <p>
               {lookedUpDate} {lookedUpTime}
             </p>
@@ -431,7 +431,10 @@ export default function AnswerMeeting(props: any) {
               </div>
             </div>
             {((mobileAnsweringMode && isMobile()) || !isMobile()) && (
-              <Button text="Wyślij" />
+              <div>
+                <Button text="Wyślij" />
+                <CopyLinkButton link={currentUrl} className="ml-6" />
+              </div>
             )}
           </form>
         </section>

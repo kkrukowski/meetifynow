@@ -8,15 +8,16 @@ describe("POST /new", () => {
     // should return 200 status code
     test("should save new appointment", async () => {
       const tomorrow = new Date();
-      tomorrow.setDate(tomorrow.getDate() + 1);
+      const date = tomorrow.getTime();
 
       const response = await request(app)
         .post("/meet/new")
         .send({
-          name: "Test",
-          availableDates: [tomorrow],
+          meetName: "Test",
+          dates: [tomorrow.getTime()],
+          startTime: "10:00",
+          endTime: "11:00",
         });
-      console.warn(response.body);
       expect(response.statusCode).toBe(200);
     });
   });

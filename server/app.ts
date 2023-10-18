@@ -32,3 +32,5 @@ app.use("/meet/", appointments);
 app.listen(PORT, () => {
   console.log("Server Listening on PORT:", PORT);
 });
+
+export default app;

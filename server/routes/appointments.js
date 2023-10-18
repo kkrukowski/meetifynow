@@ -29,12 +29,9 @@ router.get("/:appointmentId", async (req, res) => {
 
 // Create new appointment
 router.post("/new", async (req, res) => {
-  console.log("New appointment");
   // check if id is unique
   try {
     const { meetName, dates, startTime, endTime } = req.body;
-
-    console.log(req.body);
 
     //Validate name data
     if (!meetName) {
@@ -60,9 +57,10 @@ router.post("/new", async (req, res) => {
       endTime,
     });
     await newMeet.save();
-    res.status(200).json({ message: "New appointment added", newMeet });
+    return res.status(200).json({ message: "New appointment added", newMeet });
   } catch (err) {
-    res.status(400).json({ message: "Invalid appointment" });
+    console.warn(err);
+    return res.status(400).json({ message: "Invalid appointment" });
   }
 });
 

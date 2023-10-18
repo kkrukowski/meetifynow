@@ -2,7 +2,7 @@ const mongoose = require("mongoose");
 
 const AnswerSchema = new mongoose.Schema({
   username: { type: String, required: true },
-  dates: [Number],
+  dates: [{ type: Number, online: Boolean }],
 });
 
 const Answer = mongoose.model("Answer", AnswerSchema);

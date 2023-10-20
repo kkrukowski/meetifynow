@@ -13,7 +13,18 @@ import SwitchButton from "../components/SwitchButton";
 import Title from "../components/Title";
 
 export default function AnswerMeeting(props: any) {
-  const [selectedTimecells, setSelectedTimecells] = useState<number[]>([]);
+  const [selectedTimecells, setSelectedTimecells] = useState<MeetingDate[]>([]);
+
+  class MeetingDate {
+    meetDate: number;
+    isOnline: boolean;
+
+    constructor(meetDate: number, isOnline: boolean) {
+      this.meetDate = meetDate;
+      this.isOnline = isOnline;
+    }
+  }
+
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
   const [lookedUpDatetime, setLookedUpDatetime] = useState<number>();
@@ -34,6 +45,7 @@ export default function AnswerMeeting(props: any) {
   const currentUrl = window.location.href;
 
   // Get window size info
+  // Checking mobile mode
   const [windowSize, setWindowSize] = useState([
     window.innerWidth,
     window.innerHeight,
@@ -55,6 +67,7 @@ export default function AnswerMeeting(props: any) {
     return windowSize[0] < 1024;
   };
 
+  // Availability info
   const availabilityInfoNonMerged = answers.flatMap((answer: any) => {
     return answer.dates.map((date: number) => {
       return {
@@ -85,23 +98,67 @@ export default function AnswerMeeting(props: any) {
   const dates = props.dates.sort();
   const days = dates.map((date: string) => moment.utc(date));
 
+  const isDateSelected = (dateTime: number) => {
+    return selectedTimecells.some(
+      (meetDateInfo) => meetDateInfo.meetDate === dateTime
+    );
+  };
+
+  const getSelectedTimecell = (dateTime: number) => {
+    return selectedTimecells.find(
+      (meetDateInfo) => meetDateInfo.meetDate === dateTime
+    );
+  };
+
+  const [onlineSelectionMode, setOnlineSelectionMode] = useState(false);
+
   const toggleTimecell = (dateTime: number) => {
-    if (selectedTimecells.includes(dateTime)) {
-      if (!selectionMode) {
-        setSelectedTimecells(selectedTimecells.filter((dt) => dt !== dateTime));
-      }
-      if (!isMouseDown) {
+    if (isDateSelected(dateTime)) {
+      if (!isMouseDown && getSelectedTimecell(dateTime)?.isOnline) {
         setSelectionMode(false);
-        setSelectedTimecells(selectedTimecells.filter((dt) => dt !== dateTime));
         setIsMouseDown(true);
+        setOnlineSelectionMode(true);
+        setSelectedTimecells(
+          selectedTimecells.filter(
+            (meetDateInfo) => meetDateInfo.meetDate !== dateTime
+          )
+        );
+      } else if (!isMouseDown && !getSelectedTimecell(dateTime)?.isOnline) {
+        setOnlineSelectionMode(false);
+      }
+
+      if (
+        selectionMode &&
+        onlineSelectionMode &&
+        getSelectedTimecell(dateTime)?.isOnline
+      ) {
+        console.log("selection mode and is online");
+        setSelectedTimecells(
+          selectedTimecells.filter(
+            (meetDateInfo) => meetDateInfo.meetDate !== dateTime
+          )
+        );
+      } else if (
+        selectionMode &&
+        !onlineSelectionMode &&
+        !getSelectedTimecell(dateTime)?.isOnline
+      ) {
+        console.log("selection mode and is NOT online");
+        let updatedTimecellIndex = selectedTimecells.findIndex(
+          (meetDateInfo) => meetDateInfo.meetDate === dateTime
+        );
+        selectedTimecells[updatedTimecellIndex].isOnline = true;
       }
     } else {
+      const meetDateInfo = new MeetingDate(dateTime, false);
       if (selectionMode) {
-        setSelectedTimecells([...selectedTimecells, dateTime]);
+        console.log("selection mode");
+        setSelectedTimecells([...selectedTimecells, meetDateInfo]);
       }
       if (!isMouseDown) {
+        console.log("mouse down");
         setSelectionMode(true);
-        setSelectedTimecells([...selectedTimecells, dateTime]);
+        setSelectedTimecells([...selectedTimecells, meetDateInfo]);
         setIsMouseDown(true);
       }
     }
@@ -184,7 +241,7 @@ export default function AnswerMeeting(props: any) {
                 } ${
                   isAnswered(dateTime)
                     ? `${
-                        selectedTimecells.includes(dateTime)
+                        isDateSelected(dateTime)
                           ? "bg-primary selected"
                           : `answered  ${
                               !isMobile() &&
@@ -200,8 +257,12 @@ export default function AnswerMeeting(props: any) {
                         ((isMobile() && !mobileAnsweringMode) || !isMobile()) &&
                         "active:animate-cell-select hover:bg-primary-hover"
                       } ${
-                        selectedTimecells.includes(dateTime)
-                          ? "bg-primary"
+                        isDateSelected(dateTime)
+                          ? `${
+                              getSelectedTimecell(dateTime)?.isOnline
+                                ? "bg-gold"
+                                : "bg-primary"
+                            }`
                           : `border border-gray ${
                               ((isMobile() && !mobileAnsweringMode) ||
                                 !isMobile()) &&

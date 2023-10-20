@@ -14,7 +14,7 @@ describe("POST /new", () => {
         .post("/meet/new")
         .send({
           meetName: "Test",
-          dates: [tomorrow.getTime()],
+          dates: [date],
           startTime: "10:00",
           endTime: "11:00",
         });
@@ -57,5 +57,37 @@ describe("POST /new", () => {
         });
       expect(response.statusCode).toBe(400);
     });
+  });
+});
+
+describe("GET /meet/:id", () => {
+  test("Valid meet id", async () => {
+    const response = await request(app).get("/meet/tQAryTT");
+    expect(response.statusCode).toBe(200);
+  });
+  test("Not valid meet id", async () => {
+    const response = await request(app).get("/meet/doesntexist");
+    expect(response.statusCode).toBe(400);
+  });
+});
+
+describe("POST /meet/:id", () => {
+  test("Date data are valid", async () => {
+    const response = await request(app)
+      .post("/meet/tQAryTT")
+      .send({
+        username: "Test",
+        dates: [{ date: new Date().getTime(), online: true }],
+      });
+    expect(response.statusCode).toBe(200);
+  });
+  test("Date is not valid", async () => {
+    const response = await request(app)
+      .post("/meet/tQAryTT")
+      .send({
+        username: "Test",
+        dates: [{ date: new Date() }],
+      });
+    expect(response.statusCode).toBe(400);
   });
 });

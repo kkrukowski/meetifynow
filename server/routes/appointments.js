@@ -85,6 +85,7 @@ router.post("/:appointmentId", validateAnswerData, async (req, res) => {
     // Creating dates array
     let datesArray = [];
     dates.forEach((dateItem) => {
+      console.log(dateItem);
       const meetDate = dateItem.date;
       const isOnline = dateItem.online;
       const data = new DateData({

@@ -24,8 +24,6 @@ export default function AnswerMeeting(props: any) {
       this.isOnline = isOnline;
     }
   }
-
-  const [isMouseDown, setIsMouseDown] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
   const [lookedUpDatetime, setLookedUpDatetime] = useState<number>();
   const [lookedUpDate, setLookedUpDate] = useState<string>();
@@ -110,62 +108,68 @@ export default function AnswerMeeting(props: any) {
     );
   };
 
+  const updateTimecellToOnline = (dateTime: number) => {
+    let updatedTimecellIndex = selectedTimecells.findIndex(
+      (meetDateInfo) => meetDateInfo.meetDate === dateTime
+    );
+    selectedTimecells[updatedTimecellIndex].isOnline = true;
+  };
+
+  const updateTimecellToOffline = (dateTime: number) => {
+    let updatedTimecellIndex = selectedTimecells.findIndex(
+      (meetDateInfo) => meetDateInfo.meetDate === dateTime
+    );
+    selectedTimecells[updatedTimecellIndex].isOnline = false;
+  };
+
+  const unselectTimecell = (dateTime: number) => {
+    setUnselectMode(true);
+    updateTimecellToOffline(dateTime);
+    setSelectedTimecells(
+      selectedTimecells.filter(
+        (meetDateInfo) => meetDateInfo.meetDate !== dateTime
+      )
+    );
+  };
+
   const [onlineSelectionMode, setOnlineSelectionMode] = useState(false);
+  const [unselectMode, setUnselectMode] = useState(false);
 
   const toggleTimecell = (dateTime: number) => {
     if (isDateSelected(dateTime)) {
-      if (!isMouseDown && getSelectedTimecell(dateTime)?.isOnline) {
-        setSelectionMode(false);
-        setIsMouseDown(true);
-        setOnlineSelectionMode(true);
-        setSelectedTimecells(
-          selectedTimecells.filter(
-            (meetDateInfo) => meetDateInfo.meetDate !== dateTime
-          )
-        );
-      } else if (!isMouseDown && !getSelectedTimecell(dateTime)?.isOnline) {
-        setOnlineSelectionMode(false);
+      const selectedTimecell = getSelectedTimecell(dateTime);
+      // First click when timecell is selected
+      // When NOT in selection mode
+      if (!selectionMode) {
+        if (selectedTimecell?.isOnline) {
+          unselectTimecell(dateTime);
+        } else if (!selectedTimecell?.isOnline) {
+          updateTimecellToOnline(dateTime);
+        }
+      }
+
+      if (selectionMode && onlineSelectionMode && !selectedTimecell?.isOnline) {
+        updateTimecellToOnline(dateTime);
       }
 
       if (
         selectionMode &&
-        onlineSelectionMode &&
-        getSelectedTimecell(dateTime)?.isOnline
-      ) {
-        console.log("selection mode and is online");
-        setSelectedTimecells(
-          selectedTimecells.filter(
-            (meetDateInfo) => meetDateInfo.meetDate !== dateTime
-          )
-        );
-      } else if (
-        selectionMode &&
         !onlineSelectionMode &&
-        !getSelectedTimecell(dateTime)?.isOnline
+        (selectedTimecell?.isOnline || unselectMode)
       ) {
-        console.log("selection mode and is NOT online");
-        let updatedTimecellIndex = selectedTimecells.findIndex(
-          (meetDateInfo) => meetDateInfo.meetDate === dateTime
-        );
-        selectedTimecells[updatedTimecellIndex].isOnline = true;
+        unselectTimecell(dateTime);
       }
     } else {
-      const meetDateInfo = new MeetingDate(dateTime, false);
-      if (selectionMode) {
-        console.log("selection mode");
+      // First click when timecell is NOT selected
+      if (!unselectMode) {
+        const meetDateInfo = new MeetingDate(dateTime, onlineSelectionMode);
         setSelectedTimecells([...selectedTimecells, meetDateInfo]);
-      }
-      if (!isMouseDown) {
-        console.log("mouse down");
-        setSelectionMode(true);
-        setSelectedTimecells([...selectedTimecells, meetDateInfo]);
-        setIsMouseDown(true);
       }
     }
   };
 
   const handleMouseOver = (dateTime: number) => {
-    if (isMouseDown) {
+    if (selectionMode) {
       toggleTimecell(dateTime);
     }
   };
@@ -224,10 +228,17 @@ export default function AnswerMeeting(props: any) {
                     setLookedUpDatetime(dateTime);
                     convertDatetimeToDate(dateTime);
                   }
+                  if (!isMobile()) {
+                    setUnselectMode(false);
+                    setSelectionMode(true);
+                    const isTimecellOnline =
+                      getSelectedTimecell(dateTime)?.isOnline;
+                    setOnlineSelectionMode(isTimecellOnline ? true : false);
+                  }
                 }}
                 onMouseUp={() => {
                   if ((isMobile() && mobileAnsweringMode) || !isMobile())
-                    setIsMouseDown(false);
+                    setSelectionMode(false);
                 }}
                 onMouseOver={() => {
                   if (!isMobile()) {

@@ -1,5 +1,5 @@
 {
-  "name": "vite-mern-template",
+  "name": "time2meet",
   "version": "1.0.0",
   "main": "server/src/index.ts",
   "homepage": "https://time2meet.onrender.com/",
@@ -10,7 +10,7 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "test": "jest --watch --verbose"
   },
-  "repository": "https://github.com/apicgg/vite-mern-template.git",
+  "repository": "https://github.com/keirrr/time2meet",
   "license": "MIT",
   "dependencies": {
     "bcryptjs": "^2.4.3",

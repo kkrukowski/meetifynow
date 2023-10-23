@@ -77,7 +77,7 @@ describe("POST /meet/:id", () => {
       .post("/meet/tQAryTT")
       .send({
         username: "Test",
-        dates: [{ date: new Date().getTime(), online: true }],
+        dates: [{ date: new Date().getTime(), isOnline: true }],
       });
     expect(response.statusCode).toBe(200);
   });

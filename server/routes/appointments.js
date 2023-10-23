@@ -72,22 +72,16 @@ const validateAnswerData = [
 ];
 
 // Make new answer
-router.post("/:appointmentId", validateAnswerData, async (req, res) => {
+router.post("/:appointmentId", async (req, res) => {
   try {
-    const errors = validationResult(req);
-    if (!errors.isEmpty()) {
-      return res.status(400).json({ errors: errors.array() });
-    }
-
     const { appointmentId } = req.params;
     const { username, dates } = req.body;
 
     // Creating dates array
     let datesArray = [];
     dates.forEach((dateItem) => {
-      console.log(dateItem);
-      const meetDate = dateItem.date;
-      const isOnline = dateItem.online;
+      const meetDate = dateItem.meetDate;
+      const isOnline = dateItem.isOnline;
       const data = new DateData({
         meetDate,
         isOnline,
@@ -95,9 +89,7 @@ router.post("/:appointmentId", validateAnswerData, async (req, res) => {
       datesArray.push(data);
     });
 
-    console.log(datesArray);
-
-    const answer = new Answer({ username, datesArray });
+    const answer = new Answer({ username, dates: datesArray });
     await Appointment.findOneAndUpdate(
       { appointmentId },
       { $push: { answers: answer } }

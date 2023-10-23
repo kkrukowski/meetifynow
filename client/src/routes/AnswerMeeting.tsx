@@ -77,15 +77,22 @@ export default function AnswerMeeting(props: any) {
 
   const availabilityInfo = availabilityInfoNonMerged.reduce(
     (acc: any, curr: any) => {
-      if (acc[curr.date]) {
-        acc[curr.date].push(curr.username);
+      const isOnline = curr.date.isOnline;
+      if (acc[curr.date.meetDate]) {
+        acc[curr.date.meetDate].users.push(curr.username);
+        acc[curr.date.meetDate].onlineCount += isOnline ? 1 : 0;
       } else {
-        acc[curr.date] = [curr.username];
+        acc[curr.date.meetDate] = {
+          users: [curr.username],
+          onlineCount: isOnline ? 1 : 0,
+        };
       }
       return acc;
     },
     {}
   );
+
+  console.log(availabilityInfo);
 
   // Mobile answering mode
   const toggleAnsweringMode = () => {
@@ -192,6 +199,7 @@ export default function AnswerMeeting(props: any) {
   };
 
   const renderTimeCells = () => {
+    console.log(answers);
     var timeCells: any = [];
 
     for (let i = meetTime.from; i <= meetTime.to; i++) {
@@ -207,9 +215,9 @@ export default function AnswerMeeting(props: any) {
 
           if (
             availabilityInfo[dateTime] &&
-            availabilityInfo[dateTime].length > highestAvailableCount
+            availabilityInfo[dateTime].users.length > highestAvailableCount
           ) {
-            setHighestAvailableCount(availabilityInfo[dateTime].length);
+            setHighestAvailableCount(availabilityInfo[dateTime].users.length);
           }
 
           timeRow.push(
@@ -218,7 +226,7 @@ export default function AnswerMeeting(props: any) {
                 data-date={dateTime}
                 date-votes={
                   availabilityInfo[dateTime]
-                    ? availabilityInfo[dateTime].length
+                    ? availabilityInfo[dateTime].users.length
                     : 0
                 }
                 onMouseDown={() => {
@@ -258,8 +266,13 @@ export default function AnswerMeeting(props: any) {
                               !isMobile() &&
                               "active:animate-cell-select hover:bg-primary-hover"
                             } ${
-                              availabilityInfo[dateTime].length ==
-                              highestAvailableCount
+                              availabilityInfo[dateTime].onlineCount ==
+                                highestAvailableCount ||
+                              availabilityInfo[dateTime].onlineCount >=
+                                highestAvailableCount * 0.5
+                                ? "bg-gold"
+                                : availabilityInfo[dateTime].users.length ==
+                                  highestAvailableCount
                                 ? "bg-light-green"
                                 : "bg-green"
                             }`
@@ -311,7 +324,9 @@ export default function AnswerMeeting(props: any) {
   };
 
   const isAnswered = (datetime: Number) => {
-    return answers.some((answer: any) => answer.dates.includes(datetime));
+    const datesData = answers.flatMap((answer: any) => answer.dates);
+    const datesArray = datesData.map((date: any) => date.meetDate);
+    return datesArray.includes(datetime);
   };
 
   const daysNaming = ["Nd", "Pon", "Wt", "Śr", "Czw", "Pt", "Sob"];
@@ -341,7 +356,8 @@ export default function AnswerMeeting(props: any) {
           <li className="text-dark">Nikt nie jest dostępny w tym terminie</li>
         );
       } else {
-        const availableUsernames = availabilityInfo[lookedUpDatetime] || [];
+        const availableUsernames =
+          availabilityInfo[lookedUpDatetime].users || [];
         const unavailableUsernames = answeredUsernames.filter(
           (username: string) => !availableUsernames.includes(username)
         );
@@ -386,6 +402,7 @@ export default function AnswerMeeting(props: any) {
           }
         )
         .then((res) => {
+          console.log(res);
           clearFormData();
           axios
             .get(
@@ -406,8 +423,8 @@ export default function AnswerMeeting(props: any) {
 
   useEffect(() => {
     if (lookedUpDatetime) {
-      if (availabilityInfo[lookedUpDatetime]?.length > 0) {
-        setAvailableCount(availabilityInfo[lookedUpDatetime]?.length);
+      if (availabilityInfo[lookedUpDatetime]?.users.length > 0) {
+        setAvailableCount(availabilityInfo[lookedUpDatetime]?.users.length);
       } else setAvailableCount(0);
     } else setAvailableCount(0);
   });

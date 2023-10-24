@@ -19,9 +19,10 @@ module.exports = {
         gray: "#8e8e8e",
         dark: "#004466",
         red: "#FF6B73",
-        green: "#8eeda3",
-        "light-green": "#27b346",
+        green: "#27b346",
+        "light-green": "#8eeda3",
         gold: "#FFC107",
+        "gold-dark": "#ffe607",
       },
       screens: {
         "h-sm": { raw: "(min-height: 640px)" },

@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 
+import { set } from "mongoose";
 import Button from "../components/Button";
 import CopyLinkButton from "../components/CopyLinkButton";
 import Heading from "../components/Heading";
@@ -65,6 +66,22 @@ export default function AnswerMeeting(props: any) {
     return windowSize[0] < 1024;
   };
 
+  // Handling mouse down
+  const [isMouseDown, setIsMouseDown] = useState(false);
+  useEffect(() => {
+    const handleMouseDown = () => {
+      setIsMouseDown(true);
+    };
+
+    const handleMouseUp = () => {
+      setIsMouseDown(false);
+    };
+
+    document.addEventListener("mousedown", handleMouseDown);
+    document.addEventListener("mouseup", handleMouseUp);
+    console.log(isMouseDown);
+  }, [isMouseDown]);
+
   // Availability info
   const availabilityInfoNonMerged = answers.flatMap((answer: any) => {
     return answer.dates.map((date: number) => {
@@ -91,8 +108,6 @@ export default function AnswerMeeting(props: any) {
     },
     {}
   );
-
-  console.log(availabilityInfo);
 
   // Mobile answering mode
   const toggleAnsweringMode = () => {
@@ -175,6 +190,14 @@ export default function AnswerMeeting(props: any) {
     }
   };
 
+  const disableSelection = () => {
+    if (!isMouseDown) {
+      setSelectionMode(false);
+      setUnselectMode(false);
+      setOnlineSelectionMode(false);
+    }
+  };
+
   const handleMouseOver = (dateTime: number) => {
     if (selectionMode) {
       toggleTimecell(dateTime);
@@ -199,7 +222,6 @@ export default function AnswerMeeting(props: any) {
   };
 
   const renderTimeCells = () => {
-    console.log(answers);
     var timeCells: any = [];
 
     for (let i = meetTime.from; i <= meetTime.to; i++) {
@@ -245,53 +267,58 @@ export default function AnswerMeeting(props: any) {
                   }
                 }}
                 onMouseUp={() => {
-                  if ((isMobile() && mobileAnsweringMode) || !isMobile())
+                  if (!isMobile()) {
                     setSelectionMode(false);
+                    setUnselectMode(false);
+                  }
                 }}
                 onMouseOver={() => {
                   if (!isMobile()) {
                     handleMouseOver(dateTime);
                     setLookedUpDatetime(dateTime);
                     convertDatetimeToDate(dateTime);
+                    disableSelection();
                   }
                 }}
                 className={`rounded-lg h-12 w-24 lg:h-6 lg:w-12 transition-colors ${
                   isEndOfWeek && "mr-4"
+                }  ${
+                  isDateSelected(dateTime)
+                    ? `${
+                        getSelectedTimecell(dateTime)?.isOnline
+                          ? "bg-gold hover:bg-gold/50"
+                          : "bg-primary hover:bg-primary/50"
+                      }`
+                    : `border border-gray ${
+                        ((isMobile() && !mobileAnsweringMode) || !isMobile()) &&
+                        "hover:border-none"
+                      }`
                 } ${
                   isAnswered(dateTime)
-                    ? `${
+                    ? `border-none ${
                         isDateSelected(dateTime)
-                          ? "bg-primary selected"
+                          ? `${
+                              getSelectedTimecell(dateTime)?.isOnline
+                                ? "bg-gold hover:bg-gold/50"
+                                : "bg-primary hover:bg-primary/50"
+                            } selected`
                           : `answered  ${
-                              !isMobile() &&
-                              "active:animate-cell-select hover:bg-primary-hover"
+                              !isMobile() && "active:animate-cell-select"
                             } ${
                               availabilityInfo[dateTime].onlineCount ==
                                 highestAvailableCount ||
                               availabilityInfo[dateTime].onlineCount >=
                                 highestAvailableCount * 0.5
-                                ? "bg-gold"
+                                ? "bg-gold-dark hover:bg-gold-dark/50"
                                 : availabilityInfo[dateTime].users.length ==
                                   highestAvailableCount
-                                ? "bg-light-green"
-                                : "bg-green"
+                                ? "bg-green hover:bg-green/50"
+                                : "bg-light-green hover:bg-light-green/50"
                             }`
                       }`
-                    : `selected ${
+                    : `${
                         ((isMobile() && !mobileAnsweringMode) || !isMobile()) &&
-                        "active:animate-cell-select hover:bg-primary-hover"
-                      } ${
-                        isDateSelected(dateTime)
-                          ? `${
-                              getSelectedTimecell(dateTime)?.isOnline
-                                ? "bg-gold"
-                                : "bg-primary"
-                            }`
-                          : `border border-gray ${
-                              ((isMobile() && !mobileAnsweringMode) ||
-                                !isMobile()) &&
-                              "hover:border-none"
-                            }`
+                        "active:animate-cell-select hover:bg-gray"
                       }`
                 }`}
               ></div>
@@ -402,7 +429,6 @@ export default function AnswerMeeting(props: any) {
           }
         )
         .then((res) => {
-          console.log(res);
           clearFormData();
           axios
             .get(

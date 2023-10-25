@@ -1,11 +1,11 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
 import moment from "moment-timezone";
-import React, { useEffect, useState } from "react";
+import { nanoid } from "nanoid";
+import React, { useEffect, useId, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 
-import { set } from "mongoose";
 import Button from "../components/Button";
 import CopyLinkButton from "../components/CopyLinkButton";
 import Heading from "../components/Heading";
@@ -39,6 +39,7 @@ export default function AnswerMeeting(props: any) {
   };
   const answeredUsernames = answers.map((answer: any) => answer.username);
   const answersCount = answers.length;
+  const [unavailableUsersInfo, setUnavailableUsersInfo] = useState<any>([]);
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);
   const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
   const currentUrl = window.location.href;
@@ -79,28 +80,54 @@ export default function AnswerMeeting(props: any) {
 
     document.addEventListener("mousedown", handleMouseDown);
     document.addEventListener("mouseup", handleMouseUp);
-    console.log(isMouseDown);
   }, [isMouseDown]);
 
-  // Availability info
-  const availabilityInfoNonMerged = answers.flatMap((answer: any) => {
-    return answer.dates.map((date: number) => {
+  // Get unavailable users where dates array is empty
+  useEffect(() => {
+    const unavailableUsers = answers.filter(
+      (answer: any) => answer.dates.length == 0
+    );
+
+    const unavailableUsersInfo = unavailableUsers.map((user: any) => {
       return {
-        date: date,
-        username: answer.username,
+        date: null,
+        userData: { userId: user.userId, username: user.username },
+        answerData: { isOnline: null },
       };
     });
-  });
 
-  const availabilityInfo = availabilityInfoNonMerged.reduce(
+    setUnavailableUsersInfo(unavailableUsersInfo);
+  }, [answers]);
+
+  // Availability info
+  const availabilityInfoNonMerged = () => {
+    let availableUsersInfo: any = [];
+    answers.flatMap((answer: any) => {
+      const availableUserInfo = answer.dates.map((date: any) => {
+        return {
+          date: date.meetDate,
+          userData: { userId: answer.userId, username: answer.username },
+          answerData: { isOnline: date.isOnline },
+        };
+      });
+      availableUsersInfo.push(...availableUserInfo);
+    });
+
+    return [...availableUsersInfo];
+  };
+
+  const availabilityInfo = availabilityInfoNonMerged().reduce(
     (acc: any, curr: any) => {
-      const isOnline = curr.date.isOnline;
-      if (acc[curr.date.meetDate]) {
-        acc[curr.date.meetDate].users.push(curr.username);
-        acc[curr.date.meetDate].onlineCount += isOnline ? 1 : 0;
+      const isOnline = curr.answerData.isOnline;
+      if (acc[curr.date]) {
+        acc[curr.date].users.push({
+          userData: curr.userData,
+          isOnline,
+        });
+        acc[curr.date].onlineCount += isOnline ? 1 : 0;
       } else {
-        acc[curr.date.meetDate] = {
-          users: [curr.username],
+        acc[curr.date] = {
+          usersInfo: [{ userData: curr.userData, isOnline }],
           onlineCount: isOnline ? 1 : 0,
         };
       }
@@ -237,9 +264,11 @@ export default function AnswerMeeting(props: any) {
 
           if (
             availabilityInfo[dateTime] &&
-            availabilityInfo[dateTime].users.length > highestAvailableCount
+            availabilityInfo[dateTime].usersInfo.length > highestAvailableCount
           ) {
-            setHighestAvailableCount(availabilityInfo[dateTime].users.length);
+            setHighestAvailableCount(
+              availabilityInfo[dateTime].usersInfo.length
+            );
           }
 
           timeRow.push(
@@ -248,7 +277,7 @@ export default function AnswerMeeting(props: any) {
                 data-date={dateTime}
                 date-votes={
                   availabilityInfo[dateTime]
-                    ? availabilityInfo[dateTime].users.length
+                    ? availabilityInfo[dateTime].usersInfo.length
                     : 0
                 }
                 onMouseDown={() => {
@@ -306,11 +335,9 @@ export default function AnswerMeeting(props: any) {
                               !isMobile() && "active:animate-cell-select"
                             } ${
                               availabilityInfo[dateTime].onlineCount ==
-                                highestAvailableCount ||
-                              availabilityInfo[dateTime].onlineCount >=
-                                highestAvailableCount * 0.5
+                              highestAvailableCount
                                 ? "bg-gold-dark hover:bg-gold-dark/50"
-                                : availabilityInfo[dateTime].users.length ==
+                                : availabilityInfo[dateTime].usersInfo.length ==
                                   highestAvailableCount
                                 ? "bg-green hover:bg-green/50"
                                 : "bg-light-green hover:bg-light-green/50"
@@ -383,24 +410,44 @@ export default function AnswerMeeting(props: any) {
           <li className="text-dark">Nikt nie jest dostępny w tym terminie</li>
         );
       } else {
-        const availableUsernames =
-          availabilityInfo[lookedUpDatetime].users || [];
-        const unavailableUsernames = answeredUsernames.filter(
-          (username: string) => !availableUsernames.includes(username)
+        const dayAvailabilityInfo = availabilityInfo[lookedUpDatetime];
+        const availableUsers = dayAvailabilityInfo?.usersInfo.map(
+          (userData: any) => userData
         );
-        const listOfAvailableUsernames = availableUsernames?.map(
-          (username: string) => <li key={username}>{username}</li>
+
+        console.log(availableUsers);
+
+        const onlineAvailableUsers = availableUsers?.filter(
+          (user: any) => user.isOnline === true
         );
-        const listOfUnavailableUsernames = unavailableUsernames?.map(
-          (username: string) => (
-            <li key={username} className="text-gray">
-              <s>{username}</s>
+
+        const listOfOnlineAvailableUsers = onlineAvailableUsers?.map(
+          (userData: any) => (
+            <li key={userData.userData.userId}>{userData.userData.username}</li>
+          )
+        );
+
+        const offlineAvailableUsers = availableUsers?.filter(
+          (user: any) => user.isOnline === false
+        );
+
+        const listOfOfflineAvailableUsers = offlineAvailableUsers?.map(
+          (userData: any) => (
+            <li key={userData.userData.userId}>{userData.userData.username}</li>
+          )
+        );
+
+        const listOfUnavailableUsers = unavailableUsersInfo?.map(
+          (userData: any) => (
+            <li key={userData.userData.userId} className="text-gray">
+              <s>{userData.userData.username}</s>
             </li>
           )
         );
         const listOfUsernames = [
-          listOfAvailableUsernames,
-          listOfUnavailableUsernames,
+          listOfOnlineAvailableUsers,
+          listOfOfflineAvailableUsers,
+          listOfUnavailableUsers,
         ];
 
         return listOfUsernames;
@@ -449,8 +496,8 @@ export default function AnswerMeeting(props: any) {
 
   useEffect(() => {
     if (lookedUpDatetime) {
-      if (availabilityInfo[lookedUpDatetime]?.users.length > 0) {
-        setAvailableCount(availabilityInfo[lookedUpDatetime]?.users.length);
+      if (availabilityInfo[lookedUpDatetime]?.usersInfo.length > 0) {
+        setAvailableCount(availabilityInfo[lookedUpDatetime]?.usersInfo.length);
       } else setAvailableCount(0);
     } else setAvailableCount(0);
   });

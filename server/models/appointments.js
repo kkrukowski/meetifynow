@@ -8,6 +8,7 @@ const DateDataSchema = new mongoose.Schema({
 const DateData = mongoose.model("DateData", DateDataSchema);
 
 const AnswerSchema = new mongoose.Schema({
+  userId: { type: String, required: true },
   username: { type: String, required: true },
   dates: [DateDataSchema],
 });

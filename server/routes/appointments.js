@@ -63,19 +63,11 @@ router.post("/new", async (req, res) => {
   }
 });
 
-// Middleware for request validation
-const validateAnswerData = [
-  check("username").isString().notEmpty(),
-  check("dates").isArray().notEmpty(),
-  check("dates.*.date").isNumeric(),
-  check("dates.*.online").isBoolean(),
-];
-
 // Make new answer
 router.post("/:appointmentId", async (req, res) => {
   try {
     const { appointmentId } = req.params;
-    const { username, dates } = req.body;
+    const { userId, username, dates } = req.body;
 
     // Creating dates array
     let datesArray = [];
@@ -89,7 +81,7 @@ router.post("/:appointmentId", async (req, res) => {
       datesArray.push(data);
     });
 
-    const answer = new Answer({ username, dates: datesArray });
+    const answer = new Answer({ userId, username, dates: datesArray });
     await Appointment.findOneAndUpdate(
       { appointmentId },
       { $push: { answers: answer } }

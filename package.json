@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "main": "server/src/index.ts",
   "homepage": "https://time2meet.onrender.com/",
+  "type": "module",
   "scripts": {
     "install-server": "cd server && npm install",
     "server": "nodemon --watch ./**/*.ts --exec ts-node ./server/app.ts",

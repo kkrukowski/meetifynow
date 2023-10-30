@@ -1,5 +1,5 @@
 import request from "supertest";
-import app from "../app";
+import app from "../app.mjs";
 
 describe("POST /new", () => {
   describe("When the request is valid", () => {

@@ -120,7 +120,7 @@ export default function AnswerMeeting(props: any) {
     (acc: any, curr: any) => {
       const isOnline = curr.answerData.isOnline;
       if (acc[curr.date]) {
-        acc[curr.date].users.push({
+        acc[curr.date].usersInfo.push({
           userData: curr.userData,
           isOnline,
         });
@@ -172,7 +172,9 @@ export default function AnswerMeeting(props: any) {
   };
 
   const unselectTimecell = (dateTime: number) => {
-    setUnselectMode(true);
+    if (!isMobile()) {
+      setUnselectMode(true);
+    }
     updateTimecellToOffline(dateTime);
     setSelectedTimecells(
       selectedTimecells.filter(
@@ -315,8 +317,8 @@ export default function AnswerMeeting(props: any) {
                   isDateSelected(dateTime)
                     ? `${
                         getSelectedTimecell(dateTime)?.isOnline
-                          ? "bg-gold hover:bg-gold/50"
-                          : "bg-primary hover:bg-primary/50"
+                          ? `bg-gold ${!isMobile() && "hover:bg-gold/50"}`
+                          : `bg-primary ${!isMobile() && "hover:bg-primary/50"}`
                       }`
                     : `border border-gray ${
                         ((isMobile() && !mobileAnsweringMode) || !isMobile()) &&
@@ -334,8 +336,8 @@ export default function AnswerMeeting(props: any) {
                           : `answered  ${
                               !isMobile() && "active:animate-cell-select"
                             } ${
-                              availabilityInfo[dateTime].onlineCount ==
-                              highestAvailableCount
+                              availabilityInfo[dateTime].onlineCount >=
+                              highestAvailableCount * 0.5
                                 ? "bg-gold-dark hover:bg-gold-dark/50"
                                 : availabilityInfo[dateTime].usersInfo.length ==
                                   highestAvailableCount
@@ -415,15 +417,15 @@ export default function AnswerMeeting(props: any) {
           (userData: any) => userData
         );
 
-        console.log(availableUsers);
-
         const onlineAvailableUsers = availableUsers?.filter(
           (user: any) => user.isOnline === true
         );
 
         const listOfOnlineAvailableUsers = onlineAvailableUsers?.map(
           (userData: any) => (
-            <li key={userData.userData.userId}>{userData.userData.username}</li>
+            <li key={userData.userData.userId}>
+              {userData.userData.username} 🛜
+            </li>
           )
         );
 

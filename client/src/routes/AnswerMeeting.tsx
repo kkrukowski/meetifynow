@@ -1,8 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
 import moment from "moment-timezone";
-import { nanoid } from "nanoid";
-import React, { useEffect, useId, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 

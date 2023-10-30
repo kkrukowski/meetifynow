@@ -1,4 +1,4 @@
-import time2meetLogo from "../assets/imgs/time2meet-logo.png";
+import time2meetLogo from "../assets/imgs/time2meet-logo.webp";
 
 export default function Navbar() {
   return (

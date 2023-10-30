@@ -13,12 +13,9 @@ body {
   font-family: "Poppins", sans-serif;
 }
 
-table {
-  -webkit-tap-highlight-color: transparent;
-}
-
 * {
   box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
 }
 
 /* Responsive */

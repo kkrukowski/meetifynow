@@ -37,9 +37,19 @@ module.exports = {
           "0%, 100%": { backgroundColor: "none" },
           "50%": { backgroundColor: "#0086C0" },
         },
+        "copy-button": {
+          "0%, 100%": { opacity: 100 },
+          "20%, 80%": { opacity: 0 },
+        },
+        "copy-button-success": {
+          "0%, 20%, 80%, 100%": { opacity: 0 },
+          "40%, 60%": { opacity: 100 },
+        },
       },
       animation: {
         "cell-select": "cell-select 500ms ease-in-out",
+        "copy-button": "copy-button 1500ms ease-in-out",
+        "copy-button-success": "copy-button-success 1500ms ease-in-out",
       },
     },
     fontFamily: {

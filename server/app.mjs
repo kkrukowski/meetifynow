@@ -1,14 +1,14 @@
-const express = require("express");
+import express from "express";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-const mongoose = require("mongoose");
-require("dotenv").config();
+import 'dotenv/config';
+import mongoose from "mongoose";
 
-const bodyParser = require("body-parser");
-const cors = require("cors");
-const cookieParser = require("cookie-parser");
-const compression = require("compression");
+import bodyParser from "body-parser";
+import compression from "compression";
+import cookieParser from "cookie-parser";
+import cors from "cors";
 
 // Database
 mongoose.connect(process.env.DB_CONN_URI);
@@ -26,7 +26,7 @@ app.use(cookieParser());
 app.use(bodyParser.json());
 
 // Router
-const appointments = require("./routes/appointments");
+import appointments from "./routes/appointments.js";
 app.use("/meet/", appointments);
 
 app.listen(PORT, () => {

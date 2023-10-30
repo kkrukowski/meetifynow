@@ -6,7 +6,8 @@
   "repository": "https://github.com/keirrr/time2meet",
   "license": "MIT",
   "scripts": {
-    "start": "vite --host",
+    "dev": "vite --host",
+    "start": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
     "test": "vitest"

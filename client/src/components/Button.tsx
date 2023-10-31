@@ -2,6 +2,7 @@ export default function Button(props: {
   text: string;
   className?: string;
   onClick?: any;
+  disabled?: boolean;
 }) {
   return (
     <button
@@ -10,6 +11,7 @@ export default function Button(props: {
         props.className
       }
       onClick={props.onClick}
+      disabled={props.disabled}
     >
       {props.text}
     </button>

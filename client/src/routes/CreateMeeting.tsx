@@ -1,6 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import moment from "moment";
-import { set } from "mongoose";
 import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
@@ -9,6 +8,7 @@ import * as yup from "yup";
 
 // Components
 import Button from "../components/Button";
+import StepsIndicator from "../components/CreateMeeting/StepsIndicator";
 import Heading from "../components/Heading";
 import Input from "../components/Input";
 import Timepicker from "../components/Timepicker";
@@ -17,6 +17,9 @@ import Title from "../components/Title";
 import axios from "axios";
 
 export default function CreateMeeting() {
+  // Steps
+  const [currStep, setCurrStep] = useState(0);
+
   // Name
   const [meetingName, setMeetingName] = useState("");
 
@@ -89,7 +92,6 @@ export default function CreateMeeting() {
     for (let i = 0; i < weeksInMonth; i++) {
       let tableCells = [];
       for (let j = 0; j < 7; j++) {
-        // const date = new Date(year, month, day).getTime();
         const date = moment
           .utc()
           .date(day)
@@ -255,86 +257,111 @@ export default function CreateMeeting() {
     formState: { errors },
   } = useForm({ resolver: yupResolver(formSchema) });
 
+  const stepsInfo = [
+    {title: "Szczegóły spotkania"},
+    {title: "Wybierz datę spotkania"},
+    {title: "Wybierz godzinę spotkania"},
+  ]
+
   return (
     <main className="flex flex-col px-5 py-10 md:p-10 mt-20 lg:m-0 justify-center">
       <Title text="Utwórz nowe spotkanie" />
+      <StepsIndicator steps={4} stepsData={stepsInfo} currIndex={currStep} />
       <form
         id="create-meeting-form"
-        className="flex flex-col justify-center"
+        className="flex flex-col justify-center h-[400px]"
         onSubmit={handleSubmit(createMeeting)}
       >
-        {/* Meeting name input */}
-        <Input
-          label="Nazwa spotkania"
-          type="text"
-          id="meeting__name"
-          register={register}
-          errorText={errors.meeting__name?.message?.toString()}
-          error={errors.meeting__name ? true : false}
-          placeholder="📝 Nazwa spotkania"
-          onChange={(e: { target: { value: React.SetStateAction<string> } }) =>
-            setMeetingName(e.target.value)
-          }
-        />
+        {/* Meeting details */}
+        {currStep === 0 && (
+          <Input
+            label="Nazwa spotkania"
+            type="text"
+            id="meeting__name"
+            register={register}
+            errorText={errors.meeting__name?.message?.toString()}
+            error={errors.meeting__name ? true : false}
+            placeholder="📝 Nazwa spotkania"
+            onChange={(e: { target: { value: React.SetStateAction<string> } }) =>
+              setMeetingName(e.target.value)
+            }
+          />
+        )}
+        
         {/* Choose date */}
-        <Heading text="📅 Wybierz datę i czas spotkania" className="my-5" />
-        <div className="flex justify-center mb-5">
-          <div className="flex flex-col lg:flex-row items-center">
-            <div>
-              <table
-                className={`date__selection--table border border-2 border-separate border-spacing-0.5 box-content p-2 select-none ${
-                  dateError ? "rounded-lg border-red" : "border-transparent"
-                }`}
-              >
-                <thead>
-                  <tr>
-                    <th colSpan={7}>
-                      <div className="flex justify-between items-center">
-                        <button
-                          onClick={prevMonth}
-                          className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
-                        >
-                          <IoChevronBack />
-                        </button>
-                        <span className="text-dark">
-                          {monthName[month] + " " + year}
-                        </span>
-                        <button
-                          onClick={nextMonth}
-                          className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
-                        >
-                          <IoChevronForward />
-                        </button>
-                      </div>
-                    </th>
-                  </tr>
-                  <tr>
-                    {daysName.map((day) => (
-                      <th className="font-medium text-gray">{day}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>{showCalendar(month, year)}</tbody>
-              </table>
-            </div>
-            <div className="w-full lg:w-px h-px lg:h-full bg-gray rounded-lg my-5 lg:mx-14"></div>
+        {currStep === 1 && (
+          <div>
+          <table
+          className={`date__selection--table border border-2 border-separate border-spacing-0.5 box-content p-2 select-none ${
+            dateError ? "rounded-lg border-red" : "border-transparent"
+          }`}
+        >
+          <thead>
+            <tr>
+              <th colSpan={7}>
+                <div className="flex justify-between items-center">
+                  <button
+                    onClick={prevMonth}
+                    className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
+                  >
+                    <IoChevronBack />
+                  </button>
+                  <span className="text-dark">
+                    {monthName[month] + " " + year}
+                  </span>
+                  <button
+                    onClick={nextMonth}
+                    className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
+                  >
+                    <IoChevronForward />
+                  </button>
+                </div>
+              </th>
+            </tr>
+            <tr>
+              {daysName.map((day) => (
+                <th className="font-medium text-gray">{day}</th>
+              ))}
+            </tr>
+          </thead>
+          <tbody>{showCalendar(month, year)}</tbody>
+        </table>
+        <p className="text-sm relative mt-2 text-red font-medium">
+          {dateError ? "Wybierz datę spotkania." : ""}
+        </p>
+        </div>
+          )}
+
+        {/* Choose time */}
+        {currStep === 2 && (
+          <div>
+          <div className="flex justify-center mb-5">
             <div className="flex flex-col justify-center items-center w-fit">
               <div className="self-center">
                 <Timepicker from={true} onChange={handleStartTimeChange} />
                 <span className="m-4"> - </span>
                 <Timepicker from={false} onChange={handleEndTimeChange} />
               </div>
-            </div>
           </div>
         </div>
-        <p className="text-sm relative mt-2 text-red font-medium">
-          {dateError ? "Wybierz datę spotkania." : ""}
-        </p>
         <p className="text-sm relative mt-2 text-red font-medium w-11/12 whitespace-pre-wrap">
           {timeError ? timeErrorText : ""}
         </p>
-        <Button text="Utwórz spotkanie" />
+        </div>
+        )}
+
+        {currStep === 3 && (
+          <Button text="Utwórz spotkanie" />
+        )}
+        
       </form>
+      {/* Navigation */}
+      {currStep < 3 && (
+          <div className="self-center">
+            <Button text="Wstecz" onClick={() => setCurrStep(currStep - 1)} className="mr-10" disabled={currStep === 0} />
+            <Button text="Dalej" onClick={() => setCurrStep(currStep + 1)} />
+          </div>
+        )}
     </main>
   );
 }

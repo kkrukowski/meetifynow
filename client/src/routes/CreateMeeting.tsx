@@ -1,4 +1,5 @@
 import { yupResolver } from "@hookform/resolvers/yup";
+import { motion } from "framer-motion";
 import moment from "moment";
 import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
@@ -15,12 +16,21 @@ import Timepicker from "../components/Timepicker";
 import Title from "../components/Title";
 
 import axios from "axios";
+import { as } from "vitest/dist/reporters-5f784f42";
 
 export default function CreateMeeting() {
   // Steps
+  const [prevStep, setPrevStep] = useState(0);
   const [currStep, setCurrStep] = useState(0);
+  const delta = currStep - prevStep;
 
   // Name
+  const [meetDetails, setMeetDetails] = useState({
+    name: "" as string,
+    length: "" as string,
+    place: "" as string,
+    link: "" as string,
+  });
   const [meetingName, setMeetingName] = useState("");
 
   // Time
@@ -189,7 +199,7 @@ export default function CreateMeeting() {
     if (validateTime() && validateDate()) {
       axios
         .post(import.meta.env.VITE_SERVER_URL + "/meet/new", {
-          meetName: meetingName,
+          meetName: meetDetails?.name,
           dates: selectedDates,
           startTime: startTime,
           endTime: endTime,
@@ -258,10 +268,27 @@ export default function CreateMeeting() {
   } = useForm({ resolver: yupResolver(formSchema) });
 
   const stepsInfo = [
-    {title: "Szczegóły spotkania"},
-    {title: "Wybierz datę spotkania"},
-    {title: "Wybierz godzinę spotkania"},
-  ]
+    { title: "Szczegóły spotkania" },
+    { title: "Wybierz datę spotkania" },
+    { title: "Wybierz godzinę spotkania" },
+  ];
+
+  const next = () => {
+    if (currStep < stepsInfo.length - 1) {
+      // if (currStep === stepsInfo.length - 2) {
+      //   handleSubmit(createMeeting);
+      // }
+      setPrevStep(currStep);
+      setCurrStep(currStep + 1);
+    }
+  };
+
+  const prev = () => {
+    if (currStep > 0) {
+      setPrevStep(currStep);
+      setCurrStep(currStep - 1);
+    }
+  };
 
   return (
     <main className="flex flex-col px-5 py-10 md:p-10 mt-20 lg:m-0 justify-center">
@@ -270,98 +297,176 @@ export default function CreateMeeting() {
       <form
         id="create-meeting-form"
         className="flex flex-col justify-center h-[400px]"
-        onSubmit={handleSubmit(createMeeting)}
       >
-        {/* Meeting details */}
-        {currStep === 0 && (
-          <Input
-            label="Nazwa spotkania"
-            type="text"
-            id="meeting__name"
-            register={register}
-            errorText={errors.meeting__name?.message?.toString()}
-            error={errors.meeting__name ? true : false}
-            placeholder="📝 Nazwa spotkania"
-            onChange={(e: { target: { value: React.SetStateAction<string> } }) =>
-              setMeetingName(e.target.value)
-            }
-          />
-        )}
-        
-        {/* Choose date */}
-        {currStep === 1 && (
-          <div>
-          <table
-          className={`date__selection--table border border-2 border-separate border-spacing-0.5 box-content p-2 select-none ${
-            dateError ? "rounded-lg border-red" : "border-transparent"
-          }`}
-        >
-          <thead>
-            <tr>
-              <th colSpan={7}>
-                <div className="flex justify-between items-center">
-                  <button
-                    onClick={prevMonth}
-                    className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
-                  >
-                    <IoChevronBack />
-                  </button>
-                  <span className="text-dark">
-                    {monthName[month] + " " + year}
-                  </span>
-                  <button
-                    onClick={nextMonth}
-                    className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
-                  >
-                    <IoChevronForward />
-                  </button>
-                </div>
-              </th>
-            </tr>
-            <tr>
-              {daysName.map((day) => (
-                <th className="font-medium text-gray">{day}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>{showCalendar(month, year)}</tbody>
-        </table>
-        <p className="text-sm relative mt-2 text-red font-medium">
-          {dateError ? "Wybierz datę spotkania." : ""}
-        </p>
-        </div>
+        <div className="self-center">
+          {/* Meeting details */}
+          {currStep === 0 && (
+            <motion.div
+              initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              <Input
+                label="Nazwa spotkania"
+                type="text"
+                id="meeting__name"
+                register={register}
+                errorText={errors.meeting__name?.message?.toString()}
+                error={errors.meeting__name ? true : false}
+                placeholder="📝 Nazwa spotkania"
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) =>
+                  setMeetDetails({
+                    ...meetDetails,
+                    name: e.target.value.toString(),
+                  })
+                }
+              />
+              <Input
+                label="Długość spotkania"
+                type="text"
+                id="meeting__length"
+                register={register}
+                placeholder="⌚ Długość spotkania"
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) =>
+                  setMeetDetails({
+                    ...meetDetails,
+                    length: e.target.value.toString(),
+                  })
+                }
+              />
+              <Input
+                label="Miejsce spotkania"
+                type="text"
+                id="meeting__place"
+                register={register}
+                errorText={errors.meeting__name?.message?.toString()}
+                error={errors.meeting__name ? true : false}
+                placeholder="🏢 Miejsce spotkania"
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) =>
+                  setMeetDetails({
+                    ...meetDetails,
+                    place: e.target.value.toString(),
+                  })
+                }
+              />
+              <Input
+                label="Link do spotkania"
+                type="text"
+                id="meeting__link"
+                register={register}
+                errorText={errors.meeting__name?.message?.toString()}
+                error={errors.meeting__name ? true : false}
+                placeholder="🔗 Link do spotkania"
+                onChange={(e: {
+                  target: { value: React.SetStateAction<string> };
+                }) =>
+                  setMeetDetails({
+                    ...meetDetails,
+                    link: e.target.value.toString(),
+                  })
+                }
+              />
+            </motion.div>
           )}
 
-        {/* Choose time */}
-        {currStep === 2 && (
-          <div>
-          <div className="flex justify-center mb-5">
-            <div className="flex flex-col justify-center items-center w-fit">
-              <div className="self-center">
-                <Timepicker from={true} onChange={handleStartTimeChange} />
-                <span className="m-4"> - </span>
-                <Timepicker from={false} onChange={handleEndTimeChange} />
+          {/* Choose date */}
+          {currStep === 1 && (
+            <motion.div
+              initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              <div className="flex flex-col self-center">
+                <table
+                  className={`date__selection--table border border-2 border-separate border-spacing-0.5 box-content p-2 select-none w-[296px] ${
+                    dateError ? "rounded-lg border-red" : "border-transparent"
+                  }`}
+                >
+                  <thead>
+                    <tr>
+                      <th colSpan={7}>
+                        <div className="flex justify-between items-center">
+                          <button
+                            onClick={prevMonth}
+                            className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
+                          >
+                            <IoChevronBack />
+                          </button>
+                          <span className="text-dark">
+                            {monthName[month] + " " + year}
+                          </span>
+                          <button
+                            onClick={nextMonth}
+                            className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
+                          >
+                            <IoChevronForward />
+                          </button>
+                        </div>
+                      </th>
+                    </tr>
+                    <tr>
+                      {daysName.map((day) => (
+                        <th className="font-medium text-gray">{day}</th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>{showCalendar(month, year)}</tbody>
+                </table>
+                <p className="text-sm relative mt-2 text-red font-medium">
+                  {dateError ? "Wybierz datę spotkania." : ""}
+                </p>
               </div>
-          </div>
-        </div>
-        <p className="text-sm relative mt-2 text-red font-medium w-11/12 whitespace-pre-wrap">
-          {timeError ? timeErrorText : ""}
-        </p>
-        </div>
-        )}
+            </motion.div>
+          )}
 
-        {currStep === 3 && (
-          <Button text="Utwórz spotkanie" />
-        )}
-        
+          {/* Choose time */}
+          {currStep === 2 && (
+            <motion.div
+              initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+              animate={{ x: 0, opacity: 1 }}
+              transition={{ duration: 0.3, ease: "easeInOut" }}
+            >
+              <div>
+                <div className="flex justify-center mb-5">
+                  <div className="flex flex-col justify-center items-center w-fit">
+                    <div className="self-center">
+                      <Timepicker
+                        from={true}
+                        onChange={handleStartTimeChange}
+                      />
+                      <span className="m-4"> - </span>
+                      <Timepicker from={false} onChange={handleEndTimeChange} />
+                    </div>
+                  </div>
+                </div>
+                <p className="text-sm relative mt-2 text-red font-medium w-11/12 whitespace-pre-wrap">
+                  {timeError ? timeErrorText : ""}
+                </p>
+              </div>
+            </motion.div>
+          )}
+        </div>
+
+        {currStep === 3 && <Button text="Utwórz spotkanie" />}
       </form>
       {/* Navigation */}
       {currStep < 3 && (
-          <div className="self-center">
-            <Button text="Wstecz" onClick={() => setCurrStep(currStep - 1)} className="mr-10" disabled={currStep === 0} />
-            <Button text="Dalej" onClick={() => setCurrStep(currStep + 1)} />
-          </div>
-        )}
+        <div className="self-center">
+          <Button
+            text="Wstecz"
+            onClick={prev}
+            className="mr-10"
+            disabled={currStep === 0}
+          />
+          <Button text="Dalej" onClick={next} />
+        </div>
+      )}
     </main>
   );
 }

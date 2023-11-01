@@ -10,13 +10,11 @@ import * as yup from "yup";
 // Components
 import Button from "../components/Button";
 import StepsIndicator from "../components/CreateMeeting/StepsIndicator";
-import Heading from "../components/Heading";
 import Input from "../components/Input";
 import Timepicker from "../components/Timepicker";
 import Title from "../components/Title";
 
 import axios from "axios";
-import { as } from "vitest/dist/reporters-5f784f42";
 
 export default function CreateMeeting() {
   // Steps
@@ -31,7 +29,6 @@ export default function CreateMeeting() {
     place: "" as string,
     link: "" as string,
   });
-  const [meetingName, setMeetingName] = useState("");
 
   // Time
   const [startTime, setStartTime] = useState("08:00");
@@ -269,8 +266,12 @@ export default function CreateMeeting() {
 
   const stepsInfo = [
     { title: "Szczegóły spotkania" },
-    { title: "Wybierz datę spotkania" },
-    { title: "Wybierz godzinę spotkania" },
+    {
+      title: "Wybierz datę spotkania",
+    },
+    {
+      title: "Wybierz godzinę spotkania",
+    },
   ];
 
   const next = () => {
@@ -431,24 +432,53 @@ export default function CreateMeeting() {
               initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
+              className="overflow-y-auto h-[300px]"
             >
-              <div>
-                <div className="flex justify-center mb-5">
-                  <div className="flex flex-col justify-center items-center w-fit">
-                    <div className="self-center">
-                      <Timepicker
-                        from={true}
-                        onChange={handleStartTimeChange}
-                      />
-                      <span className="m-4"> - </span>
-                      <Timepicker from={false} onChange={handleEndTimeChange} />
-                    </div>
+              <div className="flex justify-center mb-5">
+                <div className="flex flex-col justify-center items-center">
+                  <div className="self-center ">
+                    {/* Main time picking */}
+                    <>
+                      {/* <Timepicker
+                          from={true}
+                          onChange={handleStartTimeChange}
+                        />
+                        <span className="m-4"> - </span>
+                        <Timepicker
+                          from={false}
+                          onChange={handleEndTimeChange}
+                        /> */}
+                    </>
+                    {/* Daily main time picking */}
+                    <>
+                      <div className="flex justify-between w-[400px] items-center mb-4">
+                        <div className="flex flex-col h-14 w-14 bg-primary rounded-lg justify-center">
+                          <p className="text-3xl text-center text-light leading-none">
+                            28
+                          </p>
+                          <p className="text-center text-light leading-none">
+                            lis
+                          </p>
+                        </div>
+                        <div>
+                          <Timepicker
+                            from={true}
+                            onChange={handleStartTimeChange}
+                          />
+                          <span className="m-4"> - </span>
+                          <Timepicker
+                            from={false}
+                            onChange={handleEndTimeChange}
+                          />
+                        </div>
+                      </div>
+                    </>
                   </div>
                 </div>
-                <p className="text-sm relative mt-2 text-red font-medium w-11/12 whitespace-pre-wrap">
-                  {timeError ? timeErrorText : ""}
-                </p>
               </div>
+              <p className="text-sm relative mt-2 text-red font-medium w-11/12 whitespace-pre-wrap">
+                {timeError ? timeErrorText : ""}
+              </p>
             </motion.div>
           )}
         </div>

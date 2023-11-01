@@ -36,7 +36,6 @@ export default function AnswerMeeting(props: any) {
     from: new Date("1970-01-01T" + props.startTime).getHours(),
     to: new Date("1970-01-01T" + props.endTime).getHours(),
   };
-  const answeredUsernames = answers.map((answer: any) => answer.username);
   const answersCount = answers.length;
   const [unavailableUsersInfo, setUnavailableUsersInfo] = useState<any>([]);
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);

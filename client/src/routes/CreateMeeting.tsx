@@ -9,10 +9,19 @@ import * as yup from "yup";
 
 // Components
 import Button from "../components/Button";
+import DetailedTimepicker from "../components/CreateMeeting/DetailedTimepicker";
 import StepsIndicator from "../components/CreateMeeting/StepsIndicator";
+import IconButton from "../components/IconButton";
 import Input from "../components/Input";
 import Timepicker from "../components/Timepicker";
 import Title from "../components/Title";
+
+// Icons
+import {
+  faCalendar,
+  faCalendarDay,
+  faCalendarDays,
+} from "@fortawesome/free-solid-svg-icons";
 
 import axios from "axios";
 
@@ -22,6 +31,9 @@ export default function CreateMeeting() {
   const [currStep, setCurrStep] = useState(0);
   const delta = currStep - prevStep;
 
+  // Timepickers navigartion
+  const [timepickerIndex, setTimepickerIndex] = useState(0);
+
   // Name
   const [meetDetails, setMeetDetails] = useState({
     name: "" as string,
@@ -30,19 +42,36 @@ export default function CreateMeeting() {
     link: "" as string,
   });
 
-  // Time
+  // Timepicker state
+  // Main time
   const [startTime, setStartTime] = useState("08:00");
   const [endTime, setEndTime] = useState("09:00");
   const [timeError, setTimeError] = useState(false);
   const [timeErrorText, setTimeErrorText] = useState("");
 
-  const handleStartTimeChange = (e: { target: { value: string } }) => {
+  const handleMainStartTimeChange = (e: { target: { value: string } }) => {
     setStartTime(e.target.value);
   };
 
-  const handleEndTimeChange = (e: { target: { value: string } }) => {
+  const handleMainEndTimeChange = (e: { target: { value: string } }) => {
     setEndTime(e.target.value);
   };
+
+  // Daily time
+  const [dailyTimeRange, setDailyTimeRange] = useState([]);
+
+  const handleDailyTimeRangeChange = (
+    e: { target: { value: string } },
+    datetime: number,
+    start: boolean
+  ) => {
+    const time = moment(e.target.value, "HH:mm");
+    const date = moment.utc(datetime).hour(time.hour());
+    const dateTimestamp = date.valueOf();
+    // dailyTimeRange.push(dateTimestamp);
+  };
+
+  // Detailed time
 
   // CALENDAR
   // Selecting dates
@@ -186,6 +215,21 @@ export default function CreateMeeting() {
     "Grudzień",
   ];
 
+  const shortMonthName = [
+    "Sty",
+    "Lut",
+    "Mar",
+    "Kwi",
+    "Maj",
+    "Cze",
+    "Lip",
+    "Sie",
+    "Wrz",
+    "Paź",
+    "Lis",
+    "Gru",
+  ];
+
   const daysName = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"];
 
   // Create meeting
@@ -261,11 +305,12 @@ export default function CreateMeeting() {
   const {
     register,
     handleSubmit,
+    trigger,
     formState: { errors },
   } = useForm({ resolver: yupResolver(formSchema) });
 
   const stepsInfo = [
-    { title: "Szczegóły spotkania" },
+    { title: "Szczegóły spotkania", fields: ["meeting__name"] },
     {
       title: "Wybierz datę spotkania",
     },
@@ -274,13 +319,29 @@ export default function CreateMeeting() {
     },
   ];
 
-  const next = () => {
+  type FieldName = keyof Inputs;
+
+  const next = async () => {
+    const fields = stepsInfo[currStep].fields;
+    const output = await trigger(fields as FieldName[], { shouldFocus: true });
+
+    if (!output) return;
+
     if (currStep < stepsInfo.length - 1) {
-      // if (currStep === stepsInfo.length - 2) {
-      //   handleSubmit(createMeeting);
-      // }
-      setPrevStep(currStep);
-      setCurrStep(currStep + 1);
+      if (currStep === 1) {
+        if (validateDate()) {
+          setPrevStep(currStep);
+          setCurrStep(currStep + 1);
+        }
+      }
+
+      if (currStep !== 1) {
+        if (currStep === stepsInfo.length - 2) {
+          handleSubmit(createMeeting);
+        }
+        setPrevStep(currStep);
+        setCurrStep(currStep + 1);
+      }
     }
   };
 
@@ -290,6 +351,8 @@ export default function CreateMeeting() {
       setCurrStep(currStep - 1);
     }
   };
+
+  const datesArr = [new Date().getTime()];
 
   return (
     <main className="flex flex-col px-5 py-10 md:p-10 mt-20 lg:m-0 justify-center">
@@ -323,6 +386,7 @@ export default function CreateMeeting() {
                     name: e.target.value.toString(),
                   })
                 }
+                required={true}
               />
               <Input
                 label="Długość spotkania"
@@ -344,8 +408,6 @@ export default function CreateMeeting() {
                 type="text"
                 id="meeting__place"
                 register={register}
-                errorText={errors.meeting__name?.message?.toString()}
-                error={errors.meeting__name ? true : false}
                 placeholder="🏢 Miejsce spotkania"
                 onChange={(e: {
                   target: { value: React.SetStateAction<string> };
@@ -361,8 +423,6 @@ export default function CreateMeeting() {
                 type="text"
                 id="meeting__link"
                 register={register}
-                errorText={errors.meeting__name?.message?.toString()}
-                error={errors.meeting__name ? true : false}
                 placeholder="🔗 Link do spotkania"
                 onChange={(e: {
                   target: { value: React.SetStateAction<string> };
@@ -432,47 +492,86 @@ export default function CreateMeeting() {
               initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
               transition={{ duration: 0.3, ease: "easeInOut" }}
-              className="overflow-y-auto h-[300px]"
             >
               <div className="flex justify-center mb-5">
                 <div className="flex flex-col justify-center items-center">
-                  <div className="self-center ">
+                  <div className="mb-6">
+                    <IconButton
+                      icon={faCalendar}
+                      onClick={setTimepickerIndex}
+                      valueToChange={0}
+                    />
+                    <IconButton
+                      icon={faCalendarDay}
+                      className="ml-6"
+                      onClick={setTimepickerIndex}
+                      valueToChange={1}
+                    />
+                    <IconButton
+                      icon={faCalendarDays}
+                      className="ml-6"
+                      onClick={setTimepickerIndex}
+                      valueToChange={2}
+                    />
+                  </div>
+                  <div className="self-center overflow-y-auto h-[300px]">
                     {/* Main time picking */}
-                    <>
-                      {/* <Timepicker
+                    {timepickerIndex === 0 && (
+                      <>
+                        <Timepicker
                           from={true}
-                          onChange={handleStartTimeChange}
+                          onChange={handleMainStartTimeChange}
                         />
                         <span className="m-4"> - </span>
                         <Timepicker
                           from={false}
-                          onChange={handleEndTimeChange}
-                        /> */}
-                    </>
+                          onChange={handleMainEndTimeChange}
+                        />
+                      </>
+                    )}
+
                     {/* Daily main time picking */}
-                    <>
-                      <div className="flex justify-between w-[400px] items-center mb-4">
-                        <div className="flex flex-col h-14 w-14 bg-primary rounded-lg justify-center">
-                          <p className="text-3xl text-center text-light leading-none">
-                            28
-                          </p>
-                          <p className="text-center text-light leading-none">
-                            lis
-                          </p>
-                        </div>
-                        <div>
-                          <Timepicker
-                            from={true}
-                            onChange={handleStartTimeChange}
-                          />
-                          <span className="m-4"> - </span>
-                          <Timepicker
-                            from={false}
-                            onChange={handleEndTimeChange}
-                          />
-                        </div>
-                      </div>
-                    </>
+                    {timepickerIndex === 1 && (
+                      <>
+                        {selectedDates.map((date) => {
+                          const dateObj = moment.utc(date);
+                          return (
+                            <div className="flex justify-between w-[350px] md:w-[400px] items-center mb-4 px-2">
+                              <div className="flex flex-col h-14 w-14 bg-primary rounded-lg justify-center">
+                                <p className="text-3xl text-center text-light leading-none">
+                                  {dateObj.date()}
+                                </p>
+                                <p className="text-center text-light leading-none">
+                                  {shortMonthName[dateObj.month()]}
+                                </p>
+                              </div>
+                              <div>
+                                <Timepicker
+                                  from={true}
+                                  onChange={(e) => {
+                                    handleDailyTimeRangeChange(
+                                      e,
+                                      dateObj.valueOf(),
+                                      true
+                                    );
+                                  }}
+                                />
+                                <span className="m-4"> - </span>
+                                <Timepicker
+                                  from={false}
+                                  onChange={handleMainEndTimeChange}
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </>
+                    )}
+
+                    {/* Detailed time picking */}
+                    {timepickerIndex === 2 && (
+                      <DetailedTimepicker dates={datesArr} />
+                    )}
                   </div>
                 </div>
               </div>
@@ -494,7 +593,10 @@ export default function CreateMeeting() {
             className="mr-10"
             disabled={currStep === 0}
           />
-          <Button text="Dalej" onClick={next} />
+          <Button
+            text={`${currStep === 2 ? "Utwórz spotkanie" : "Dalej"}`}
+            onClick={next}
+          />
         </div>
       )}
     </main>

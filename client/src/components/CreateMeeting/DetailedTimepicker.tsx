@@ -1,10 +1,9 @@
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function DetailedTimepicker(props: { dates: number[] }) {
   const [selectedTimecells, setSelectedTimecells] = useState<any>([]);
   const [selectionMode, setSelectionMode] = useState(false);
-  const [mobileAnsweringMode, setMobileAnsweringMode] = useState(false);
 
   // Checking mobile mode
   const [windowSize, setWindowSize] = useState([
@@ -70,19 +69,22 @@ export default function DetailedTimepicker(props: { dates: number[] }) {
     );
   };
 
-  const [onlineSelectionMode, setOnlineSelectionMode] = useState(false);
   const [unselectMode, setUnselectMode] = useState(false);
 
   const toggleTimecell = (dateTime: number) => {
     if (isDateSelected(dateTime)) {
-      const selectedTimecell = getSelectedTimecell(dateTime);
-      // First click when timecell is selected
+      if (!selectionMode) {
+        unselectTimecell(dateTime);
+      }
 
-      unselectTimecell(dateTime);
+      if (selectionMode && unselectMode) {
+        unselectTimecell(dateTime);
+      }
     } else {
       // First click when timecell is NOT selected
       if (!unselectMode) {
         setSelectedTimecells([...selectedTimecells, dateTime]);
+        console.log(selectedTimecells);
       }
     }
   };
@@ -103,7 +105,7 @@ export default function DetailedTimepicker(props: { dates: number[] }) {
   const renderTimeCells = () => {
     var timeCells: any = [];
 
-    for (let i = 0; i <= 24; i++) {
+    for (let i = 0; i <= 23; i++) {
       for (let h = 0; h < 2; h++) {
         let timeRow = [];
         for (let j = 0; j < days.length; j++) {
@@ -119,16 +121,9 @@ export default function DetailedTimepicker(props: { dates: number[] }) {
               <div
                 data-date={dateTime}
                 onMouseDown={() => {
-                  if ((isMobile() && mobileAnsweringMode) || !isMobile()) {
-                    toggleTimecell(dateTime);
-                  } else if (isMobile() && !mobileAnsweringMode) {
-                  }
+                  toggleTimecell(dateTime);
                   if (!isMobile()) {
-                    setUnselectMode(false);
                     setSelectionMode(true);
-                    const isTimecellOnline =
-                      getSelectedTimecell(dateTime)?.isOnline;
-                    setOnlineSelectionMode(isTimecellOnline ? true : false);
                   }
                 }}
                 onMouseUp={() => {
@@ -143,6 +138,15 @@ export default function DetailedTimepicker(props: { dates: number[] }) {
                     disableSelection();
                   }
                 }}
+                className={`rounded-lg h-12 w-24 lg:h-6 lg:w-12 transition-colors ${
+                  isEndOfWeek && "mr-4"
+                } ${
+                  isDateSelected(dateTime)
+                    ? `bg-primary ${!isMobile() && "hover:bg-primary/50"}`
+                    : `border border-gray ${
+                        !isMobile() && "hover:border-none hover:bg-gray"
+                      }`
+                }`}
               ></div>
             </td>
           );

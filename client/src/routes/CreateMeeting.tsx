@@ -58,17 +58,44 @@ export default function CreateMeeting() {
   };
 
   // Daily time
-  const [dailyTimeRange, setDailyTimeRange] = useState([]);
+  interface DailyTimeRange {
+    date: number;
+    from: number;
+    to: number;
+  }
+
+  const [dailyTimeRanges, setDailyTimeRanges] = useState<DailyTimeRange[]>([]);
 
   const handleDailyTimeRangeChange = (
     e: { target: { value: string } },
     datetime: number,
-    start: boolean
+    fromTime: boolean
   ) => {
     const time = moment(e.target.value, "HH:mm");
-    const date = moment.utc(datetime).hour(time.hour());
-    const dateTimestamp = date.valueOf();
-    // dailyTimeRange.push(dateTimestamp);
+    let newTimeRange: DailyTimeRange;
+    if (!dailyTimeRanges[datetime]) {
+      newTimeRange = {
+        date: datetime,
+        from: fromTime ? time.hour() : 8,
+        to: fromTime ? 9 : time.hour(),
+      };
+    } else {
+      newTimeRange = {
+        date: datetime,
+        from: fromTime ? time.hour() : dailyTimeRanges[datetime].from,
+        to: fromTime ? dailyTimeRanges[datetime].to : time.hour(),
+      };
+    }
+    const index = dailyTimeRanges.findIndex((range) => range.date === datetime);
+    if (index !== -1) {
+      setDailyTimeRanges((prevTimeRanges) => {
+        const updatedTimeRanges = [...prevTimeRanges];
+        updatedTimeRanges[index] = newTimeRange;
+        return updatedTimeRanges;
+      });
+    } else {
+      setDailyTimeRanges((prevTimeRanges) => [...prevTimeRanges, newTimeRange]);
+    }
   };
 
   // Detailed time

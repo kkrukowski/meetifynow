@@ -1,9 +1,28 @@
 import moment from "moment";
 import { useEffect, useState } from "react";
 
-export default function DetailedTimepicker(props: { dates: number[] }) {
-  const [selectedTimecells, setSelectedTimecells] = useState<any>([]);
+type DayTimesData = {
+  date: number;
+  times: number[];
+};
+
+export default function DetailedTimepicker(props: {
+  dates: Array<DayTimesData>;
+}) {
+  const getPickedTimes = () => {
+    const pickedTimesArrays = props.dates.map(
+      (dateInfo: DayTimesData) => dateInfo.times
+    );
+
+    const pickedTimes = pickedTimesArrays.flat(1);
+
+    return pickedTimes;
+  };
+  const [selectedTimecells, setSelectedTimecells] = useState<number[]>(
+    getPickedTimes()
+  );
   const [selectionMode, setSelectionMode] = useState(false);
+  console.log(selectedTimecells);
 
   // Checking mobile mode
   const [windowSize, setWindowSize] = useState([
@@ -49,8 +68,8 @@ export default function DetailedTimepicker(props: { dates: number[] }) {
   };
 
   // Answering functionallity
-  const dates = props.dates.sort();
-  const days = dates.map((date: number) => moment.utc(date));
+  const dates = props.dates;
+  const days = dates.map((dateInfo: DayTimesData) => moment.utc(dateInfo.date));
 
   const getSelectedTimecell = (dateTime: number) => {
     return selectedTimecells.find(

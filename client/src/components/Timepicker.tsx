@@ -9,6 +9,7 @@ const Timepicker = (props: {
       defaultValue={props.from ? "08:00" : "09:00"}
       onChange={props.onChange}
     >
+      <option value="00:00">00:00</option>
       <option value="01:00">01:00</option>
       <option value="02:00">02:00</option>
       <option value="03:00">03:00</option>
@@ -32,7 +33,6 @@ const Timepicker = (props: {
       <option value="21:00">21:00</option>
       <option value="22:00">22:00</option>
       <option value="23:00">23:00</option>
-      <option value="00:00">00:00</option>
     </select>
   );
 };

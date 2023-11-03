@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { motion } from "framer-motion";
-import moment from "moment";
+import moment, { isDate } from "moment";
 import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
@@ -9,6 +9,7 @@ import * as yup from "yup";
 
 // Components
 import Button from "../components/Button";
+import DailyTimepicker from "../components/CreateMeeting/DailyTimepicker";
 import DetailedTimepicker from "../components/CreateMeeting/DetailedTimepicker";
 import StepsIndicator from "../components/CreateMeeting/StepsIndicator";
 import IconButton from "../components/IconButton";
@@ -24,6 +25,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import axios from "axios";
+import { get } from "mongoose";
 
 export default function CreateMeeting() {
   // Steps
@@ -31,7 +33,7 @@ export default function CreateMeeting() {
   const [currStep, setCurrStep] = useState(0);
   const delta = currStep - prevStep;
 
-  // Timepickers navigartion
+  // Timepickers navigation
   const [timepickerIndex, setTimepickerIndex] = useState(0);
 
   // Name
@@ -60,41 +62,108 @@ export default function CreateMeeting() {
   // Daily time
   interface DailyTimeRange {
     date: number;
-    from: number;
-    to: number;
+    times: number[];
   }
 
   const [dailyTimeRanges, setDailyTimeRanges] = useState<DailyTimeRange[]>([]);
+
+  const getStartTime = (datetime: number) => {
+    const timeRange = dailyTimeRanges.find((range) => range.date === datetime);
+    if (timeRange) {
+      return timeRange.times[0];
+    }
+    return 8;
+  };
+
+  const getEndTime = (datetime: number) => {
+    const timeRange = dailyTimeRanges.find((range) => range.date === datetime);
+    if (timeRange) {
+      return timeRange?.times[timeRange?.times.length - 1];
+    }
+    return 9;
+  };
+
+  const convertDatetimeToTime = (datetime: number) => {
+    return moment(datetime);
+  };
+
+  const isDatetime = (datetime: number) => {
+    return datetime.toString().length === 13;
+  };
+
+  const getTimeRangeDatetimes = (
+    datetime: number,
+    from: number,
+    to: number
+  ) => {
+    const datetimes: number[] = [];
+
+    if (isDatetime(from)) {
+      from = convertDatetimeToTime(from).hour();
+    }
+    if (isDatetime(to)) {
+      to = convertDatetimeToTime(to).hour();
+    }
+    console.log(from, to);
+    for (let i = from; i <= to; i++) {
+      for (let hourHalf = 0; hourHalf < (i !== to ? 2 : 1); hourHalf++) {
+        const time = moment(datetime)
+          .hour(i)
+          .minute(hourHalf * 30)
+          .valueOf();
+
+        datetimes.push(time);
+      }
+    }
+    console.log(datetimes);
+
+    return datetimes;
+  };
+
+  const fillDailyTimeRanges = () => {
+    const timeRanges: DailyTimeRange[] = [];
+    selectedDates.forEach((date) => {
+      timeRanges.push({
+        date: date,
+        times: getTimeRangeDatetimes(date, 8, 9),
+      });
+    });
+    setDailyTimeRanges(timeRanges);
+  };
+
+  const isDatetimeExistInRanges = (datetime: number) => {
+    return dailyTimeRanges.some((range) => range.date === datetime);
+  };
+
+  const getDailyTimeRangeIndex = (datetime: number) => {
+    return dailyTimeRanges.findIndex((range) => range.date === datetime);
+  };
 
   const handleDailyTimeRangeChange = (
     e: { target: { value: string } },
     datetime: number,
     fromTime: boolean
   ) => {
-    const time = moment(e.target.value, "HH:mm");
+    const hour = +e.target.value.split(":")[0];
     let newTimeRange: DailyTimeRange;
-    if (!dailyTimeRanges[datetime]) {
+    let index = -1;
+    if (isDatetimeExistInRanges(datetime)) {
+      index = getDailyTimeRangeIndex(datetime);
       newTimeRange = {
         date: datetime,
-        from: fromTime ? time.hour() : 8,
-        to: fromTime ? 9 : time.hour(),
-      };
-    } else {
-      newTimeRange = {
-        date: datetime,
-        from: fromTime ? time.hour() : dailyTimeRanges[datetime].from,
-        to: fromTime ? dailyTimeRanges[datetime].to : time.hour(),
+        times: getTimeRangeDatetimes(
+          datetime,
+          fromTime ? hour : getStartTime(datetime),
+          fromTime ? getEndTime(datetime) : hour
+        ),
       };
     }
-    const index = dailyTimeRanges.findIndex((range) => range.date === datetime);
     if (index !== -1) {
       setDailyTimeRanges((prevTimeRanges) => {
         const updatedTimeRanges = [...prevTimeRanges];
         updatedTimeRanges[index] = newTimeRange;
         return updatedTimeRanges;
       });
-    } else {
-      setDailyTimeRanges((prevTimeRanges) => [...prevTimeRanges, newTimeRange]);
     }
   };
 
@@ -264,7 +333,8 @@ export default function CreateMeeting() {
   const createMeeting: SubmitHandler<Inputs> = async () => {
     validateTime();
     validateDate();
-    if (validateTime() && validateDate()) {
+    validateDailyTime();
+    if (validateTime() && validateDate() && validateDailyTime()) {
       axios
         .post(import.meta.env.VITE_SERVER_URL + "/meet/new", {
           meetName: meetDetails?.name,
@@ -316,6 +386,44 @@ export default function CreateMeeting() {
     }
   };
 
+  const validateDailyTime = () => {
+    const now = new Date();
+    const nowDateTime = now.toISOString();
+    const nowDate = nowDateTime.split("T")[0];
+
+    let isValid = false;
+
+    if (dailyTimeRanges.length === selectedDates.length) {
+      dailyTimeRanges.forEach((timeRange) => {
+        console.log(timeRange);
+        const startTimeConverted = new Date(
+          nowDate + "T" + getStartTime(timeRange.date)
+        );
+        const endTimeConverted = new Date(
+          nowDate + "T" + getEndTime(timeRange.date)
+        );
+        if (startTimeConverted >= endTimeConverted) {
+          setTimeError(true);
+          setTimeErrorText(
+            "Godzina zakończenia musi być późniejsza niż rozpoczęcia."
+          );
+          isValid = false;
+          return;
+        } else {
+          setTimeError(false);
+          setTimeErrorText("");
+          isValid = true;
+        }
+      });
+    } else {
+      setTimeError(true);
+      setTimeErrorText("Wszystkie przedziały godzin muszą zostać podane.");
+      isValid = false;
+    }
+
+    return isValid;
+  };
+
   // Form validation
   const formSchema = yup.object().shape({
     meeting__name: yup
@@ -339,10 +447,10 @@ export default function CreateMeeting() {
   const stepsInfo = [
     { title: "Szczegóły spotkania", fields: ["meeting__name"] },
     {
-      title: "Wybierz datę spotkania",
+      title: "Wybierz daty spotkania",
     },
     {
-      title: "Wybierz godzinę spotkania",
+      title: "Wybierz godziny spotkania",
     },
   ];
 
@@ -354,20 +462,28 @@ export default function CreateMeeting() {
 
     if (!output) return;
 
-    if (currStep < stepsInfo.length - 1) {
+    if (currStep < stepsInfo.length) {
       if (currStep === 1) {
         if (validateDate()) {
           setPrevStep(currStep);
           setCurrStep(currStep + 1);
+          fillDailyTimeRanges();
         }
       }
 
-      if (currStep !== 1) {
-        if (currStep === stepsInfo.length - 2) {
-          handleSubmit(createMeeting);
-        }
+      if (currStep !== 1 && currStep !== 2) {
         setPrevStep(currStep);
         setCurrStep(currStep + 1);
+      }
+
+      if (currStep === 2) {
+        if (validateDailyTime()) {
+          console.log("ok");
+        } else {
+          console.log("not ok");
+          console.log(dailyTimeRanges);
+        }
+        // handleSubmit(createMeeting);
       }
     }
   };
@@ -378,8 +494,6 @@ export default function CreateMeeting() {
       setCurrStep(currStep - 1);
     }
   };
-
-  const datesArr = [new Date().getTime()];
 
   return (
     <main className="flex flex-col px-5 py-10 md:p-10 mt-20 lg:m-0 justify-center">
@@ -560,44 +674,61 @@ export default function CreateMeeting() {
                     {/* Daily main time picking */}
                     {timepickerIndex === 1 && (
                       <>
-                        {selectedDates.map((date) => {
-                          const dateObj = moment.utc(date);
-                          return (
-                            <div className="flex justify-between w-[350px] md:w-[400px] items-center mb-4 px-2">
-                              <div className="flex flex-col h-14 w-14 bg-primary rounded-lg justify-center">
-                                <p className="text-3xl text-center text-light leading-none">
-                                  {dateObj.date()}
-                                </p>
-                                <p className="text-center text-light leading-none">
-                                  {shortMonthName[dateObj.month()]}
-                                </p>
+                        {dailyTimeRanges.map(
+                          (dayTimeRange: { date: number }) => {
+                            const dateObj = moment.utc(dayTimeRange.date);
+                            const fromTime = moment(
+                              getStartTime(dayTimeRange.date)
+                            ).hour();
+                            const toTime = moment(
+                              getEndTime(dayTimeRange.date)
+                            ).hour();
+                            console.log(fromTime, toTime);
+                            return (
+                              <div className="flex justify-between w-[350px] md:w-[400px] items-center mb-4 px-2">
+                                <div className="flex flex-col h-14 w-14 bg-primary rounded-lg justify-center">
+                                  <p className="text-3xl text-center text-light leading-none">
+                                    {dateObj.date()}
+                                  </p>
+                                  <p className="text-center text-light leading-none">
+                                    {shortMonthName[dateObj.month()]}
+                                  </p>
+                                </div>
+                                <div>
+                                  <DailyTimepicker
+                                    from={true}
+                                    toTime={toTime}
+                                    onChange={(e) => {
+                                      handleDailyTimeRangeChange(
+                                        e,
+                                        dateObj.valueOf(),
+                                        true
+                                      );
+                                    }}
+                                  />
+                                  <span className="m-4"> - </span>
+                                  <DailyTimepicker
+                                    from={false}
+                                    fromTime={fromTime}
+                                    onChange={(e) => {
+                                      handleDailyTimeRangeChange(
+                                        e,
+                                        dateObj.valueOf(),
+                                        false
+                                      );
+                                    }}
+                                  />
+                                </div>
                               </div>
-                              <div>
-                                <Timepicker
-                                  from={true}
-                                  onChange={(e) => {
-                                    handleDailyTimeRangeChange(
-                                      e,
-                                      dateObj.valueOf(),
-                                      true
-                                    );
-                                  }}
-                                />
-                                <span className="m-4"> - </span>
-                                <Timepicker
-                                  from={false}
-                                  onChange={handleMainEndTimeChange}
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
+                            );
+                          }
+                        )}
                       </>
                     )}
 
                     {/* Detailed time picking */}
                     {timepickerIndex === 2 && (
-                      <DetailedTimepicker dates={datesArr} />
+                      <DetailedTimepicker dates={dailyTimeRanges} />
                     )}
                   </div>
                 </div>
@@ -608,8 +739,6 @@ export default function CreateMeeting() {
             </motion.div>
           )}
         </div>
-
-        {currStep === 3 && <Button text="Utwórz spotkanie" />}
       </form>
       {/* Navigation */}
       {currStep < 3 && (

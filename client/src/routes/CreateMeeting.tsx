@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { motion } from "framer-motion";
-import moment, { isDate } from "moment";
+import moment from "moment";
 import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
@@ -9,12 +9,12 @@ import * as yup from "yup";
 
 // Components
 import Button from "../components/Button";
-import DailyTimepicker from "../components/CreateMeeting/DailyTimepicker";
 import DetailedTimepicker from "../components/CreateMeeting/DetailedTimepicker";
 import StepsIndicator from "../components/CreateMeeting/StepsIndicator";
+import Timepicker from "../components/CreateMeeting/Timepicker";
+// import Timepicker from "../components/CreateMeeting/Timepicker-bk";
 import IconButton from "../components/IconButton";
 import Input from "../components/Input";
-import Timepicker from "../components/Timepicker";
 import Title from "../components/Title";
 
 // Icons
@@ -25,7 +25,6 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 
 import axios from "axios";
-import { get } from "mongoose";
 
 export default function CreateMeeting() {
   // Steps
@@ -46,17 +45,11 @@ export default function CreateMeeting() {
 
   // Timepicker state
   // Main time
-  const [startTime, setStartTime] = useState("08:00");
-  const [endTime, setEndTime] = useState("09:00");
   const [timeError, setTimeError] = useState(false);
   const [timeErrorText, setTimeErrorText] = useState("");
 
-  const handleMainStartTimeChange = (e: { target: { value: string } }) => {
-    setStartTime(e.target.value);
-  };
-
-  const handleMainEndTimeChange = (e: { target: { value: string } }) => {
-    setEndTime(e.target.value);
+  const handleMainTimeChange = (e: { target: { value: string } }) => {
+    console.log(e.target.value);
   };
 
   // Daily time
@@ -102,11 +95,10 @@ export default function CreateMeeting() {
       from = convertDatetimeToTime(from).hour();
     }
     if (isDatetime(to)) {
-      to = convertDatetimeToTime(to).hour();
+      to = convertDatetimeToTime(to).hour() + 1;
     }
-    console.log(from, to);
-    for (let i = from; i <= to; i++) {
-      for (let hourHalf = 0; hourHalf < (i !== to ? 2 : 1); hourHalf++) {
+    for (let i = from; i < to; i++) {
+      for (let hourHalf = 0; hourHalf < 2; hourHalf++) {
         const time = moment(datetime)
           .hour(i)
           .minute(hourHalf * 30)
@@ -338,9 +330,7 @@ export default function CreateMeeting() {
       axios
         .post(import.meta.env.VITE_SERVER_URL + "/meet/new", {
           meetName: meetDetails?.name,
-          dates: selectedDates,
-          startTime: startTime,
-          endTime: endTime,
+          dates: dailyTimeRanges,
         })
         .then(function (response) {
           const meetId = response.data.newMeet.appointmentId;
@@ -370,8 +360,11 @@ export default function CreateMeeting() {
     const now = new Date();
     const nowDateTime = now.toISOString();
     const nowDate = nowDateTime.split("T")[0];
-    const startTimeConverted = new Date(nowDate + "T" + startTime);
-    const endTimeConverted = new Date(nowDate + "T" + endTime);
+    // FIX: Now is not working properly because there is no time in the date
+    // const startTimeConverted = new Date(nowDate + "T" + startTime);
+    // const endTimeConverted = new Date(nowDate + "T" + endTime);
+    const startTimeConverted = new Date(nowDate + "T");
+    const endTimeConverted = new Date(nowDate + "T");
 
     if (startTimeConverted >= endTimeConverted) {
       setTimeError(true);
@@ -467,6 +460,8 @@ export default function CreateMeeting() {
         if (validateDate()) {
           setPrevStep(currStep);
           setCurrStep(currStep + 1);
+          // Sort selectedDates
+          setSelectedDates(selectedDates.sort());
           fillDailyTimeRanges();
         }
       }
@@ -661,12 +656,24 @@ export default function CreateMeeting() {
                       <>
                         <Timepicker
                           from={true}
-                          onChange={handleMainStartTimeChange}
+                          fromTime={moment(
+                            getStartTime(dailyTimeRanges[0].date)
+                          ).hour()}
+                          toTime={moment(
+                            getEndTime(dailyTimeRanges[0].date)
+                          ).hour()}
+                          onChange={handleMainTimeChange}
                         />
                         <span className="m-4"> - </span>
                         <Timepicker
                           from={false}
-                          onChange={handleMainEndTimeChange}
+                          fromTime={moment(
+                            getStartTime(dailyTimeRanges[0].date)
+                          ).hour()}
+                          toTime={moment(
+                            getEndTime(dailyTimeRanges[0].date)
+                          ).hour()}
+                          onChange={handleMainTimeChange}
                         />
                       </>
                     )}
@@ -676,14 +683,15 @@ export default function CreateMeeting() {
                       <>
                         {dailyTimeRanges.map(
                           (dayTimeRange: { date: number }) => {
-                            const dateObj = moment.utc(dayTimeRange.date);
+                            const dateObj = moment(dayTimeRange.date);
+
                             const fromTime = moment(
                               getStartTime(dayTimeRange.date)
                             ).hour();
                             const toTime = moment(
                               getEndTime(dayTimeRange.date)
                             ).hour();
-                            console.log(fromTime, toTime);
+                            console.log("timepicker", fromTime, toTime);
                             return (
                               <div className="flex justify-between w-[350px] md:w-[400px] items-center mb-4 px-2">
                                 <div className="flex flex-col h-14 w-14 bg-primary rounded-lg justify-center">
@@ -695,8 +703,9 @@ export default function CreateMeeting() {
                                   </p>
                                 </div>
                                 <div>
-                                  <DailyTimepicker
+                                  <Timepicker
                                     from={true}
+                                    fromTime={fromTime}
                                     toTime={toTime}
                                     onChange={(e) => {
                                       handleDailyTimeRangeChange(
@@ -707,9 +716,10 @@ export default function CreateMeeting() {
                                     }}
                                   />
                                   <span className="m-4"> - </span>
-                                  <DailyTimepicker
+                                  <Timepicker
                                     from={false}
                                     fromTime={fromTime}
+                                    toTime={toTime}
                                     onChange={(e) => {
                                       handleDailyTimeRangeChange(
                                         e,

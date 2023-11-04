@@ -69,7 +69,7 @@ export default function DetailedTimepicker(props: {
 
   // Answering functionallity
   const dates = props.dates;
-  const days = dates.map((dateInfo: DayTimesData) => moment.utc(dateInfo.date));
+  const days = dates.map((dateInfo: DayTimesData) => moment(dateInfo.date));
 
   const getSelectedTimecell = (dateTime: number) => {
     return selectedTimecells.find(
@@ -103,7 +103,6 @@ export default function DetailedTimepicker(props: {
       // First click when timecell is NOT selected
       if (!unselectMode) {
         setSelectedTimecells([...selectedTimecells, dateTime]);
-        console.log(selectedTimecells);
       }
     }
   };
@@ -200,17 +199,17 @@ export default function DetailedTimepicker(props: {
   const renderDaysHeadings = () => {
     return days.map((day: any) => (
       <th
-        key={moment.utc(day).date()}
+        key={moment(day).date()}
         className={`bg-light sticky top-0 z-10 ${
-          moment.utc(day).day() == 0 && "pr-4"
+          moment(day).day() == 0 && "pr-4"
         }`}
       >
         <p className="text-sm text-dark font-medium">
-          {moment.utc(day).date().toString().padStart(2, "0") +
+          {moment(day).date().toString().padStart(2, "0") +
             "." +
-            (moment.utc(day).month() + 1).toString().padStart(2, "0")}
+            (moment(day).month() + 1).toString().padStart(2, "0")}
         </p>
-        <p className="text-dark">{daysNaming[moment.utc(day).day()]}</p>
+        <p className="text-dark">{daysNaming[moment(day).day()]}</p>
       </th>
     ));
   };

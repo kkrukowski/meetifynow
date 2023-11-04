@@ -1,25 +1,25 @@
-const DailyTimepicker = (props: {
+const Timepicker = (props: {
   from: boolean;
-  fromTime?: number;
-  toTime?: number;
+  fromTime: number;
+  toTime: number;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
 }) => {
   const defaultTime = () => {
-    if (props.from && props.toTime) {
-      return props.toTime - 1;
+    if (props.from) {
+      return props.fromTime;
     }
-    if (!props.from && props.fromTime) {
-      return props.fromTime + 1;
+    if (!props.from) {
+      return props.toTime + 1;
     }
   };
 
-  console.log(props.fromTime, props.toTime);
+  console.log(defaultTime());
 
   const renderOptions = () => {
     const optionsElements = [];
     // For start timepicker
-    if (props.toTime) {
-      for (let i = 1; i <= props.toTime - 1; i++) {
+    if (props.from) {
+      for (let i = 1; i <= props.toTime; i++) {
         const optionElement = (
           <option key={i} value={i}>{`${i < 10 ? `0${i}` : i}:00`}</option>
         );
@@ -27,7 +27,7 @@ const DailyTimepicker = (props: {
       }
     }
     // For end timepicker
-    if (props.fromTime) {
+    if (!props.from) {
       for (let i = props.fromTime + 1; i <= 24; i++) {
         const optionElement = (
           <option key={i} value={i}>{`${i < 10 ? `0${i}` : i}:00`}</option>
@@ -51,4 +51,4 @@ const DailyTimepicker = (props: {
   );
 };
 
-export default DailyTimepicker;
+export default Timepicker;

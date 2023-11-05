@@ -12,7 +12,6 @@ import Button from "../components/Button";
 import DetailedTimepicker from "../components/CreateMeeting/DetailedTimepicker";
 import StepsIndicator from "../components/CreateMeeting/StepsIndicator";
 import Timepicker from "../components/CreateMeeting/Timepicker";
-// import Timepicker from "../components/CreateMeeting/Timepicker-bk";
 import IconButton from "../components/IconButton";
 import Input from "../components/Input";
 import Title from "../components/Title";
@@ -650,18 +649,21 @@ export default function CreateMeeting() {
                       icon={faCalendar}
                       onClick={setTimepickerIndex}
                       valueToChange={0}
+                      isCurrent={timepickerIndex === 0}
                     />
                     <IconButton
                       icon={faCalendarDay}
                       className="ml-6"
                       onClick={setTimepickerIndex}
                       valueToChange={1}
+                      isCurrent={timepickerIndex === 1}
                     />
                     <IconButton
                       icon={faCalendarDays}
                       className="ml-6"
                       onClick={setTimepickerIndex}
                       valueToChange={2}
+                      isCurrent={timepickerIndex === 2}
                     />
                   </div>
                   <div className="self-center overflow-y-auto h-[300px]">

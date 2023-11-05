@@ -216,42 +216,56 @@ export default function CreateMeeting() {
     for (let i = 0; i < weeksInMonth; i++) {
       let tableCells = [];
       for (let j = 0; j < 7; j++) {
-        const date = moment
-          .utc()
+        const date = moment()
           .date(day)
           .month(month)
           .year(year)
           .startOf("day")
           .valueOf();
+
+        const isPast = date < moment().subtract(1, "days").valueOf();
         if (day <= daysInMonth && (i > 0 || j >= firstDay - 1)) {
-          tableCells.push(
-            <td
-              key={"d" + day}
-              data-date={date}
-              onMouseDown={() => toggleTimecell(date)}
-              onMouseUp={() => setIsMouseDown(false)}
-              onMouseOver={() => handleMouseOver(date)}
-              className={`h-10 w-10 font-medium text-center cursor-pointer ${
-                selectedDates.includes(date)
-                  ? `${
-                      dateNow.getDate() == day &&
-                      dateNow.getMonth() == month &&
-                      dateNow.getFullYear() == year
-                        ? "border border-2 border-dark bg-primary text-light rounded-lg selected"
-                        : "bg-primary rounded-lg text-light selected"
-                    }`
-                  : `${
-                      dateNow.getDate() == day &&
-                      dateNow.getMonth() == month &&
-                      dateNow.getFullYear() == year
-                        ? "border border-2 border-primary rounded-lg"
-                        : ""
-                    }`
-              }`}
-            >
-              {day}
-            </td>
-          );
+          let tableCellElement;
+          if (!isPast) {
+            tableCellElement = (
+              <td
+                key={"d" + day}
+                data-date={date}
+                onMouseDown={() => toggleTimecell(date)}
+                onMouseUp={() => setIsMouseDown(false)}
+                onMouseOver={() => handleMouseOver(date)}
+                className={`h-10 w-10 font-medium text-center cursor-pointer ${
+                  selectedDates.includes(date)
+                    ? `${
+                        dateNow.getDate() == day &&
+                        dateNow.getMonth() == month &&
+                        dateNow.getFullYear() == year
+                          ? "border border-2 border-dark bg-primary text-light rounded-lg selected"
+                          : "bg-primary rounded-lg text-light selected"
+                      }`
+                    : `${
+                        dateNow.getDate() == day &&
+                        dateNow.getMonth() == month &&
+                        dateNow.getFullYear() == year
+                          ? "border border-2 border-primary rounded-lg"
+                          : ""
+                      }`
+                }`}
+              >
+                {day}
+              </td>
+            );
+          } else {
+            tableCellElement = (
+              <td
+                key={"d" + day}
+                className={`h-10 w-10 font-medium text-center cursor-pointer text-gray`}
+              >
+                {day}
+              </td>
+            );
+          }
+          tableCells.push(tableCellElement);
           day++;
         } else {
           tableCells.push(<td key={"e" + e}></td>);

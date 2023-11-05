@@ -14,7 +14,7 @@
 
 ## ⌚ Time spent
 
-Total time in programming this project - 63h
+Total time in programming this project - 80h
 
 
 ## 👨‍💻 Technologies

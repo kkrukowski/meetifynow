@@ -1,7 +1,7 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { motion } from "framer-motion";
 import moment from "moment";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
@@ -106,7 +106,6 @@ export default function CreateMeeting() {
         datetimes.push(time);
       }
     }
-    console.log(datetimes);
 
     return datetimes;
   };
@@ -136,26 +135,75 @@ export default function CreateMeeting() {
     fromTime: boolean
   ) => {
     const hour = +e.target.value.split(":")[0];
-    let newTimeRange: DailyTimeRange;
-    let index = -1;
-    if (isDatetimeExistInRanges(datetime)) {
-      index = getDailyTimeRangeIndex(datetime);
-      newTimeRange = {
-        date: datetime,
-        times: getTimeRangeDatetimes(
-          datetime,
-          fromTime ? hour : getStartTime(datetime),
-          fromTime ? getEndTime(datetime) : hour
-        ),
-      };
-    }
-    if (index !== -1) {
-      setDailyTimeRanges((prevTimeRanges) => {
-        const updatedTimeRanges = [...prevTimeRanges];
-        updatedTimeRanges[index] = newTimeRange;
-        return updatedTimeRanges;
+    let newTimeRanges: DailyTimeRange[] = [];
+    if (timepickerIndex === 0 && datetime === -1) {
+      const dates = dailyTimeRanges.map((range) => range.date);
+      dates.forEach((date) => {
+        newTimeRanges.push({
+          date: date,
+          times: getTimeRangeDatetimes(
+            date,
+            fromTime ? hour : getStartTime(date),
+            fromTime ? getEndTime(date) : hour
+          ),
+        });
+        setDailyTimeRanges(newTimeRanges);
       });
+    } else {
+      let newTimeRange: DailyTimeRange;
+      let index = -1;
+      if (isDatetimeExistInRanges(datetime)) {
+        index = getDailyTimeRangeIndex(datetime);
+        newTimeRange = {
+          date: datetime,
+          times: getTimeRangeDatetimes(
+            datetime,
+            fromTime ? hour : getStartTime(datetime),
+            fromTime ? getEndTime(datetime) : hour
+          ),
+        };
+      }
+      if (index !== -1) {
+        setDailyTimeRanges((prevTimeRanges) => {
+          const updatedTimeRanges = [...prevTimeRanges];
+          updatedTimeRanges[index] = newTimeRange;
+          return updatedTimeRanges;
+        });
+      }
     }
+  };
+
+  const pushSelectedTimecell = (dayDateTime: number, dateTime: number) => {
+    const timeRange = dailyTimeRanges.find(
+      (range) => range.date === dayDateTime
+    ) as DailyTimeRange;
+    const newTimeRangeArr = [...timeRange.times, dateTime];
+    const newTimeRange = {
+      date: dayDateTime,
+      times: newTimeRangeArr.sort(),
+    };
+    const index = getDailyTimeRangeIndex(dayDateTime);
+    setDailyTimeRanges((prevTimeRanges) => {
+      const updatedTimeRanges = [...prevTimeRanges];
+      updatedTimeRanges[index] = newTimeRange;
+      return updatedTimeRanges;
+    });
+  };
+
+  const popUnselectedTimecell = (dayDateTime: number, dateTime: number) => {
+    const timeRange = dailyTimeRanges.find(
+      (range) => range.date === dayDateTime
+    ) as DailyTimeRange;
+    const newTimeRange = {
+      date: dayDateTime,
+      times: timeRange.times.filter((time) => time !== dateTime),
+    };
+    const index = getDailyTimeRangeIndex(dayDateTime);
+    setDailyTimeRanges((prevTimeRanges) => {
+      const updatedTimeRanges = [...prevTimeRanges];
+      updatedTimeRanges[index] = newTimeRange;
+      return updatedTimeRanges;
+    });
   };
 
   // Detailed time
@@ -401,7 +449,6 @@ export default function CreateMeeting() {
 
     if (dailyTimeRanges.length === selectedDates.length) {
       dailyTimeRanges.forEach((timeRange) => {
-        console.log(timeRange);
         const startTimeConverted = new Date(
           nowDate + "T" + getStartTime(timeRange.date)
         );
@@ -487,9 +534,6 @@ export default function CreateMeeting() {
       if (currStep === 2) {
         if (validateDailyTime()) {
           console.log("ok");
-        } else {
-          console.log("not ok");
-          console.log(dailyTimeRanges);
         }
         // handleSubmit(createMeeting);
       }
@@ -678,7 +722,9 @@ export default function CreateMeeting() {
                           toTime={moment(
                             getEndTime(dailyTimeRanges[0].date)
                           ).hour()}
-                          onChange={handleMainTimeChange}
+                          onChange={(e) =>
+                            handleDailyTimeRangeChange(e, -1, true)
+                          }
                         />
                         <span className="m-4"> - </span>
                         <Timepicker
@@ -689,7 +735,9 @@ export default function CreateMeeting() {
                           toTime={moment(
                             getEndTime(dailyTimeRanges[0].date)
                           ).hour()}
-                          onChange={handleMainTimeChange}
+                          onChange={(e) =>
+                            handleDailyTimeRangeChange(e, -1, false)
+                          }
                         />
                       </>
                     )}
@@ -707,7 +755,6 @@ export default function CreateMeeting() {
                             const toTime = moment(
                               getEndTime(dayTimeRange.date)
                             ).hour();
-                            console.log("timepicker", fromTime, toTime);
                             return (
                               <div className="flex justify-between w-[350px] md:w-[400px] items-center mb-4 px-2">
                                 <div className="flex flex-col h-14 w-14 bg-primary rounded-lg justify-center">
@@ -754,7 +801,11 @@ export default function CreateMeeting() {
 
                     {/* Detailed time picking */}
                     {timepickerIndex === 2 && (
-                      <DetailedTimepicker dates={dailyTimeRanges} />
+                      <DetailedTimepicker
+                        dates={dailyTimeRanges}
+                        pushSelectedTimecell={pushSelectedTimecell}
+                        popUnselectedTimecell={popUnselectedTimecell}
+                      />
                     )}
                   </div>
                 </div>

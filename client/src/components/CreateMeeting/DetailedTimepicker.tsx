@@ -8,6 +8,8 @@ type DayTimesData = {
 
 export default function DetailedTimepicker(props: {
   dates: Array<DayTimesData>;
+  pushSelectedTimecell: (dayDatetime: number, dateTime: number) => void;
+  popUnselectedTimecell: (dayDatetime: number, dateTime: number) => void;
 }) {
   const getPickedTimes = () => {
     const pickedTimesArrays = props.dates.map(
@@ -22,7 +24,6 @@ export default function DetailedTimepicker(props: {
     getPickedTimes()
   );
   const [selectionMode, setSelectionMode] = useState(false);
-  console.log(selectedTimecells);
 
   // Checking mobile mode
   const [windowSize, setWindowSize] = useState([
@@ -90,19 +91,23 @@ export default function DetailedTimepicker(props: {
 
   const [unselectMode, setUnselectMode] = useState(false);
 
-  const toggleTimecell = (dateTime: number) => {
+  const toggleTimecell = (dayDatetime: number, dateTime: number) => {
+    console.log(moment(dayDatetime).format("DD.MM.YYYY HH:mm"));
     if (isDateSelected(dateTime)) {
       if (!selectionMode) {
         unselectTimecell(dateTime);
+        props.popUnselectedTimecell(dayDatetime, dateTime);
       }
 
       if (selectionMode && unselectMode) {
         unselectTimecell(dateTime);
+        props.popUnselectedTimecell(dayDatetime, dateTime);
       }
     } else {
       // First click when timecell is NOT selected
       if (!unselectMode) {
         setSelectedTimecells([...selectedTimecells, dateTime]);
+        props.pushSelectedTimecell(dayDatetime, dateTime);
       }
     }
   };
@@ -114,9 +119,9 @@ export default function DetailedTimepicker(props: {
     }
   };
 
-  const handleMouseOver = (dateTime: number) => {
+  const handleMouseOver = (dayDatetime: number, dateTime: number) => {
     if (selectionMode) {
-      toggleTimecell(dateTime);
+      toggleTimecell(dayDatetime, dateTime);
     }
   };
 
@@ -127,6 +132,7 @@ export default function DetailedTimepicker(props: {
       for (let h = 0; h < 2; h++) {
         let timeRow = [];
         for (let j = 0; j < days.length; j++) {
+          const dayDatetime = props.dates[j].date;
           const dateTime = days[j]
             .hour(i)
             .minute(h == 0 ? 0 : 30)
@@ -139,7 +145,7 @@ export default function DetailedTimepicker(props: {
               <div
                 data-date={dateTime}
                 onMouseDown={() => {
-                  toggleTimecell(dateTime);
+                  toggleTimecell(dayDatetime, dateTime);
                   if (!isMobile()) {
                     setSelectionMode(true);
                   }
@@ -152,7 +158,7 @@ export default function DetailedTimepicker(props: {
                 }}
                 onMouseOver={() => {
                   if (!isMobile()) {
-                    handleMouseOver(dateTime);
+                    handleMouseOver(dayDatetime, dateTime);
                     disableSelection();
                   }
                 }}

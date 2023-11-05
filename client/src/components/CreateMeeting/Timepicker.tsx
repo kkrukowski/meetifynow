@@ -13,8 +13,6 @@ const Timepicker = (props: {
     }
   };
 
-  console.log(defaultTime());
-
   const renderOptions = () => {
     const optionsElements = [];
     // For start timepicker

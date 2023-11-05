@@ -138,7 +138,7 @@ export default function DetailedTimepicker(props: {
             .minute(h == 0 ? 0 : 30)
             .valueOf();
 
-          const isEndOfWeek = moment.utc(dateTime).day() == 0;
+          const isEndOfWeek = moment(dateTime).day() == 0;
 
           timeRow.push(
             <td key={dateTime}>

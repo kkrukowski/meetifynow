@@ -710,7 +710,7 @@ export default function CreateMeeting() {
                       isCurrent={timepickerIndex === 2}
                     />
                   </div>
-                  <div className="self-center overflow-y-auto h-[300px]">
+                  <div className="self-center overflow-y-auto h-[300px] p-2">
                     {/* Main time picking */}
                     {timepickerIndex === 0 && (
                       <>

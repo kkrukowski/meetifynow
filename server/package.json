@@ -4,7 +4,8 @@
   "main": "server/src/index.ts",
   "homepage": "https://time2meet.onrender.com/",
   "scripts": {
-    "test": "jest --watch --verbose"
+    "test": "jest --watch --verbose",
+    "start": "nodemon app.mjs"
   },
   "repository": "https://github.com/keirrr/time2meet",
   "license": "MIT",

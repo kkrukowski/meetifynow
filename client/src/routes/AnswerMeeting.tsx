@@ -1,6 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
-import moment from "moment-timezone";
+import moment, { max } from "moment-timezone";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
@@ -32,11 +32,8 @@ export default function AnswerMeeting(props: any) {
   const [availableCount, setAvailableCount] = useState(0);
   const [answers, setAnswers] = useState<any>(props.answers);
   const [meetName, setMeetName] = useState(props.meetName);
-  const meetTime = {
-    from: new Date("1970-01-01T" + props.startTime).getHours(),
-    to: new Date("1970-01-01T" + props.endTime).getHours(),
-  };
   const answersCount = answers.length;
+  const datesInfo = props.dates;
   const [unavailableUsersInfo, setUnavailableUsersInfo] = useState<any>([]);
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);
   const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
@@ -141,7 +138,6 @@ export default function AnswerMeeting(props: any) {
 
   // Answering functionallity
   const dates = props.dates.sort();
-  const days = dates.map((date: string) => moment.utc(date));
 
   const isDateSelected = (dateTime: number) => {
     return selectedTimecells.some(
@@ -248,19 +244,50 @@ export default function AnswerMeeting(props: any) {
     setLookedUpTime(convertedTime);
   };
 
+  const flatTimes = datesInfo.flatMap((date: any) => date.times);
+
+  const getMinimumTimeInDates = () => {
+    return moment(Math.min(...flatTimes));
+  };
+
+  const getMaximumTimeInDates = () => {
+    return moment(Math.max(...flatTimes));
+  };
+
+  const isMinimumTimeHalfHour = () => {
+    return moment(getMinimumTimeInDates()).minute() == 30;
+  };
+
+  const isMaximumTimeHalfHour = () => {
+    return moment(getMaximumTimeInDates()).minute() == 0;
+  };
+
   const renderTimeCells = () => {
+    const minimumTimeHour = getMinimumTimeInDates().hour();
+    const maximumTimeHour = getMaximumTimeInDates().hour();
+
     var timeCells: any = [];
 
-    for (let i = meetTime.from; i <= meetTime.to; i++) {
+    for (let i = minimumTimeHour; i <= maximumTimeHour; i++) {
       for (let h = 0; h < 2; h++) {
+        // Handle half hours
+        if (i == maximumTimeHour && h == 1 && isMaximumTimeHalfHour()) break;
+        if (i == minimumTimeHour && h == 0 && isMinimumTimeHalfHour()) continue;
+
         let timeRow = [];
-        for (let j = 0; j < days.length; j++) {
-          const dateTime = days[j]
+        for (let j = 0; j < dates.length; j++) {
+          const dateTime = moment(dates[j].date)
             .hour(i)
             .minute(h == 0 ? 0 : 30)
             .valueOf();
 
-          const isEndOfWeek = moment.utc(dateTime).day() == 0;
+          const isEndOfWeek = moment(dateTime).day() == 0;
+
+          if (flatTimes.includes(dateTime)) {
+            timeRow.push(availableTimecell(dateTime, isEndOfWeek));
+          } else {
+            timeRow.push(disabledTimecell());
+          }
 
           if (
             availabilityInfo[dateTime] &&
@@ -270,87 +297,6 @@ export default function AnswerMeeting(props: any) {
               availabilityInfo[dateTime].usersInfo.length
             );
           }
-
-          timeRow.push(
-            <td key={dateTime}>
-              <div
-                data-date={dateTime}
-                date-votes={
-                  availabilityInfo[dateTime]
-                    ? availabilityInfo[dateTime].usersInfo.length
-                    : 0
-                }
-                onMouseDown={() => {
-                  if ((isMobile() && mobileAnsweringMode) || !isMobile()) {
-                    toggleTimecell(dateTime);
-                  } else if (isMobile() && !mobileAnsweringMode) {
-                    setLookedUpDatetime(dateTime);
-                    convertDatetimeToDate(dateTime);
-                  }
-                  if (!isMobile()) {
-                    setUnselectMode(false);
-                    setSelectionMode(true);
-                    const isTimecellOnline =
-                      getSelectedTimecell(dateTime)?.isOnline;
-                    setOnlineSelectionMode(isTimecellOnline ? true : false);
-                  }
-                }}
-                onMouseUp={() => {
-                  if (!isMobile()) {
-                    setSelectionMode(false);
-                    setUnselectMode(false);
-                  }
-                }}
-                onMouseOver={() => {
-                  if (!isMobile()) {
-                    handleMouseOver(dateTime);
-                    setLookedUpDatetime(dateTime);
-                    convertDatetimeToDate(dateTime);
-                    disableSelection();
-                  }
-                }}
-                className={`rounded-lg h-12 w-24 lg:h-6 lg:w-12 transition-colors ${
-                  isEndOfWeek && "mr-4"
-                }  ${
-                  isDateSelected(dateTime)
-                    ? `${
-                        getSelectedTimecell(dateTime)?.isOnline
-                          ? `bg-gold ${!isMobile() && "hover:bg-gold/50"}`
-                          : `bg-primary ${!isMobile() && "hover:bg-primary/50"}`
-                      }`
-                    : `border border-gray ${
-                        ((isMobile() && !mobileAnsweringMode) || !isMobile()) &&
-                        "hover:border-none"
-                      }`
-                } ${
-                  isAnswered(dateTime)
-                    ? `border-none ${
-                        isDateSelected(dateTime)
-                          ? `${
-                              getSelectedTimecell(dateTime)?.isOnline
-                                ? "bg-gold hover:bg-gold/50"
-                                : "bg-primary hover:bg-primary/50"
-                            } selected`
-                          : `answered  ${
-                              !isMobile() && "active:animate-cell-select"
-                            } ${
-                              availabilityInfo[dateTime].onlineCount >=
-                              highestAvailableCount * 0.5
-                                ? "bg-gold-dark hover:bg-gold-dark/50"
-                                : availabilityInfo[dateTime].usersInfo.length ==
-                                  highestAvailableCount
-                                ? "bg-green hover:bg-green/50"
-                                : "bg-light-green hover:bg-light-green/50"
-                            }`
-                      }`
-                    : `${
-                        ((isMobile() && !mobileAnsweringMode) || !isMobile()) &&
-                        "active:animate-cell-select hover:bg-gray"
-                      }`
-                }`}
-              ></div>
-            </td>
-          );
         }
         if (h == 0) {
           timeCells.push(
@@ -377,6 +323,90 @@ export default function AnswerMeeting(props: any) {
     return timeCells;
   };
 
+  const availableTimecell = (dateTime: number, isEndOfWeek: boolean) => (
+    <td key={dateTime}>
+      <div
+        data-date={dateTime}
+        date-votes={
+          availabilityInfo[dateTime]
+            ? availabilityInfo[dateTime].usersInfo.length
+            : 0
+        }
+        onMouseDown={() => {
+          if ((isMobile() && mobileAnsweringMode) || !isMobile()) {
+            toggleTimecell(dateTime);
+          } else if (isMobile() && !mobileAnsweringMode) {
+            setLookedUpDatetime(dateTime);
+            convertDatetimeToDate(dateTime);
+          }
+          if (!isMobile()) {
+            setUnselectMode(false);
+            setSelectionMode(true);
+            const isTimecellOnline = getSelectedTimecell(dateTime)?.isOnline;
+            setOnlineSelectionMode(isTimecellOnline ? true : false);
+          }
+        }}
+        onMouseUp={() => {
+          if (!isMobile()) {
+            setSelectionMode(false);
+            setUnselectMode(false);
+          }
+        }}
+        onMouseOver={() => {
+          if (!isMobile()) {
+            handleMouseOver(dateTime);
+            setLookedUpDatetime(dateTime);
+            convertDatetimeToDate(dateTime);
+            disableSelection();
+          }
+        }}
+        className={`rounded-lg h-12 w-24 lg:h-6 lg:w-12 transition-colors ${
+          isEndOfWeek && "mr-4"
+        }  ${
+          isDateSelected(dateTime)
+            ? `${
+                getSelectedTimecell(dateTime)?.isOnline
+                  ? `bg-gold ${!isMobile() && "hover:bg-gold/50"}`
+                  : `bg-primary ${!isMobile() && "hover:bg-primary/50"}`
+              }`
+            : `border border-gray ${
+                ((isMobile() && !mobileAnsweringMode) || !isMobile()) &&
+                "hover:border-none"
+              }`
+        } ${
+          isAnswered(dateTime)
+            ? `border-none ${
+                isDateSelected(dateTime)
+                  ? `${
+                      getSelectedTimecell(dateTime)?.isOnline
+                        ? "bg-gold hover:bg-gold/50"
+                        : "bg-primary hover:bg-primary/50"
+                    } selected`
+                  : `answered  ${!isMobile() && "active:animate-cell-select"} ${
+                      availabilityInfo[dateTime].onlineCount >=
+                      highestAvailableCount * 0.5
+                        ? "bg-gold-dark hover:bg-gold-dark/50"
+                        : availabilityInfo[dateTime].usersInfo.length ==
+                          highestAvailableCount
+                        ? "bg-green hover:bg-green/50"
+                        : "bg-light-green hover:bg-light-green/50"
+                    }`
+              }`
+            : `${
+                ((isMobile() && !mobileAnsweringMode) || !isMobile()) &&
+                "active:animate-cell-select hover:bg-primary"
+              }`
+        }`}
+      ></div>
+    </td>
+  );
+
+  const disabledTimecell = () => (
+    <td>
+      <div className="rounded-lg h-12 w-24 lg:h-6 lg:w-12 bg-light-gray cursor-default"></div>
+    </td>
+  );
+
   const isAnswered = (datetime: Number) => {
     const datesData = answers.flatMap((answer: any) => answer.dates);
     const datesArray = datesData.map((date: any) => date.meetDate);
@@ -386,19 +416,19 @@ export default function AnswerMeeting(props: any) {
   const daysNaming = ["Nd", "Pon", "Wt", "Śr", "Czw", "Pt", "Sob"];
 
   const renderDaysHeadings = () => {
-    return days.map((day: Date) => (
+    return dates.map((day: any) => (
       <th
-        key={moment.utc(day).date()}
+        key={moment(day.date).date()}
         className={`bg-light sticky top-0 z-10 ${
-          moment.utc(day).day() == 0 && "pr-4"
+          moment(day.date).day() == 0 && "pr-4"
         }`}
       >
         <p className="text-sm text-dark font-medium">
-          {moment.utc(day).date().toString().padStart(2, "0") +
+          {moment(day.date).date().toString().padStart(2, "0") +
             "." +
-            (moment.utc(day).month() + 1).toString().padStart(2, "0")}
+            (moment(day.date).month() + 1).toString().padStart(2, "0")}
         </p>
-        <p className="text-dark">{daysNaming[moment.utc(day).day()]}</p>
+        <p className="text-dark">{daysNaming[moment(day.date).day()]}</p>
       </th>
     ));
   };
@@ -578,7 +608,7 @@ export default function AnswerMeeting(props: any) {
                 </div>
               )}
               <div
-                className={`overflow-auto max-h-[250px] h-smd:max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[500px] w-full max-w-[360px] md:max-w-[700px] lg:max-w-[350px] mt-5 ${
+                className={`self-center overflow-auto max-h-[250px] h-smd:max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[500px] w-auto max-w-[360px] md:max-w-[700px] lg:max-w-[350px] mt-5 ${
                   isMobile() && "mb-5"
                 }`}
               >

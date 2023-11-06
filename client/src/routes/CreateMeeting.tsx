@@ -381,29 +381,6 @@ export default function CreateMeeting() {
 
   const daysName = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"];
 
-  // Create meeting
-  const navigate = useNavigate();
-  const createMeeting: SubmitHandler<Inputs> = async () => {
-    validateTime();
-    validateDate();
-    validateDailyTime();
-    if (validateTime() && validateDate() && validateDailyTime()) {
-      axios
-        .post(import.meta.env.VITE_SERVER_URL + "/meet/new", {
-          meetName: meetDetails?.name,
-          dates: dailyTimeRanges,
-        })
-        .then(function (response) {
-          const meetId = response.data.newMeet.appointmentId;
-          const meetUrl = `/meet/${meetId}`;
-          navigate(meetUrl);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
-    }
-  };
-
   // VALIDATION
   // Date validation
   const validateDate = () => {
@@ -477,6 +454,26 @@ export default function CreateMeeting() {
     return isValid;
   };
 
+  // Create meeting
+  const navigate = useNavigate();
+  const createMeeting: SubmitHandler<Inputs> = async () => {
+    if (validateDate()) {
+      axios
+        .post(import.meta.env.VITE_SERVER_URL + "/meet/new", {
+          meetName: meetDetails?.name,
+          dates: dailyTimeRanges,
+        })
+        .then(function (response) {
+          const meetId = response.data.newMeet.appointmentId;
+          const meetUrl = `/meet/${meetId}`;
+          navigate(meetUrl);
+        })
+        .catch(function (error) {
+          console.log(error);
+        });
+    }
+  };
+
   // Form validation
   const formSchema = yup.object().shape({
     meeting__name: yup
@@ -512,7 +509,6 @@ export default function CreateMeeting() {
   const next = async () => {
     const fields = stepsInfo[currStep].fields;
     const output = await trigger(fields as FieldName[], { shouldFocus: true });
-
     if (!output) return;
 
     if (currStep < stepsInfo.length) {
@@ -532,10 +528,7 @@ export default function CreateMeeting() {
       }
 
       if (currStep === 2) {
-        if (validateDailyTime()) {
-          console.log("ok");
-        }
-        // handleSubmit(createMeeting);
+        handleSubmit(createMeeting)();
       }
     }
   };
@@ -710,7 +703,11 @@ export default function CreateMeeting() {
                       isCurrent={timepickerIndex === 2}
                     />
                   </div>
-                  <div className="self-center overflow-y-auto h-[300px] p-2">
+                  <div
+                    className={`self-center overflow-y-auto h-[300px] ${
+                      timepickerIndex !== 2 && "p-2"
+                    }`}
+                  >
                     {/* Main time picking */}
                     {timepickerIndex === 0 && (
                       <>

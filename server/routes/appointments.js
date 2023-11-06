@@ -30,7 +30,7 @@ router.get("/:appointmentId", async (req, res) => {
 router.post("/new", async (req, res) => {
   // check if id is unique
   try {
-    const { meetName, dates, startTime, endTime } = req.body;
+    const { meetName, dates } = req.body;
 
     //Validate name data
     if (!meetName) {
@@ -52,8 +52,6 @@ router.post("/new", async (req, res) => {
       appointmentId: randomString.generate(7),
       meetName,
       dates,
-      startTime,
-      endTime,
     });
     await newMeet.save();
     return res.status(200).json({ message: "New appointment added", newMeet });

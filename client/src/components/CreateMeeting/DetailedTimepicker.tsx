@@ -221,7 +221,7 @@ export default function DetailedTimepicker(props: {
   };
 
   return (
-    <table className="time__seclection--table w-fit lg:mt-5 self-center select-none">
+    <table className="time__seclection--table w-fit self-center select-none">
       <thead>
         <tr>
           <th className="bg-light sticky top-0 left-0 z-20"></th>

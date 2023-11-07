@@ -215,31 +215,33 @@ export default function CreateMeeting() {
   const [selectionMode, setSelectionMode] = useState(false);
   const [dateError, setDateError] = useState(false);
 
-  const toggleTimecell = (date: number) => {
-    if (selectedDates.includes(date)) {
+  const toggleTimecell = (dateTime: number) => {
+    console.log("toggle");
+    console.log(selectedDates);
+    if (selectedDates.includes(dateTime)) {
       if (!selectionMode) {
-        setSelectedDates(selectedDates.filter((d) => d !== date));
+        setSelectedDates(selectedDates.filter((d) => d !== dateTime));
       }
       if (!isMouseDown) {
         setSelectionMode(false);
-        setSelectedDates(selectedDates.filter((d) => d !== date));
+        setSelectedDates(selectedDates.filter((d) => d !== dateTime));
         setIsMouseDown(true);
       }
     } else {
       if (selectionMode) {
-        setSelectedDates([...selectedDates, date]);
+        setSelectedDates([...selectedDates, dateTime]);
       }
       if (!isMouseDown) {
         setSelectionMode(true);
-        setSelectedDates([...selectedDates, date]);
+        setSelectedDates([...selectedDates, dateTime]);
         setIsMouseDown(true);
       }
     }
   };
 
-  const handleMouseOver = (date: number) => {
+  const handleMouseOver = (dateTime: number) => {
     if (isMouseDown) {
-      toggleTimecell(date);
+      toggleTimecell(dateTime);
     }
   };
 
@@ -263,26 +265,22 @@ export default function CreateMeeting() {
     for (let i = 0; i < weeksInMonth; i++) {
       let tableCells = [];
       for (let j = 0; j < 7; j++) {
-        const date = moment()
-          .date(day)
-          .month(month)
-          .year(year)
-          .startOf("day")
-          .valueOf();
+        const date = moment().month(month).year(year).startOf("day").date(day);
+        const dateTime = date.valueOf();
 
-        const isPast = date < moment().subtract(1, "days").valueOf();
+        const isPast = dateTime < moment().subtract(1, "days").valueOf();
         if (day <= daysInMonth && (i > 0 || j >= firstDay - 1)) {
           let tableCellElement;
           if (!isPast) {
             tableCellElement = (
               <td
-                key={"d" + day}
-                data-date={date}
-                onMouseDown={() => toggleTimecell(date)}
+                key={"d" + date.date()}
+                data-date={dateTime}
+                onMouseDown={() => toggleTimecell(dateTime)}
                 onMouseUp={() => setIsMouseDown(false)}
-                onMouseOver={() => handleMouseOver(date)}
+                onMouseOver={() => handleMouseOver(dateTime)}
                 className={`h-10 w-10 font-medium text-center cursor-pointer ${
-                  selectedDates.includes(date)
+                  selectedDates.includes(dateTime)
                     ? `${
                         dateNow.getDate() == day &&
                         dateNow.getMonth() == month &&
@@ -299,16 +297,16 @@ export default function CreateMeeting() {
                       }`
                 }`}
               >
-                {day}
+                {date.date()}
               </td>
             );
           } else {
             tableCellElement = (
               <td
-                key={"d" + day}
+                key={"d" + date.date()}
                 className={`h-10 w-10 font-medium text-center cursor-pointer text-gray`}
               >
-                {day}
+                {date.date()}
               </td>
             );
           }

@@ -42,15 +42,6 @@ export default function CreateMeeting() {
     link: "" as string,
   });
 
-  // Timepicker state
-  // Main time
-  const [timeError, setTimeError] = useState(false);
-  const [timeErrorText, setTimeErrorText] = useState("");
-
-  const handleMainTimeChange = (e: { target: { value: string } }) => {
-    console.log(e.target.value);
-  };
-
   // Daily time
   interface DailyTimeRange {
     date: number;
@@ -214,6 +205,7 @@ export default function CreateMeeting() {
   const [isMouseDown, setIsMouseDown] = useState(false);
   const [selectionMode, setSelectionMode] = useState(false);
   const [dateError, setDateError] = useState(false);
+  const [dateErrorText, setDateErrorText] = useState("");
 
   const toggleTimecell = (dateTime: number) => {
     console.log("toggle");
@@ -384,72 +376,19 @@ export default function CreateMeeting() {
   const validateDate = () => {
     if (selectedDates.length < 1) {
       setDateError(true);
+      setDateErrorText("Wybierz datę spotkania.");
       return false;
-    } else {
-      setDateError(false);
-      return true;
     }
-  };
 
-  // Time validation
-  const validateTime = () => {
-    const now = new Date();
-    const nowDateTime = now.toISOString();
-    const nowDate = nowDateTime.split("T")[0];
-    // FIX: Now is not working properly because there is no time in the date
-    // const startTimeConverted = new Date(nowDate + "T" + startTime);
-    // const endTimeConverted = new Date(nowDate + "T" + endTime);
-    const startTimeConverted = new Date(nowDate + "T");
-    const endTimeConverted = new Date(nowDate + "T");
-
-    if (startTimeConverted >= endTimeConverted) {
-      setTimeError(true);
-      setTimeErrorText(
-        "Godzina zakończenia musi być późniejsza niż rozpoczęcia."
-      );
+    if (selectedDates.length > 15) {
+      setDateError(true);
+      setDateErrorText("Możesz wybrać maksymalnie 15 dat.");
       return false;
-    } else {
-      setTimeError(false);
-      setTimeErrorText("");
-      return true;
-    }
-  };
-
-  const validateDailyTime = () => {
-    const now = new Date();
-    const nowDateTime = now.toISOString();
-    const nowDate = nowDateTime.split("T")[0];
-
-    let isValid = false;
-
-    if (dailyTimeRanges.length === selectedDates.length) {
-      dailyTimeRanges.forEach((timeRange) => {
-        const startTimeConverted = new Date(
-          nowDate + "T" + getStartTime(timeRange.date)
-        );
-        const endTimeConverted = new Date(
-          nowDate + "T" + getEndTime(timeRange.date)
-        );
-        if (startTimeConverted >= endTimeConverted) {
-          setTimeError(true);
-          setTimeErrorText(
-            "Godzina zakończenia musi być późniejsza niż rozpoczęcia."
-          );
-          isValid = false;
-          return;
-        } else {
-          setTimeError(false);
-          setTimeErrorText("");
-          isValid = true;
-        }
-      });
-    } else {
-      setTimeError(true);
-      setTimeErrorText("Wszystkie przedziały godzin muszą zostać podane.");
-      isValid = false;
     }
 
-    return isValid;
+    setDateError(false);
+    setDateErrorText("");
+    return true;
   };
 
   // Create meeting
@@ -664,7 +603,7 @@ export default function CreateMeeting() {
                   <tbody>{showCalendar(month, year)}</tbody>
                 </table>
                 <p className="text-sm relative mt-2 text-red font-medium">
-                  {dateError ? "Wybierz datę spotkania." : ""}
+                  {dateError && dateErrorText}
                 </p>
               </div>
             </motion.div>
@@ -751,7 +690,7 @@ export default function CreateMeeting() {
                               getEndTime(dayTimeRange.date)
                             ).hour();
                             return (
-                              <div className="flex justify-between w-[350px] md:w-[400px] items-center mb-4 px-2">
+                              <div className="flex justify-between w-[310px] md:w-[400px] items-center mb-4 px-2">
                                 <div className="flex flex-col h-14 w-14 bg-primary rounded-lg justify-center">
                                   <p className="text-3xl text-center text-light leading-none">
                                     {dateObj.date()}
@@ -773,7 +712,7 @@ export default function CreateMeeting() {
                                       );
                                     }}
                                   />
-                                  <span className="m-4"> - </span>
+                                  <span className="m-2 md:m-4"> - </span>
                                   <Timepicker
                                     from={false}
                                     fromTime={fromTime}
@@ -796,18 +735,17 @@ export default function CreateMeeting() {
 
                     {/* Detailed time picking */}
                     {timepickerIndex === 2 && (
-                      <DetailedTimepicker
-                        dates={dailyTimeRanges}
-                        pushSelectedTimecell={pushSelectedTimecell}
-                        popUnselectedTimecell={popUnselectedTimecell}
-                      />
+                      <div className="w-auto max-w-[330px] md:max-w-[700px] lg:max-w-[350px]">
+                        <DetailedTimepicker
+                          dates={dailyTimeRanges}
+                          pushSelectedTimecell={pushSelectedTimecell}
+                          popUnselectedTimecell={popUnselectedTimecell}
+                        />
+                      </div>
                     )}
                   </div>
                 </div>
               </div>
-              <p className="text-sm relative mt-2 text-red font-medium w-11/12 whitespace-pre-wrap">
-                {timeError ? timeErrorText : ""}
-              </p>
             </motion.div>
           )}
         </div>

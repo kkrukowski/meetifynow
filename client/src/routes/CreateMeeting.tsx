@@ -37,7 +37,6 @@ export default function CreateMeeting() {
   // Name
   const [meetDetails, setMeetDetails] = useState({
     name: "" as string,
-    length: "" as string,
     place: "" as string,
     link: "" as string,
   });
@@ -398,6 +397,8 @@ export default function CreateMeeting() {
       axios
         .post(import.meta.env.VITE_SERVER_URL + "/meet/new", {
           meetName: meetDetails?.name,
+          meetPlace: meetDetails?.place,
+          meetLink: meetDetails?.link,
           dates: dailyTimeRanges,
         })
         .then(function (response) {
@@ -418,6 +419,9 @@ export default function CreateMeeting() {
       .required("Nazwa spotkania jest wymagana.")
       .min(4, "Nazwa spotkania musi mieć co najmniej 4 znaki.")
       .max(50, "Nazwa spotkania może mieć maksymalnie 50 znaków."),
+    meeting__place: yup
+      .string()
+      .max(100, "Miejsce spotkania może mieć maksymalnie 100 znaków."),
   });
 
   type Inputs = {
@@ -432,7 +436,10 @@ export default function CreateMeeting() {
   } = useForm({ resolver: yupResolver(formSchema) });
 
   const stepsInfo = [
-    { title: "Szczegóły spotkania", fields: ["meeting__name"] },
+    {
+      title: "Szczegóły spotkania",
+      fields: ["meeting__name", "meeting__place"],
+    },
     {
       title: "Wybierz daty spotkania",
     },
@@ -512,25 +519,12 @@ export default function CreateMeeting() {
                 required={true}
               />
               <Input
-                label="Długość spotkania"
-                type="text"
-                id="meeting__length"
-                register={register}
-                placeholder="⌚ Długość spotkania"
-                onChange={(e: {
-                  target: { value: React.SetStateAction<string> };
-                }) =>
-                  setMeetDetails({
-                    ...meetDetails,
-                    length: e.target.value.toString(),
-                  })
-                }
-              />
-              <Input
                 label="Miejsce spotkania"
                 type="text"
                 id="meeting__place"
                 register={register}
+                errorText={errors.meeting__place?.message?.toString()}
+                error={errors.meeting__place ? true : false}
                 placeholder="🏢 Miejsce spotkania"
                 onChange={(e: {
                   target: { value: React.SetStateAction<string> };

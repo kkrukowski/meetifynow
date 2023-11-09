@@ -25,7 +25,15 @@ const DayTimes = mongoose.model("DayTimes", DayTimesSchema);
 const AppointmentSchema = new mongoose.Schema({
   appointmentId: { type: String, required: true },
   meetName: { type: String, required: true },
-  dates: [DayTimesSchema],
+  meetPlace: {
+    type: String,
+    set: (place) => (place === "" ? undefined : place),
+  },
+  meetLink: {
+    type: String,
+    set: (link) => (link === "" ? undefined : link),
+  },
+  dates: { type: [DayTimesSchema], required: true },
   answers: [AnswerSchema],
 });
 

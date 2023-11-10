@@ -1,6 +1,5 @@
 const express = require("express");
 const router = express.Router();
-const { check, validationResult } = require("express-validator");
 
 const Appointment = require("../models/appointments").Appointment;
 const Answer = require("../models/appointments").Answer;

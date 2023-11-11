@@ -2,10 +2,10 @@
   "name": "time2meet",
   "version": "1.0.0",
   "main": "app.mjs",
-  "homepage": "https://time2meet.onrender.com/",
+  "homepage": "https://meetifynow.com/",
   "scripts": {
     "test": "jest --watch --verbose",
-    "start": "nodemon app.mjs"
+    "start": "set NODE_ENV=production node app.mjs"
   },
   "repository": "https://github.com/keirrr/time2meet",
   "license": "MIT",

@@ -1,7 +1,7 @@
 {
   "name": "time2meet",
   "version": "1.0.0",
-  "main": "server/src/index.ts",
+  "main": "app.mjs",
   "homepage": "https://time2meet.onrender.com/",
   "scripts": {
     "test": "jest --watch --verbose",

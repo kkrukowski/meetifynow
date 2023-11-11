@@ -10,6 +10,7 @@ type Props = {
   errorText?: string | undefined | null;
   error?: boolean;
   value?: string;
+  required?: boolean | undefined;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
 };
 
@@ -24,12 +25,14 @@ const Input = ({
   errorText,
   onChange,
   value,
+  required = false,
 }: Props) => {
   return (
     <div className="flex flex-col w-[300px] gap-2">
       <div className="flex justify-between">
         <label htmlFor={id} className="font-medium text-gray">
           {label}
+          {required && <span className="text-red">*</span>}
         </label>
       </div>
       <input
@@ -44,6 +47,7 @@ const Input = ({
         onChange={onChange}
         value={value}
         autoComplete="off"
+        required={required}
       />
       <p className="text-sm relative -top-1 text-red font-medium">
         {errorText}

@@ -15,15 +15,28 @@ const AnswerSchema = new mongoose.Schema({
 
 const Answer = mongoose.model("Answer", AnswerSchema);
 
+const DayTimesSchema = new mongoose.Schema({
+  date: { type: Number, required: true },
+  times: { type: [Number], required: true },
+});
+
+const DayTimes = mongoose.model("DayTimes", DayTimesSchema);
+
 const AppointmentSchema = new mongoose.Schema({
   appointmentId: { type: String, required: true },
   meetName: { type: String, required: true },
-  dates: [Number],
-  startTime: { type: String, required: true },
-  endTime: { type: String, required: true },
+  meetPlace: {
+    type: String,
+    set: (place) => (place === "" ? undefined : place),
+  },
+  meetLink: {
+    type: String,
+    set: (link) => (link === "" ? undefined : link),
+  },
+  dates: { type: [DayTimesSchema], required: true },
   answers: [AnswerSchema],
 });
 
 const Appointment = mongoose.model("Appointment", AppointmentSchema);
 
-module.exports = { Appointment, Answer, DateData };
+module.exports = { Appointment, Answer, DateData, DayTimes };

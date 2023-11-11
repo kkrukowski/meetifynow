@@ -422,6 +422,7 @@ export default function CreateMeeting() {
     meeting__place: yup
       .string()
       .max(100, "Miejsce spotkania może mieć maksymalnie 100 znaków."),
+    meeting__link: yup.string().url("Link do spotkania jest niepoprawny."),
   });
 
   type Inputs = {
@@ -438,7 +439,7 @@ export default function CreateMeeting() {
   const stepsInfo = [
     {
       title: "Szczegóły spotkania",
-      fields: ["meeting__name", "meeting__place"],
+      fields: ["meeting__name", "meeting__place", "meeting__link"],
     },
     {
       title: "Wybierz daty spotkania",
@@ -540,6 +541,8 @@ export default function CreateMeeting() {
                 type="text"
                 id="meeting__link"
                 register={register}
+                errorText={errors.meeting__link?.message?.toString()}
+                error={errors.meeting__link ? true : false}
                 placeholder="🔗 Link do spotkania"
                 onChange={(e: {
                   target: { value: React.SetStateAction<string> };

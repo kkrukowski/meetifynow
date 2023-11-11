@@ -9,6 +9,7 @@ import Button from "../components/Button";
 import CopyLinkButton from "../components/CopyLinkButton";
 import Heading from "../components/Heading";
 import Input from "../components/Input";
+import LinkButton from "../components/LinkButton";
 import SwitchButton from "../components/SwitchButton";
 import Title from "../components/Title";
 
@@ -32,6 +33,8 @@ export default function AnswerMeeting(props: any) {
   const [availableCount, setAvailableCount] = useState(0);
   const [answers, setAnswers] = useState<any>(props.answers);
   const [meetName, setMeetName] = useState(props.meetName);
+  const meetPlace = props.meetPlace;
+  const meetLink = props.meetLink;
   const answersCount = answers.length;
   const datesInfo = props.dates;
   const [unavailableUsersInfo, setUnavailableUsersInfo] = useState<any>([]);
@@ -553,8 +556,21 @@ export default function AnswerMeeting(props: any) {
   });
 
   return (
-    <main className="flex flex-col lg:justify-center p-5 pt-20 lg:p-10 h-screen w-full lg:w-[800px] overflow-hidden">
+    <main className="flex flex-col lg:justify-center p-5 pt-20 lg:p-10  w-full lg:w-[800px] overflow-hidden">
       <Title text={meetName} />
+      {/* Meeting details */}
+      {(meetPlace || meetLink) && (
+        <div className="mb-10">
+          {meetPlace && <p>🏢 {meetPlace}</p>}
+          {meetLink && (
+            <p>
+              🔗 <LinkButton href={meetLink} text="Link do spotkania" />
+            </p>
+          )}
+        </div>
+      )}
+
+      {/* Meeting data */}
       <div className="flex flex-1 lg:flex-none justify-end items-center lg:items-start flex-col-reverse lg:justify-start lg:flex-row">
         {((!mobileAnsweringMode && isMobile()) || !isMobile()) && (
           <section className="availability__info w-full lg:w-1/2 lg:mr-10">

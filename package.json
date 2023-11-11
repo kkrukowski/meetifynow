@@ -1,15 +1,15 @@
 {
   "name": "time2meet",
   "version": "1.0.0",
+  "main": "index.js",
   "license": "MIT",
-  "dependencies": {},
   "devDependencies": {
     "concurrently": "^8.2.0",
-    "prettier": "^3.0.0"
+    "prettier": "^3.0.3"
   },
   "scripts": {
-    "dev": "concurrently \"cd server && nodemon app.mjs\" \"cd client && yarn run dev\"",
-    "dev-client": "cd client && yarn run start",
-    "dev-server": "cd server && nodemon app.mjs"
+    "dev": "concurrently \"cd server && npm run start\" \"cd client && npm run dev\"",
+    "dev-client": "cd client && npm run start",
+    "dev-server": "cd server && npm run start"
   }
 }

@@ -21,10 +21,14 @@ const corsOptions = {
 
 app.use(express.json());
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions));
 app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
+
+app.options("*", cors());
+app.options("/*", (_, res) => {
+  res.sendStatus(200);
+});
 
 // Router
 import appointments from "./routes/appointments.js";

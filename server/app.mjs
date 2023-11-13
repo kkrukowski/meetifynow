@@ -2,7 +2,7 @@ import express from "express";
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-import 'dotenv/config';
+import "dotenv/config";
 import mongoose from "mongoose";
 
 import bodyParser from "body-parser";
@@ -21,6 +21,7 @@ const corsOptions = {
 
 app.use(express.json());
 app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());

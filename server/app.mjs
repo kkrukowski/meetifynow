@@ -16,6 +16,8 @@ mongoose.connect(process.env.DB_CONN_URI);
 // App
 const corsOptions = {
   origin: process.env.CLIENT_URI,
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  optionsSuccessStatus: 200,
   credentials: true,
 };
 
@@ -25,10 +27,7 @@ app.use(compression());
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-app.options("*", cors());
-app.options("/*", (_, res) => {
-  res.sendStatus(200);
-});
+app.options("*", cors(corsOptions));
 
 // Router
 import appointments from "./routes/appointments.js";

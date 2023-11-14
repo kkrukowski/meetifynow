@@ -8,7 +8,7 @@ export default function HomePage() {
       <div className="flex flex-col items-center lg:items-start">
         <Title text="Planowanie spotkań nigdy nie było prostsze!" />
         <p className="mb-5 text-dark">
-          time2meet to platforma do prostego planowania spotkań niewymagająca
+          MeetifyNow to platforma do prostego planowania spotkań niewymagająca
           logowania
         </p>
         <a href="/meet/new">

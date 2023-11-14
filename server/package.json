@@ -5,7 +5,7 @@
   "homepage": "https://meetifynow.com/",
   "scripts": {
     "test": "jest --watch --verbose",
-    "start": "set NODE_ENV=production node app.mjs"
+    "start": "node app.mjs"
   },
   "repository": "https://github.com/keirrr/time2meet",
   "license": "MIT",

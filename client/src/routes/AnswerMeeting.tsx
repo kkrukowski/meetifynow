@@ -366,38 +366,41 @@ export default function AnswerMeeting(props: any) {
         className={`rounded-lg h-12 w-24 lg:h-6 lg:w-12 transition-colors ${
           isEndOfWeek && "mr-4"
         }  ${
-          isDateSelected(dateTime)
-            ? `${
-                getSelectedTimecell(dateTime)?.isOnline
-                  ? `bg-gold ${!isMobile() && "hover:bg-gold/50"}`
-                  : `bg-primary ${!isMobile() && "hover:bg-primary/50"}`
-              }`
-            : `border border-gray ${
-                ((isMobile() && !mobileAnsweringMode) || !isMobile()) &&
-                "hover:border-none"
-              }`
-        } ${
           isAnswered(dateTime)
             ? `border-none ${
                 isDateSelected(dateTime)
                   ? `${
                       getSelectedTimecell(dateTime)?.isOnline
-                        ? "bg-gold hover:bg-gold/50"
-                        : "bg-primary hover:bg-primary/50"
+                        ? `bg-gold ${!isMobile() && "hover:bg-gold/50"}`
+                        : `bg-primary ${!isMobile() && "hover:bg-primary/50"}`
                     } selected`
                   : `answered  ${!isMobile() && "active:animate-cell-select"} ${
                       availabilityInfo[dateTime].onlineCount >=
-                      highestAvailableCount * 0.5
-                        ? "bg-gold-dark hover:bg-gold-dark/50"
+                        highestAvailableCount * 0.5 &&
+                      availabilityInfo[dateTime].usersInfo.length ==
+                        highestAvailableCount
+                        ? `bg-gold-dark ${
+                            !isMobile() && "hover:bg-gold-dark/50"
+                          }`
                         : availabilityInfo[dateTime].usersInfo.length ==
                           highestAvailableCount
-                        ? "bg-green hover:bg-green/50"
-                        : "bg-light-green hover:bg-light-green/50"
+                        ? `bg-green ${!isMobile() && "hover:bg-green/50"}`
+                        : `bg-light-green ${
+                            !isMobile() && "hover:bg-light-green/50"
+                          }`
                     }`
               }`
-            : `${
-                ((isMobile() && !mobileAnsweringMode) || !isMobile()) &&
-                "active:animate-cell-select hover:bg-primary"
+            : `border border-gray ${!isMobile() && "hover:border-none"} ${
+                isDateSelected(dateTime)
+                  ? `border-none ${
+                      getSelectedTimecell(dateTime)?.isOnline
+                        ? `bg-gold ${!isMobile() && "hover:bg-gold/50"}`
+                        : `bg-primary ${!isMobile() && "hover:bg-primary/50"}`
+                    }`
+                  : `${
+                      ((isMobile() && !mobileAnsweringMode) || !isMobile()) &&
+                      "hover:border-none active:animate-cell-select hover:bg-primary"
+                    }`
               }`
         }`}
       ></div>

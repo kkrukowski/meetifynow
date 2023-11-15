@@ -324,14 +324,23 @@ export default function AnswerMeeting(props: any) {
     }
 
     // Add end hour row
-    timeCells.push(
-      <tr key={maximumTimeHour + 1 + "30"} className="cursor-pointer">
-        <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2"></th>
-        <td colSpan={100} className="text-center text-dark font-bold bg-light">
-          {(maximumTimeHour + 1).toString().padStart(2, "0")}:00
-        </td>
-      </tr>
-    );
+    if (isMaximumTimeHalfHour()) {
+      timeCells.push(
+        <tr key={maximumTimeHour + "30"} className="cursor-pointer">
+          <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2">
+            {maximumTimeHour.toString().padStart(2, "0")}:30
+          </th>
+        </tr>
+      );
+    } else {
+      timeCells.push(
+        <tr key={maximumTimeHour + 1 + "30"} className="cursor-pointer">
+          <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2">
+            {(maximumTimeHour + 1).toString().padStart(2, "0")}:00
+          </th>
+        </tr>
+      );
+    }
 
     return timeCells;
   };

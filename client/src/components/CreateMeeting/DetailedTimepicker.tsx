@@ -200,10 +200,9 @@ export default function DetailedTimepicker(props: {
     // Add end hour row
     timeCells.push(
       <tr key={24 + "30"} className="cursor-pointer">
-        <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2"></th>
-        <td colSpan={100} className="text-center text-dark font-bold bg-light">
+        <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2">
           {(24).toString().padStart(2, "0")}:00
-        </td>
+        </th>
       </tr>
     );
 

@@ -305,7 +305,9 @@ export default function AnswerMeeting(props: any) {
           timeCells.push(
             <tr key={i + "00"} className="cursor-pointer">
               <th
-                rowSpan={2}
+                rowSpan={
+                  i == maximumTimeHour && isMaximumTimeHalfHour() ? 1 : 2
+                }
                 className="text-right text-dark align-top bg-light sticky left-0 pr-2"
               >
                 {i.toString().padStart(2, "0")}:00

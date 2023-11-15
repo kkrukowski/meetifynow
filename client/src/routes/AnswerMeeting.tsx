@@ -305,7 +305,7 @@ export default function AnswerMeeting(props: any) {
           timeCells.push(
             <tr key={i + "00"} className="cursor-pointer">
               <th
-                rowSpan={i == maximumTimeHour ? 1 : 2}
+                rowSpan={2}
                 className="text-right text-dark align-top bg-light sticky left-0 pr-2"
               >
                 {i.toString().padStart(2, "0")}:00
@@ -314,25 +314,24 @@ export default function AnswerMeeting(props: any) {
             </tr>
           );
         } else if (h == 1) {
-          if (i == maximumTimeHour) {
-            timeCells.push(
-              <tr key={i + 1 + "30"} className="cursor-pointer">
-                <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2">
-                  {(i + 1).toString().padStart(2, "0")}:00
-                </th>
-                {timeRow}
-              </tr>
-            );
-          } else {
-            timeCells.push(
-              <tr key={i + "30"} className="cursor-pointer">
-                {timeRow}
-              </tr>
-            );
-          }
+          timeCells.push(
+            <tr key={i + "30"} className="cursor-pointer">
+              {timeRow}
+            </tr>
+          );
         }
       }
     }
+
+    // Add end hour row
+    timeCells.push(
+      <tr key={maximumTimeHour + 1 + "30"} className="cursor-pointer">
+        <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2"></th>
+        <td colSpan={100} className="text-center text-dark font-bold bg-light">
+          {(maximumTimeHour + 1).toString().padStart(2, "0")}:00
+        </td>
+      </tr>
+    );
 
     return timeCells;
   };
@@ -638,7 +637,7 @@ export default function AnswerMeeting(props: any) {
                 </div>
               )}
               <div
-                className={`self-center overflow-auto max-h-[250px] h-smd:max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[500px] w-auto max-w-[360px] md:max-w-[700px] lg:max-w-[350px] mt-5 ${
+                className={`self-center overflow-auto max-h-[250px] h-smd:max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[500px] w-auto max-w-[360px] md:max-w-[700px] lg:max-w-[350px] pr-3 mt-5 ${
                   isMobile() && "mb-5"
                 }`}
               >

@@ -305,7 +305,7 @@ export default function AnswerMeeting(props: any) {
           timeCells.push(
             <tr key={i + "00"} className="cursor-pointer">
               <th
-                rowSpan={2}
+                rowSpan={i == maximumTimeHour ? 1 : 2}
                 className="text-right text-dark align-top bg-light sticky left-0 pr-2"
               >
                 {i.toString().padStart(2, "0")}:00
@@ -314,11 +314,22 @@ export default function AnswerMeeting(props: any) {
             </tr>
           );
         } else if (h == 1) {
-          timeCells.push(
-            <tr key={i + "30"} className="cursor-pointer">
-              {timeRow}
-            </tr>
-          );
+          if (i == maximumTimeHour) {
+            timeCells.push(
+              <tr key={i + 1 + "30"} className="cursor-pointer">
+                <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2">
+                  {(i + 1).toString().padStart(2, "0")}:00
+                </th>
+                {timeRow}
+              </tr>
+            );
+          } else {
+            timeCells.push(
+              <tr key={i + "30"} className="cursor-pointer">
+                {timeRow}
+              </tr>
+            );
+          }
         }
       }
     }

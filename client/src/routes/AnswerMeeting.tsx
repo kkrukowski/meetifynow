@@ -232,7 +232,7 @@ export default function AnswerMeeting(props: any) {
 
   // Table rendering
   const convertDatetimeToDate = (datetime: number) => {
-    const date = moment.utc(datetime);
+    const date = moment(datetime);
     const convertedDate =
       date.date().toString().padStart(2, "0") +
       "." +
@@ -580,7 +580,7 @@ export default function AnswerMeeting(props: any) {
   });
 
   return (
-    <main className="flex flex-col lg:justify-center p-5 pt-20 lg:p-10  w-full lg:w-[800px] overflow-hidden">
+    <main className="flex flex-col lg:justify-center p-5 pt-20 lg:p-20 lg:h-smd:pt-10 w-full lg:w-[800px] overflow-auto">
       <Title text={meetName} />
       {/* Meeting details */}
       {(meetPlace || meetLink) && (
@@ -648,7 +648,7 @@ export default function AnswerMeeting(props: any) {
                 </div>
               )}
               <div
-                className={`self-center overflow-auto max-h-[250px] h-smd:max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[500px] w-auto max-w-[360px] md:max-w-[700px] lg:max-w-[350px] pr-3 mt-5 ${
+                className={`self-center overflow-auto h-smd:max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[300px] w-auto max-w-[360px] md:max-w-[700px] lg:max-w-[350px] pr-3 mt-5 ${
                   isMobile() && "mb-5"
                 }`}
               >

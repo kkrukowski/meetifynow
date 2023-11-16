@@ -11,6 +11,7 @@ body {
   background-color: #f4fcff;
   font-size: 16px;
   font-family: "Poppins", sans-serif;
+  overflow-x: hidden;
 }
 
 * {
@@ -19,7 +20,7 @@ body {
 }
 
 /* Responsive */
-@media (min-width: 1024px) {
+@media (min-width: 1024px) and (min-height: 700px) {
   body {
     align-items: center;
   }

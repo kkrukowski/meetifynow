@@ -4,7 +4,7 @@ import Title from "../components/Title";
 
 export default function HomePage() {
   return (
-    <main className="w-full md:max-w-xl lg:max-w-5xl mt-20 lg:mt-0 p-5 md:p-10 flex flex-col lg:flex-row items-center">
+    <main className="w-full md:max-w-xl lg:max-w-5xl p-5 lg:p-20 lg:pt-28 h-smd:pt-20 flex flex-col lg:flex-row items-center">
       <div className="flex flex-col items-center lg:items-start">
         <Title text="Planowanie spotkań nigdy nie było prostsze!" />
         <p className="mb-5 text-dark">

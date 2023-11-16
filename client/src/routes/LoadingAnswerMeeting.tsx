@@ -24,7 +24,7 @@ export default function AnswerMeeting(props: any) {
   };
 
   return (
-    <main className="flex flex-col lg:justify-center p-5 pt-20 lg:p-10 h-screen w-full lg:w-[800px] overflow-hidden">
+    <main className="flex flex-col lg:justify-center p-5 lg:p-20 lg:pt-28 h-smd:pt-20 h-screen w-full lg:w-[800px] overflow-hidden">
       <div className="flex flex-1 lg:flex-none justify-end items-center lg:items-start flex-col-reverse lg:justify-start lg:flex-row">
         {!isMobile() && (
           <section className="availability__info w-full lg:w-1/2 lg:mr-10">

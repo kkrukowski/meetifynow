@@ -207,8 +207,6 @@ export default function CreateMeeting() {
   const [dateErrorText, setDateErrorText] = useState("");
 
   const toggleTimecell = (dateTime: number) => {
-    console.log("toggle");
-    console.log(selectedDates);
     if (selectedDates.includes(dateTime)) {
       if (!selectionMode) {
         setSelectedDates(selectedDates.filter((d) => d !== dateTime));

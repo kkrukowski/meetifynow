@@ -1,4 +1,4 @@
-import CalendarImg from "../assets/imgs/calendar.svg";
+import CalendarImg from "../assets/imgs/calendar.webp";
 import Button from "../components/Button";
 import Title from "../components/Title";
 

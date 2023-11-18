@@ -580,7 +580,7 @@ export default function AnswerMeeting(props: any) {
   });
 
   return (
-    <main className="flex flex-col lg:justify-center p-5 lg:p-20 lg:pt-28 h-smd:pt-20 w-full lg:w-[800px] overflow-auto">
+    <main className="flex flex-1 h-full flex-col lg:justify-center p-5 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 w-full lg:w-[800px] overflow-auto">
       <Title text={meetName} />
       {/* Meeting details */}
       {(meetPlace || meetLink) && (

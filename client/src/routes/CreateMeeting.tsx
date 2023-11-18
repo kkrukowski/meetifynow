@@ -484,7 +484,7 @@ export default function CreateMeeting() {
   };
 
   return (
-    <main className="flex flex-col px-5 py-10 lg:p-20 lg:pt-28 h-smd:pt-20 lg:m-0 justify-center">
+    <main className="flex flex-1 h-full flex-col px-5 py-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 lg:m-0 justify-center">
       <Title text="Utwórz nowe spotkanie" />
       <StepsIndicator steps={4} stepsData={stepsInfo} currIndex={currStep} />
       <form

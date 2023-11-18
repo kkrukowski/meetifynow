@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
+    "@types/react-helmet": "^6.1.9",
     "concurrently": "^8.2.0",
     "prettier": "^3.0.3"
   },
@@ -11,5 +12,8 @@
     "dev": "concurrently \"cd server && npm run start\" \"cd client && npm run dev\"",
     "dev-client": "cd client && npm run start",
     "dev-server": "cd server && npm run start"
+  },
+  "dependencies": {
+    "react-helmet": "^6.1.0"
   }
 }

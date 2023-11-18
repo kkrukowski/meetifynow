@@ -8,9 +8,9 @@ export default function HomePage() {
     <main className="w-full flex-1 h-full md:max-w-xl lg:max-w-5xl p-5 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 flex flex-col lg:flex-row items-center">
       <div className="flex flex-col items-center lg:items-start">
         <Title text="Planowanie spotkań nigdy nie było prostsze!" />
-        <p className="mb-5 text-dark">
-          MeetifyNow to platforma do prostego planowania spotkań niewymagająca
-          logowania
+        <p className="mb-5 text-dark text-justify">
+          MeetifyNow to łatwa w obsłudze platforma do planowania spotkań bez
+          potrzeby logowania.
         </p>
         <a href="/meet/new">
           <Button text="Utwórz spotkanie" />

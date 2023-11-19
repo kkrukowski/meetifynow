@@ -17,6 +17,7 @@ import RootLayout from "./layouts/RootLayout";
 import AnswerMeeting from "./routes/AnswerMeeting";
 import AnswerNotFound from "./routes/AnswerNotFound";
 import CreateMeeting from "./routes/CreateMeeting";
+import Error404 from "./routes/Error404";
 import HomePage from "./routes/HomePage";
 import LoadingAnswerMeeting from "./routes/LoadingAnswerMeeting";
 
@@ -28,6 +29,7 @@ const router = createBrowserRouter(
         <Route path="new" element={<CreateMeeting />} />
         <Route path=":id" element={<RenderAnswerMeeting />} />
       </Route>
+      <Route path="*" element={<Error404 />} />
     </Route>
   )
 );

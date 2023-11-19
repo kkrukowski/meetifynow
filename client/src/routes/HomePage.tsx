@@ -19,6 +19,7 @@ export default function HomePage() {
       <img
         src={CalendarImg}
         alt="Calendar"
+        title="Calendar Illustration"
         className="m-0 mt-10 lg:mt-0 lg:ml-10 lg:w-1/2 h-48 md:h-64 lg:h-auto"
       />
     </main>

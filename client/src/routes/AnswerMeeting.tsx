@@ -621,7 +621,7 @@ export default function AnswerMeeting(props: any) {
                 isAnsweringMode={mobileAnsweringMode}
                 toggleAnsweringMode={toggleAnsweringMode}
               />
-              <span className="text-2xl">📅</span>
+              <span className="text-2xl">👀</span>
             </div>
           )}
 

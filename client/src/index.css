@@ -5,7 +5,7 @@
 
 body {
   width: 100vw;
-  height: 100vh;
+  height: auto;
   display: flex;
   justify-content: center;
   background-color: #f4fcff;
@@ -26,8 +26,10 @@ body {
 }
 
 /* Responsive */
+
 @media (min-width: 1024px) and (min-height: 700px) {
   body {
     align-items: center;
+    height: 100vh;
   }
 }

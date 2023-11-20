@@ -26,7 +26,6 @@ body {
 }
 
 /* Responsive */
-
 @media (min-width: 1024px) and (min-height: 700px) {
   body {
     align-items: center;

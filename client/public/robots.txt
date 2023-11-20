@@ -1,2 +1,3 @@
 User-agent: *
 Disallow: /meet/
+Sitemap: https://meetifynow.com/sitemap.xml

@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
 
+// Components
 import Button from "../components/Button";
 import CopyLinkButton from "../components/CopyLinkButton";
 import Heading from "../components/Heading";
@@ -12,6 +13,12 @@ import Input from "../components/Input";
 import LinkButton from "../components/LinkButton";
 import SwitchButton from "../components/SwitchButton";
 import Title from "../components/Title";
+
+// Utils
+import { getAvailabilityInfo } from "../utils/meeting/answer/getAvailabilityInfo";
+import { getUnavailableUsersInfo } from "../utils/meeting/answer/getUnavailableUsersInfo";
+import useIsMobile from "../utils/useIsMobile";
+import useMouseDown from "../utils/useIsMouseDown";
 
 export default function AnswerMeeting(props: any) {
   const [selectedTimecells, setSelectedTimecells] = useState<MeetingDate[]>([]);
@@ -42,102 +49,21 @@ export default function AnswerMeeting(props: any) {
   const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
   const currentUrl = window.location.href;
 
-  // Get window size info
   // Checking mobile mode
-  const [windowSize, setWindowSize] = useState([
-    window.innerWidth,
-    window.innerHeight,
-  ]);
-
-  useEffect(() => {
-    const handleWindowResize = () => {
-      setWindowSize([window.innerWidth, window.innerHeight]);
-    };
-
-    window.addEventListener("resize", handleWindowResize);
-
-    return () => {
-      window.removeEventListener("resize", handleWindowResize);
-    };
-  }, []);
-
-  const isMobile = () => {
-    return windowSize[0] < 1024;
-  };
+  const isMobile = useIsMobile();
 
   // Handling mouse down
-  const [isMouseDown, setIsMouseDown] = useState(false);
-  useEffect(() => {
-    const handleMouseDown = () => {
-      setIsMouseDown(true);
-    };
-
-    const handleMouseUp = () => {
-      setIsMouseDown(false);
-    };
-
-    document.addEventListener("mousedown", handleMouseDown);
-    document.addEventListener("mouseup", handleMouseUp);
-  }, [isMouseDown]);
-
-  // Get unavailable users where dates array is empty
-  useEffect(() => {
-    const unavailableUsers = answers.filter(
-      (answer: any) => answer.dates.length == 0
-    );
-
-    const unavailableUsersInfo = unavailableUsers.map((user: any) => {
-      return {
-        date: null,
-        userData: { userId: user.userId, username: user.username },
-        answerData: { isOnline: null },
-      };
-    });
-
-    setUnavailableUsersInfo(unavailableUsersInfo);
-  }, [answers]);
+  const isMouseDown = useMouseDown();
 
   // Availability info
-  const availabilityInfoNonMerged = () => {
-    let availableUsersInfo: any = [];
-    answers.flatMap((answer: any) => {
-      const availableUserInfo = answer.dates.map((date: any) => {
-        return {
-          date: date.meetDate,
-          userData: { userId: answer.userId, username: answer.username },
-          answerData: { isOnline: date.isOnline },
-        };
-      });
-      availableUsersInfo.push(...availableUserInfo);
-    });
+  useEffect(() => {
+    setUnavailableUsersInfo(getUnavailableUsersInfo(answers));
+  }, [answers]);
 
-    return [...availableUsersInfo];
-  };
+  const availabilityInfo = getAvailabilityInfo(answers);
 
-  const availabilityInfo = availabilityInfoNonMerged().reduce(
-    (acc: any, curr: any) => {
-      const isOnline = curr.answerData.isOnline;
-      if (acc[curr.date]) {
-        acc[curr.date].usersInfo.push({
-          userData: curr.userData,
-          isOnline,
-        });
-        acc[curr.date].onlineCount += isOnline ? 1 : 0;
-      } else {
-        acc[curr.date] = {
-          usersInfo: [{ userData: curr.userData, isOnline }],
-          onlineCount: isOnline ? 1 : 0,
-        };
-      }
-      return acc;
-    },
-    {}
-  );
-
-  // Mobile answering mode
-  const toggleAnsweringMode = () => {
-    setMobileAnsweringMode(!mobileAnsweringMode);
-  };
+  const toggleAnsweringMode = () =>
+    setMobileAnsweringMode((prevMode) => !prevMode);
 
   // Answering functionallity
   const dates = props.dates.sort();
@@ -148,11 +74,10 @@ export default function AnswerMeeting(props: any) {
     );
   };
 
-  const getSelectedTimecell = (dateTime: number) => {
-    return selectedTimecells.find(
+  const getSelectedTimecell = (dateTime: number) =>
+    selectedTimecells.find(
       (meetDateInfo) => meetDateInfo.meetDate === dateTime
     );
-  };
 
   const updateTimecellToOnline = (dateTime: number) => {
     let updatedTimecellIndex = selectedTimecells.findIndex(
@@ -169,7 +94,7 @@ export default function AnswerMeeting(props: any) {
   };
 
   const unselectTimecell = (dateTime: number) => {
-    if (!isMobile()) {
+    if (!isMobile) {
       setUnselectMode(true);
     }
     updateTimecellToOffline(dateTime);
@@ -357,13 +282,13 @@ export default function AnswerMeeting(props: any) {
             : 0
         }
         onMouseDown={() => {
-          if ((isMobile() && mobileAnsweringMode) || !isMobile()) {
+          if ((isMobile && mobileAnsweringMode) || !isMobile) {
             toggleTimecell(dateTime);
-          } else if (isMobile() && !mobileAnsweringMode) {
+          } else if (isMobile && !mobileAnsweringMode) {
             setLookedUpDatetime(dateTime);
             convertDatetimeToDate(dateTime);
           }
-          if (!isMobile()) {
+          if (!isMobile) {
             setUnselectMode(false);
             setSelectionMode(true);
             const isTimecellOnline = getSelectedTimecell(dateTime)?.isOnline;
@@ -371,13 +296,13 @@ export default function AnswerMeeting(props: any) {
           }
         }}
         onMouseUp={() => {
-          if (!isMobile()) {
+          if (!isMobile) {
             setSelectionMode(false);
             setUnselectMode(false);
           }
         }}
         onMouseOver={() => {
-          if (!isMobile()) {
+          if (!isMobile) {
             handleMouseOver(dateTime);
             setLookedUpDatetime(dateTime);
             convertDatetimeToDate(dateTime);
@@ -392,34 +317,32 @@ export default function AnswerMeeting(props: any) {
                 isDateSelected(dateTime)
                   ? `${
                       getSelectedTimecell(dateTime)?.isOnline
-                        ? `bg-gold ${!isMobile() && "hover:bg-gold/50"}`
-                        : `bg-primary ${!isMobile() && "hover:bg-primary/50"}`
+                        ? `bg-gold ${!isMobile && "hover:bg-gold/50"}`
+                        : `bg-primary ${!isMobile && "hover:bg-primary/50"}`
                     } selected`
-                  : `answered  ${!isMobile() && "active:animate-cell-select"} ${
+                  : `answered  ${!isMobile && "active:animate-cell-select"} ${
                       availabilityInfo[dateTime].onlineCount >=
                         highestAvailableCount * 0.5 &&
                       availabilityInfo[dateTime].usersInfo.length ==
                         highestAvailableCount
-                        ? `bg-gold-dark ${
-                            !isMobile() && "hover:bg-gold-dark/50"
-                          }`
+                        ? `bg-gold-dark ${!isMobile && "hover:bg-gold-dark/50"}`
                         : availabilityInfo[dateTime].usersInfo.length ==
                           highestAvailableCount
-                        ? `bg-green ${!isMobile() && "hover:bg-green/50"}`
+                        ? `bg-green ${!isMobile && "hover:bg-green/50"}`
                         : `bg-light-green ${
-                            !isMobile() && "hover:bg-light-green/50"
+                            !isMobile && "hover:bg-light-green/50"
                           }`
                     }`
               }`
-            : `border border-gray ${!isMobile() && "hover:border-none"} ${
+            : `border border-gray ${!isMobile && "hover:border-none"} ${
                 isDateSelected(dateTime)
                   ? `border-none ${
                       getSelectedTimecell(dateTime)?.isOnline
-                        ? `bg-gold ${!isMobile() && "hover:bg-gold/50"}`
-                        : `bg-primary ${!isMobile() && "hover:bg-primary/50"}`
+                        ? `bg-gold ${!isMobile && "hover:bg-gold/50"}`
+                        : `bg-primary ${!isMobile && "hover:bg-primary/50"}`
                     }`
                   : `${
-                      ((isMobile() && !mobileAnsweringMode) || !isMobile()) &&
+                      ((isMobile && !mobileAnsweringMode) || !isMobile) &&
                       "hover:border-none active:animate-cell-select hover:bg-primary"
                     }`
               }`
@@ -510,7 +433,7 @@ export default function AnswerMeeting(props: any) {
         return listOfUsernames;
       }
     } else {
-      if (isMobile()) {
+      if (isMobile) {
         return <li>Kliknij na godzinę, aby zobaczyć dostępność</li>;
       }
       return <li>Najedź na godzinę, aby zobaczyć dostępność</li>;
@@ -596,7 +519,7 @@ export default function AnswerMeeting(props: any) {
 
       {/* Meeting data */}
       <div className="flex flex-1 lg:flex-none justify-end items-center lg:items-start flex-col-reverse lg:justify-start lg:flex-row">
-        {((!mobileAnsweringMode && isMobile()) || !isMobile()) && (
+        {((!mobileAnsweringMode && isMobile) || !isMobile) && (
           <section className="availability__info w-full lg:w-1/2 lg:mr-10">
             <p>
               {lookedUpDate} {lookedUpTime}
@@ -614,7 +537,7 @@ export default function AnswerMeeting(props: any) {
         )}
 
         <section className="flex flex-col time__selection lg:w-1/2">
-          {isMobile() && (
+          {isMobile && (
             <div className="flex items-center justify-center">
               <span className="text-2xl">✅</span>
               <SwitchButton
@@ -630,7 +553,7 @@ export default function AnswerMeeting(props: any) {
             onSubmit={handleSubmit(sendAnswer)}
           >
             <div className="flex flex-col-reverse lg:flex-col items-center lg:items-start">
-              {((mobileAnsweringMode && isMobile()) || !isMobile()) && (
+              {((mobileAnsweringMode && isMobile) || !isMobile) && (
                 <div>
                   <Input
                     label="Twoje imie"
@@ -649,7 +572,7 @@ export default function AnswerMeeting(props: any) {
               )}
               <div
                 className={`self-center overflow-auto h-smd:max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[300px] w-auto max-w-[360px] md:max-w-[700px] lg:max-w-[350px] pr-3 mt-5 ${
-                  isMobile() && "mb-5"
+                  isMobile && "mb-5"
                 }`}
               >
                 <table className="time__seclection--table w-fit lg:mt-5 self-center select-none">
@@ -663,7 +586,7 @@ export default function AnswerMeeting(props: any) {
                 </table>
               </div>
             </div>
-            {((mobileAnsweringMode && isMobile()) || !isMobile()) && (
+            {((mobileAnsweringMode && isMobile) || !isMobile) && (
               <div>
                 <Button text="Wyślij" />
                 <CopyLinkButton link={currentUrl} className="ml-6" />

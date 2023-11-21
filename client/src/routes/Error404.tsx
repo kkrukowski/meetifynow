@@ -2,17 +2,16 @@ import BigText from "../components/BigText";
 import Button from "../components/Button";
 import Heading from "../components/Heading";
 
-import { useRouteError } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function Error404() {
-  const error = useRouteError();
   return (
     <div className="flex flex-col justify-center items-center h-full">
       <BigText text="404" />
       <Heading text="Nie znaleziono takiej strony 😥" />
-      <a href="/">
+      <Link to="/">
         <Button text="Strona główna" />
-      </a>
+      </Link>
     </div>
   );
 }

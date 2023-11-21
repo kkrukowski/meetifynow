@@ -15,11 +15,11 @@ import RootLayout from "./layouts/RootLayout";
 
 // Views
 import AnswerMeeting from "./routes/AnswerMeeting";
+import AnswerMeetingLoader from "./routes/AnswerMeetingLoader";
 import AnswerNotFound from "./routes/AnswerNotFound";
 import CreateMeeting from "./routes/CreateMeeting";
 import Error404 from "./routes/Error404";
 import HomePage from "./routes/HomePage";
-import LoadingAnswerMeeting from "./routes/LoadingAnswerMeeting";
 
 const router = createBrowserRouter(
   createRoutesFromElements(
@@ -64,7 +64,7 @@ function RenderAnswerMeeting() {
   }, [id]);
 
   if (isLoading) {
-    return <LoadingAnswerMeeting />;
+    return <AnswerMeetingLoader />;
   }
 
   if (isMeetingFound) {

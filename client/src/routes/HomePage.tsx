@@ -1,4 +1,4 @@
-import React from "react";
+import { Link } from "react-router-dom";
 import CalendarImg from "../assets/imgs/calendar.webp";
 import Button from "../components/Button";
 import Title from "../components/Title";
@@ -12,13 +12,13 @@ export default function HomePage() {
           MeetifyNow to łatwa w obsłudze platforma do planowania spotkań bez
           potrzeby logowania.
         </p>
-        <a href="/meet/new">
+        <Link to="/meet/new">
           <Button text="Utwórz spotkanie" />
-        </a>
+        </Link>
       </div>
       <img
         src={CalendarImg}
-        alt="Calendar"
+        alt="Illustration of a calendar"
         title="Calendar Illustration"
         className="m-0 mt-10 lg:mt-0 lg:ml-10 lg:w-1/2 h-48 md:h-64 lg:h-auto"
       />

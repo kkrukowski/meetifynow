@@ -1,9 +1,10 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
-import moment, { max } from "moment-timezone";
+import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, set, useForm } from "react-hook-form";
 import * as yup from "yup";
+moment.locale("pl");
 
 // Components
 import Button from "../components/Button";
@@ -68,36 +69,32 @@ export default function AnswerMeeting(props: any) {
   // Answering functionallity
   const dates = props.dates.sort();
 
-  const isDateSelected = (dateTime: number) => {
-    return selectedTimecells.some(
+  const isDateSelected = (dateTime: number) =>
+    selectedTimecells.some(
       (meetDateInfo) => meetDateInfo.meetDate === dateTime
     );
-  };
 
   const getSelectedTimecell = (dateTime: number) =>
     selectedTimecells.find(
       (meetDateInfo) => meetDateInfo.meetDate === dateTime
     );
 
-  const updateTimecellToOnline = (dateTime: number) => {
-    let updatedTimecellIndex = selectedTimecells.findIndex(
-      (meetDateInfo) => meetDateInfo.meetDate === dateTime
-    );
-    selectedTimecells[updatedTimecellIndex].isOnline = true;
-  };
-
-  const updateTimecellToOffline = (dateTime: number) => {
-    let updatedTimecellIndex = selectedTimecells.findIndex(
-      (meetDateInfo) => meetDateInfo.meetDate === dateTime
-    );
-    selectedTimecells[updatedTimecellIndex].isOnline = false;
+  const updateTimecell = (dateTime: number, isOnline: boolean) => {
+    setSelectedTimecells((prevTimecells) => {
+      const updatedTimecells = prevTimecells.map((meetDateInfo) =>
+        meetDateInfo.meetDate === dateTime
+          ? { ...meetDateInfo, isOnline }
+          : meetDateInfo
+      );
+      return updatedTimecells;
+    });
   };
 
   const unselectTimecell = (dateTime: number) => {
     if (!isMobile) {
       setUnselectMode(true);
     }
-    updateTimecellToOffline(dateTime);
+    updateTimecell(dateTime, false);
     setSelectedTimecells(
       selectedTimecells.filter(
         (meetDateInfo) => meetDateInfo.meetDate !== dateTime
@@ -109,35 +106,37 @@ export default function AnswerMeeting(props: any) {
   const [unselectMode, setUnselectMode] = useState(false);
 
   const toggleTimecell = (dateTime: number) => {
-    if (isDateSelected(dateTime)) {
-      const selectedTimecell = getSelectedTimecell(dateTime);
-      // First click when timecell is selected
-      // When NOT in selection mode
+    const isSelected = isDateSelected(dateTime);
+    const selectedTimecell = getSelectedTimecell(dateTime);
+
+    if (isSelected) {
       if (!selectionMode) {
         if (selectedTimecell?.isOnline) {
+          // Selecting timecell online -> unselected (click)
           unselectTimecell(dateTime);
-        } else if (!selectedTimecell?.isOnline) {
-          updateTimecellToOnline(dateTime);
+        } else if (!onlineSelectionMode && !selectedTimecell?.isOnline) {
+          // Selecting timecell offline -> online (click)
+          setOnlineSelectionMode(true);
+          updateTimecell(dateTime, true);
+        }
+      } else {
+        if (!unselectMode) {
+          if (onlineSelectionMode && !selectedTimecell?.isOnline) {
+            // Updating timecell offline -> online (drag)
+            updateTimecell(dateTime, true);
+          } else if (!onlineSelectionMode && selectedTimecell?.isOnline) {
+            // Updating timecell online -> offline (drag)
+            updateTimecell(dateTime, false);
+          }
+        } else {
+          // Updating timecell online -> unselected (drag)
+          unselectTimecell(dateTime);
         }
       }
-
-      if (selectionMode && onlineSelectionMode && !selectedTimecell?.isOnline) {
-        updateTimecellToOnline(dateTime);
-      }
-
-      if (
-        selectionMode &&
-        !onlineSelectionMode &&
-        (selectedTimecell?.isOnline || unselectMode)
-      ) {
-        unselectTimecell(dateTime);
-      }
-    } else {
-      // First click when timecell is NOT selected
-      if (!unselectMode) {
-        const meetDateInfo = new MeetingDate(dateTime, onlineSelectionMode);
-        setSelectedTimecells([...selectedTimecells, meetDateInfo]);
-      }
+    } else if (!unselectMode) {
+      // Selecting timecell unselected -> offline (click)
+      const meetDateInfo = new MeetingDate(dateTime, onlineSelectionMode);
+      setSelectedTimecells([...selectedTimecells, meetDateInfo]);
     }
   };
 
@@ -156,18 +155,11 @@ export default function AnswerMeeting(props: any) {
   };
 
   // Table rendering
+  // TODO: Fix locale for moment.js
   const convertDatetimeToDate = (datetime: number) => {
     const date = moment(datetime);
-    const convertedDate =
-      date.date().toString().padStart(2, "0") +
-      "." +
-      (date.month() + 1).toString().padStart(2, "0") +
-      " " +
-      daysNaming[date.day()];
-    const convertedTime =
-      date.hour().toString().padStart(2, "0") +
-      ":" +
-      date.minute().toString().padStart(2, "0");
+    const convertedDate = date.format("DD.MM dddd");
+    const convertedTime = date.format("HH:mm");
     setLookedUpDate(convertedDate);
     setLookedUpTime(convertedTime);
   };
@@ -289,10 +281,10 @@ export default function AnswerMeeting(props: any) {
             convertDatetimeToDate(dateTime);
           }
           if (!isMobile) {
-            setUnselectMode(false);
+            // setUnselectMode(false);
             setSelectionMode(true);
-            const isTimecellOnline = getSelectedTimecell(dateTime)?.isOnline;
-            setOnlineSelectionMode(isTimecellOnline ? true : false);
+            // const isTimecellOnline = getSelectedTimecell(dateTime)?.isOnline;
+            // setOnlineSelectionMode(isTimecellOnline ? true : false);
           }
         }}
         onMouseUp={() => {

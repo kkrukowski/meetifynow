@@ -4,7 +4,6 @@ import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, set, useForm } from "react-hook-form";
 import * as yup from "yup";
-moment.locale("pl");
 
 // Components
 import Button from "../components/Button";
@@ -155,7 +154,6 @@ export default function AnswerMeeting(props: any) {
   };
 
   // Table rendering
-  // TODO: Fix locale for moment.js
   const convertDatetimeToDate = (datetime: number) => {
     const date = moment(datetime);
     const convertedDate = date.format("DD.MM dddd");
@@ -164,23 +162,17 @@ export default function AnswerMeeting(props: any) {
     setLookedUpTime(convertedTime);
   };
 
-  const flatTimes = datesInfo.flatMap((date: any) => date.times);
+  const flatTimes: number[] = datesInfo.flatMap((date: any) => date.times);
 
-  const getMinimumTimeInDates = () => {
-    return moment(Math.min(...flatTimes));
-  };
+  const getMinimumTimeInDates = (): moment.Moment =>
+    moment(Math.min(...flatTimes));
+  const getMaximumTimeInDates = (): moment.Moment =>
+    moment(Math.max(...flatTimes));
 
-  const getMaximumTimeInDates = () => {
-    return moment(Math.max(...flatTimes));
-  };
-
-  const isMinimumTimeHalfHour = () => {
-    return moment(getMinimumTimeInDates()).minute() == 30;
-  };
-
-  const isMaximumTimeHalfHour = () => {
-    return moment(getMaximumTimeInDates()).minute() == 0;
-  };
+  const isMinimumTimeHalfHour = (): boolean =>
+    getMinimumTimeInDates().minute() === 30;
+  const isMaximumTimeHalfHour = (): boolean =>
+    getMaximumTimeInDates().minute() === 0;
 
   const renderTimeCells = () => {
     const minimumTimeHour = getMinimumTimeInDates().hour();

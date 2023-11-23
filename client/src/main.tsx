@@ -10,6 +10,11 @@ import {
 } from "react-router-dom";
 import "./index.css";
 
+// Moment
+import moment from "moment";
+import "moment/dist/locale/pl";
+moment.locale("pl");
+
 // Layout
 import RootLayout from "./layouts/RootLayout";
 

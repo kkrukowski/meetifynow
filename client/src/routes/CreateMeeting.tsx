@@ -126,25 +126,22 @@ export default function CreateMeeting() {
   ) => {
     const hour = +e.target.value.split(":")[0];
     let newTimeRanges: DailyTimeRange[] = [];
+
     if (timepickerIndex === 0 && datetime === -1) {
       const dates = dailyTimeRanges.map((range) => range.date);
-      dates.forEach((date) => {
-        newTimeRanges.push({
-          date: date,
-          times: getTimeRangeDatetimes(
-            date,
-            fromTime ? hour : getStartTime(date),
-            fromTime ? getEndTime(date) : hour
-          ),
-        });
-        setDailyTimeRanges(newTimeRanges);
-      });
+      newTimeRanges = dates.map((date) => ({
+        date,
+        times: getTimeRangeDatetimes(
+          date,
+          fromTime ? hour : getStartTime(date),
+          fromTime ? getEndTime(date) : hour
+        ),
+      }));
+      setDailyTimeRanges(newTimeRanges);
     } else {
-      let newTimeRange: DailyTimeRange;
-      let index = -1;
       if (isDatetimeExistInRanges(datetime)) {
-        index = getDailyTimeRangeIndex(datetime);
-        newTimeRange = {
+        const index = getDailyTimeRangeIndex(datetime);
+        const newTimeRange = {
           date: datetime,
           times: getTimeRangeDatetimes(
             datetime,
@@ -152,48 +149,47 @@ export default function CreateMeeting() {
             fromTime ? getEndTime(datetime) : hour
           ),
         };
-      }
-      if (index !== -1) {
-        setDailyTimeRanges((prevTimeRanges) => {
-          const updatedTimeRanges = [...prevTimeRanges];
-          updatedTimeRanges[index] = newTimeRange;
-          return updatedTimeRanges;
-        });
+
+        if (index !== -1) {
+          setDailyTimeRanges((prevTimeRanges) => {
+            const updatedTimeRanges = [...prevTimeRanges];
+            updatedTimeRanges[index] = newTimeRange;
+            return updatedTimeRanges;
+          });
+        }
       }
     }
   };
 
-  const pushSelectedTimecell = (dayDateTime: number, dateTime: number) => {
-    const timeRange = dailyTimeRanges.find(
-      (range) => range.date === dayDateTime
-    ) as DailyTimeRange;
-    const newTimeRangeArr = [...timeRange.times, dateTime];
-    const newTimeRange = {
-      date: dayDateTime,
-      times: newTimeRangeArr.sort(),
-    };
-    const index = getDailyTimeRangeIndex(dayDateTime);
+  const updateDailyTimeRanges = (
+    dayDateTime: number,
+    dateTime: number,
+    add: boolean
+  ) => {
     setDailyTimeRanges((prevTimeRanges) => {
+      const index = getDailyTimeRangeIndex(dayDateTime);
+      const timeRange = prevTimeRanges[index];
+      const newTimes = add
+        ? [...timeRange.times, dateTime].sort()
+        : timeRange.times.filter((time) => time !== dateTime);
+
+      const newTimeRange = {
+        date: dayDateTime,
+        times: newTimes,
+      };
+
       const updatedTimeRanges = [...prevTimeRanges];
       updatedTimeRanges[index] = newTimeRange;
       return updatedTimeRanges;
     });
   };
 
+  const pushSelectedTimecell = (dayDateTime: number, dateTime: number) => {
+    updateDailyTimeRanges(dayDateTime, dateTime, true);
+  };
+
   const popUnselectedTimecell = (dayDateTime: number, dateTime: number) => {
-    const timeRange = dailyTimeRanges.find(
-      (range) => range.date === dayDateTime
-    ) as DailyTimeRange;
-    const newTimeRange = {
-      date: dayDateTime,
-      times: timeRange.times.filter((time) => time !== dateTime),
-    };
-    const index = getDailyTimeRangeIndex(dayDateTime);
-    setDailyTimeRanges((prevTimeRanges) => {
-      const updatedTimeRanges = [...prevTimeRanges];
-      updatedTimeRanges[index] = newTimeRange;
-      return updatedTimeRanges;
-    });
+    updateDailyTimeRanges(dayDateTime, dateTime, false);
   };
 
   // Detailed time
@@ -390,23 +386,33 @@ export default function CreateMeeting() {
 
   // Create meeting
   const navigate = useNavigate();
+  const [isRequestInProgress, setIsRequestInProgress] = useState(false);
   const createMeeting: SubmitHandler<Inputs> = async () => {
-    if (validateDate()) {
-      axios
-        .post(import.meta.env.VITE_SERVER_URL + "/meet/new", {
+    if (isRequestInProgress) {
+      return;
+    }
+    try {
+      setIsRequestInProgress(true);
+      if (!validateDate()) {
+        return;
+      }
+      const response = await axios.post(
+        `${import.meta.env.VITE_SERVER_URL}/meet/new`,
+        {
           meetName: meetDetails?.name,
           meetPlace: meetDetails?.place,
           meetLink: meetDetails?.link,
           dates: dailyTimeRanges,
-        })
-        .then(function (response) {
-          const meetId = response.data.newMeet.appointmentId;
-          const meetUrl = `/meet/${meetId}`;
-          navigate(meetUrl);
-        })
-        .catch(function (error) {
-          console.log(error);
-        });
+        }
+      );
+
+      const meetId = response.data.newMeet.appointmentId;
+      const meetUrl = `/meet/${meetId}`;
+      navigate(meetUrl);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsRequestInProgress(false);
     }
   };
 

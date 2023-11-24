@@ -147,12 +147,6 @@ export default function AnswerMeeting(props: any) {
     }
   };
 
-  const handleMouseOver = (dateTime: number) => {
-    if (selectionMode) {
-      toggleTimecell(dateTime);
-    }
-  };
-
   // Table rendering
   const convertDatetimeToDate = (datetime: number) => {
     const date = moment(datetime);
@@ -175,196 +169,200 @@ export default function AnswerMeeting(props: any) {
     getMaximumTimeInDates().minute() === 0;
 
   const renderTimeCells = () => {
+    const disabledTimecell = () => (
+      <td>
+        <div className="rounded-lg h-12 w-24 lg:h-6 lg:w-12 bg-light-gray cursor-default"></div>
+      </td>
+    );
+
     const minimumTimeHour = getMinimumTimeInDates().hour();
     const maximumTimeHour = getMaximumTimeInDates().hour();
 
-    var timeCells: any = [];
+    var timeCells: JSX.Element[] = [];
 
     for (let i = minimumTimeHour; i <= maximumTimeHour; i++) {
       for (let h = 0; h < 2; h++) {
         // Handle half hours
-        if (i == maximumTimeHour && h == 1 && isMaximumTimeHalfHour()) break;
-        if (i == minimumTimeHour && h == 0 && isMinimumTimeHalfHour()) continue;
+        const isHalfHour = h === 1;
+        if (i == maximumTimeHour && isHalfHour && isMaximumTimeHalfHour())
+          break;
+        if (i == minimumTimeHour && isHalfHour && isMinimumTimeHalfHour())
+          continue;
 
-        let timeRow = [];
-        for (let j = 0; j < dates.length; j++) {
-          const dateTime = moment(dates[j].date)
+        let timeRow: JSX.Element[] = [];
+        for (const date of dates) {
+          const dateTime = moment(date.date)
             .hour(i)
-            .minute(h == 0 ? 0 : 30)
+            .minute(isHalfHour ? 30 : 0)
             .valueOf();
 
           const isEndOfWeek = moment(dateTime).day() == 0;
 
-          if (flatTimes.includes(dateTime)) {
-            timeRow.push(availableTimecell(dateTime, isEndOfWeek));
-          } else {
-            timeRow.push(disabledTimecell());
-          }
+          const cellComponent = flatTimes.includes(dateTime)
+            ? availableTimecell(dateTime, isEndOfWeek)
+            : disabledTimecell();
+          timeRow.push(cellComponent);
 
-          if (
-            availabilityInfo[dateTime] &&
-            availabilityInfo[dateTime].usersInfo.length > highestAvailableCount
-          ) {
+          const usersInfoCount =
+            availabilityInfo[dateTime]?.usersInfo.length || 0;
+          if (usersInfoCount > highestAvailableCount) {
             setHighestAvailableCount(
               availabilityInfo[dateTime].usersInfo.length
             );
           }
         }
-        if (h == 0) {
-          timeCells.push(
-            <tr key={i + "00"} className="cursor-pointer">
+        timeCells.push(
+          <tr
+            key={`${i}${isHalfHour ? "30" : "00"}`}
+            className="cursor-pointer"
+          >
+            {h === 0 && (
               <th
                 rowSpan={
                   i == maximumTimeHour && isMaximumTimeHalfHour() ? 1 : 2
                 }
                 className="text-right text-dark align-top bg-light sticky left-0 pr-2"
               >
-                {i.toString().padStart(2, "0")}:00
+                {`${i.toString().padStart(2, "0")}:${isHalfHour ? "30" : "00"}`}
               </th>
-              {timeRow}
-            </tr>
-          );
-        } else if (h == 1) {
-          timeCells.push(
-            <tr key={i + "30"} className="cursor-pointer">
-              {timeRow}
-            </tr>
-          );
-        }
+            )}
+            {timeRow}
+          </tr>
+        );
       }
     }
 
     // Add end hour row
-    if (isMaximumTimeHalfHour()) {
-      timeCells.push(
-        <tr key={maximumTimeHour + "30"} className="cursor-pointer">
-          <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2">
-            {maximumTimeHour.toString().padStart(2, "0")}:30
-          </th>
-        </tr>
-      );
-    } else {
-      timeCells.push(
-        <tr key={maximumTimeHour + 1 + "30"} className="cursor-pointer">
-          <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2">
-            {(maximumTimeHour + 1).toString().padStart(2, "0")}:00
-          </th>
-        </tr>
-      );
-    }
+    const endHour = isMaximumTimeHalfHour()
+      ? maximumTimeHour
+      : maximumTimeHour + 1;
+    const key = `${endHour}${isMaximumTimeHalfHour() ? "30" : "00"}`;
+    timeCells.push(
+      <tr key={key} className="cursor-pointer">
+        <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2">
+          {`${endHour.toString().padStart(2, "0")}:${
+            isMaximumTimeHalfHour() ? "30" : "00"
+          }`}
+        </th>
+      </tr>
+    );
 
     return timeCells;
   };
 
-  const availableTimecell = (dateTime: number, isEndOfWeek: boolean) => (
-    <td key={dateTime}>
-      <div
-        data-date={dateTime}
-        date-votes={
-          availabilityInfo[dateTime]
-            ? availabilityInfo[dateTime].usersInfo.length
-            : 0
-        }
-        onMouseDown={() => {
-          if ((isMobile && mobileAnsweringMode) || !isMobile) {
-            toggleTimecell(dateTime);
-          } else if (isMobile && !mobileAnsweringMode) {
-            setLookedUpDatetime(dateTime);
-            convertDatetimeToDate(dateTime);
-          }
-          if (!isMobile) {
-            // setUnselectMode(false);
-            setSelectionMode(true);
-            // const isTimecellOnline = getSelectedTimecell(dateTime)?.isOnline;
-            // setOnlineSelectionMode(isTimecellOnline ? true : false);
-          }
-        }}
-        onMouseUp={() => {
-          if (!isMobile) {
-            setSelectionMode(false);
-            setUnselectMode(false);
-          }
-        }}
-        onMouseOver={() => {
-          if (!isMobile) {
-            handleMouseOver(dateTime);
-            setLookedUpDatetime(dateTime);
-            convertDatetimeToDate(dateTime);
-            disableSelection();
-          }
-        }}
-        className={`rounded-lg h-12 w-24 lg:h-6 lg:w-12 transition-colors ${
-          isEndOfWeek && "mr-4"
-        }  ${
-          isAnswered(dateTime)
-            ? `border-none ${
-                isDateSelected(dateTime)
-                  ? `${
-                      getSelectedTimecell(dateTime)?.isOnline
-                        ? `bg-gold ${!isMobile && "hover:bg-gold/50"}`
-                        : `bg-primary ${!isMobile && "hover:bg-primary/50"}`
-                    } selected`
-                  : `answered  ${!isMobile && "active:animate-cell-select"} ${
-                      availabilityInfo[dateTime].onlineCount >=
-                        highestAvailableCount * 0.5 &&
-                      availabilityInfo[dateTime].usersInfo.length ==
-                        highestAvailableCount
-                        ? `bg-gold-dark ${!isMobile && "hover:bg-gold-dark/50"}`
-                        : availabilityInfo[dateTime].usersInfo.length ==
+  const availableTimecell = (dateTime: number, isEndOfWeek: boolean) => {
+    const isMobileAnsweringMode = isMobile && mobileAnsweringMode;
+    const isDesktop = !isMobile;
+    const selectedTimecell = getSelectedTimecell(dateTime);
+    const dateVotes = availabilityInfo[dateTime]?.usersInfo.length || 0;
+    const isSelected = isDateSelected(dateTime);
+    const isAnsweredDate = isAnswered(dateTime);
+
+    const handleMouseDown = () => {
+      if ((isMobileAnsweringMode || isDesktop) && !unselectMode) {
+        toggleTimecell(dateTime);
+      } else if (isMobileAnsweringMode && !unselectMode) {
+        setLookedUpDatetime(dateTime);
+        convertDatetimeToDate(dateTime);
+      }
+      if (isDesktop) {
+        setSelectionMode(true);
+      }
+    };
+
+    const handleMouseUp = () => {
+      if (isDesktop) {
+        setSelectionMode(false);
+        setUnselectMode(false);
+      }
+    };
+
+    const handleMouseOver = () => {
+      if (selectionMode) {
+        toggleTimecell(dateTime);
+      }
+      setLookedUpDatetime(dateTime);
+      convertDatetimeToDate(dateTime);
+      disableSelection();
+    };
+
+    return (
+      <td key={dateTime}>
+        <div
+          data-date={dateTime}
+          date-votes={dateVotes}
+          onMouseDown={handleMouseDown}
+          onMouseUp={handleMouseUp}
+          onMouseOver={handleMouseOver}
+          className={`rounded-lg h-12 w-24 lg:h-6 lg:w-12 transition-colors ${
+            isEndOfWeek && "mr-4"
+          } ${
+            isAnsweredDate
+              ? `border-none ${
+                  isSelected
+                    ? `${
+                        selectedTimecell?.isOnline
+                          ? `bg-gold ${!isMobile && "hover:bg-gold/50"}`
+                          : `bg-primary ${!isMobile && "hover:bg-primary/50"}`
+                      } selected`
+                    : `answered  ${!isMobile && "active:animate-cell-select"} ${
+                        availabilityInfo[dateTime].onlineCount >=
+                          highestAvailableCount * 0.5 &&
+                        availabilityInfo[dateTime].usersInfo.length ==
                           highestAvailableCount
-                        ? `bg-green ${!isMobile && "hover:bg-green/50"}`
-                        : `bg-light-green ${
-                            !isMobile && "hover:bg-light-green/50"
-                          }`
-                    }`
-              }`
-            : `border border-gray ${!isMobile && "hover:border-none"} ${
-                isDateSelected(dateTime)
-                  ? `border-none ${
-                      getSelectedTimecell(dateTime)?.isOnline
-                        ? `bg-gold ${!isMobile && "hover:bg-gold/50"}`
-                        : `bg-primary ${!isMobile && "hover:bg-primary/50"}`
-                    }`
-                  : `${
-                      ((isMobile && !mobileAnsweringMode) || !isMobile) &&
-                      "hover:border-none active:animate-cell-select hover:bg-primary"
-                    }`
-              }`
-        }`}
-      ></div>
-    </td>
-  );
-
-  const disabledTimecell = () => (
-    <td>
-      <div className="rounded-lg h-12 w-24 lg:h-6 lg:w-12 bg-light-gray cursor-default"></div>
-    </td>
-  );
-
-  const isAnswered = (datetime: Number) => {
-    const datesData = answers.flatMap((answer: any) => answer.dates);
-    const datesArray = datesData.map((date: any) => date.meetDate);
-    return datesArray.includes(datetime);
+                          ? `bg-gold-dark ${
+                              !isMobile && "hover:bg-gold-dark/50"
+                            }`
+                          : availabilityInfo[dateTime].usersInfo.length ==
+                            highestAvailableCount
+                          ? `bg-green ${!isMobile && "hover:bg-green/50"}`
+                          : `bg-light-green ${
+                              !isMobile && "hover:bg-light-green/50"
+                            }`
+                      }`
+                }`
+              : `border border-gray ${!isMobile && "hover:border-none"} ${
+                  isSelected
+                    ? `border-none ${
+                        selectedTimecell?.isOnline
+                          ? `bg-gold ${!isMobile && "hover:bg-gold/50"}`
+                          : `bg-primary ${!isMobile && "hover:bg-primary/50"}`
+                      }`
+                    : `${
+                        (isMobileAnsweringMode || isDesktop) &&
+                        !unselectMode &&
+                        "hover:border-none active:animate-cell-select hover:bg-primary"
+                      }`
+                }`
+          }`}
+        ></div>
+      </td>
+    );
   };
 
-  const daysNaming = ["Nd", "Pon", "Wt", "Śr", "Czw", "Pt", "Sob"];
+  const isAnswered = (datetime: number) =>
+    answers.some((answer: any) =>
+      answer.dates.some((date: any) => date.meetDate === datetime)
+    );
 
   const renderDaysHeadings = () => {
-    return dates.map((day: any) => (
-      <th
-        key={moment(day.date).date()}
-        className={`bg-light sticky top-0 z-10 ${
-          moment(day.date).day() == 0 && "pr-4"
-        }`}
-      >
-        <p className="text-sm text-dark font-medium">
-          {moment(day.date).date().toString().padStart(2, "0") +
-            "." +
-            (moment(day.date).month() + 1).toString().padStart(2, "0")}
-        </p>
-        <p className="text-dark">{daysNaming[moment(day.date).day()]}</p>
-      </th>
-    ));
+    return dates.map((day: any) => {
+      const dateMoment = moment(day.date);
+      const date = dateMoment.date();
+      const month = dateMoment.month() + 1;
+      const dayOfWeek = dateMoment.day();
+      const classNames = dayOfWeek === 0 ? "pr-4" : "";
+      return (
+        <th key={date} className={`bg-light sticky top-0 z-10 ${classNames}`}>
+          <p className="text-sm text-dark font-medium">
+            {`${date.toString().padStart(2, "0")}.${month
+              .toString()
+              .padStart(2, "0")}`}
+          </p>
+          <p className="text-dark">{dateMoment.format("ddd")}</p>
+        </th>
+      );
+    });
   };
 
   const renderAvailabilityInfo = () => {
@@ -375,9 +373,7 @@ export default function AnswerMeeting(props: any) {
         );
       } else {
         const dayAvailabilityInfo = availabilityInfo[lookedUpDatetime];
-        const availableUsers = dayAvailabilityInfo?.usersInfo.map(
-          (userData: any) => userData
-        );
+        const availableUsers = dayAvailabilityInfo?.usersInfo;
 
         const onlineAvailableUsers = availableUsers?.filter(
           (user: any) => user.isOnline === true
@@ -429,42 +425,43 @@ export default function AnswerMeeting(props: any) {
     setSelectedTimecells([]);
   }
 
+  const [isSendingReq, setIsSendingReq] = useState(false);
   const sendAnswer: SubmitHandler<Inputs> = async () => {
-    if (username.length > 0) {
-      axios
-        .post(
-          import.meta.env.VITE_SERVER_URL + `/meet/${props.appointmentId}`,
-          {
-            username: username,
-            dates: selectedTimecells,
-          }
-        )
-        .then((res) => {
-          clearFormData();
-          axios
-            .get(
-              import.meta.env.VITE_SERVER_URL + `/meet/${props.appointmentId}`
-            )
-            .then((res) => {
-              if (res.status === 200) {
-                setAnswers(res.data.answers);
-                setMeetName(res.data.meetName);
-              }
-            });
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+    try {
+      if (isSendingReq || !username) return;
+
+      setIsSendingReq(true);
+
+      const answerResponse = await axios.post(
+        `${import.meta.env.VITE_SERVER_URL}/meet/${props.appointmentId}`,
+        { username, dates: selectedTimecells }
+      );
+
+      if (answerResponse.status !== 200) return;
+
+      const updatedMeetResponse = await axios.get(
+        `${import.meta.env.VITE_SERVER_URL}/meet/${props.appointmentId}`
+      );
+
+      if (updatedMeetResponse.status === 200) {
+        setAnswers(updatedMeetResponse.data.answers);
+        setMeetName(updatedMeetResponse.data.meetName);
+        clearFormData();
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSendingReq(false);
     }
   };
 
   useEffect(() => {
-    if (lookedUpDatetime) {
-      if (availabilityInfo[lookedUpDatetime]?.usersInfo.length > 0) {
-        setAvailableCount(availabilityInfo[lookedUpDatetime]?.usersInfo.length);
-      } else setAvailableCount(0);
-    } else setAvailableCount(0);
-  });
+    if (lookedUpDatetime && availabilityInfo[lookedUpDatetime]) {
+      setAvailableCount(availabilityInfo[lookedUpDatetime].usersInfo.length);
+    } else {
+      setAvailableCount(0);
+    }
+  }, [lookedUpDatetime, availabilityInfo]);
 
   // Forms
   const formSchema = yup.object().shape({
@@ -503,22 +500,19 @@ export default function AnswerMeeting(props: any) {
 
       {/* Meeting data */}
       <div className="flex flex-1 lg:flex-none justify-end items-center lg:items-start flex-col-reverse lg:justify-start lg:flex-row">
-        {((!mobileAnsweringMode && isMobile) || !isMobile) && (
+        {(!mobileAnsweringMode && isMobile) || !isMobile ? (
           <section className="availability__info w-full lg:w-1/2 lg:mr-10">
             <p>
               {lookedUpDate} {lookedUpTime}
             </p>
-            {lookedUpDate ? (
+            {lookedUpDate && (
               <Heading text={`${availableCount}/${answersCount}`} />
-            ) : (
-              ""
             )}
-
             <ul className="overflow-auto max-h-[100px] h-hd:max-h-[300px]">
               {renderAvailabilityInfo()}
             </ul>
           </section>
-        )}
+        ) : null}
 
         <section className="flex flex-col time__selection lg:w-1/2">
           {isMobile && (
@@ -537,7 +531,7 @@ export default function AnswerMeeting(props: any) {
             onSubmit={handleSubmit(sendAnswer)}
           >
             <div className="flex flex-col-reverse lg:flex-col items-center lg:items-start">
-              {((mobileAnsweringMode && isMobile) || !isMobile) && (
+              {(mobileAnsweringMode && isMobile) || !isMobile ? (
                 <div>
                   <Input
                     label="Twoje imie"
@@ -546,14 +540,12 @@ export default function AnswerMeeting(props: any) {
                     register={register}
                     error={errors.name ? true : false}
                     errorText={errors.name?.message?.toString()}
-                    onChange={(e: {
-                      target: { value: React.SetStateAction<string> };
-                    }) => setUsername(e.target.value)}
+                    onChange={(e) => setUsername(e.target.value)}
                     value={username}
                     placeholder="Twoje imie"
                   />
                 </div>
-              )}
+              ) : null}
               <div
                 className={`self-center overflow-auto h-smd:max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[300px] w-auto max-w-[360px] md:max-w-[700px] lg:max-w-[350px] pr-3 mt-5 ${
                   isMobile && "mb-5"
@@ -570,12 +562,12 @@ export default function AnswerMeeting(props: any) {
                 </table>
               </div>
             </div>
-            {((mobileAnsweringMode && isMobile) || !isMobile) && (
+            {(mobileAnsweringMode && isMobile) || !isMobile ? (
               <div>
                 <Button text="Wyślij" />
                 <CopyLinkButton link={currentUrl} className="ml-6" />
               </div>
-            )}
+            ) : null}
           </form>
         </section>
       </div>

@@ -3,6 +3,7 @@ import axios from "axios";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, set, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import * as yup from "yup";
 
 // Components
@@ -21,6 +22,7 @@ import useIsMobile from "../utils/useIsMobile";
 import useMouseDown from "../utils/useIsMouseDown";
 
 export default function AnswerMeeting(props: any) {
+  const { t } = useTranslation();
   const [selectedTimecells, setSelectedTimecells] = useState<MeetingDate[]>([]);
 
   class MeetingDate {
@@ -369,7 +371,7 @@ export default function AnswerMeeting(props: any) {
     if (lookedUpDatetime) {
       if (!availabilityInfo[lookedUpDatetime]) {
         return (
-          <li className="text-dark">Nikt nie jest dostępny w tym terminie</li>
+          <li className="text-dark">{t("answerMeeting.nobodyAvailable")}</li>
         );
       } else {
         const dayAvailabilityInfo = availabilityInfo[lookedUpDatetime];
@@ -414,9 +416,9 @@ export default function AnswerMeeting(props: any) {
       }
     } else {
       if (isMobile) {
-        return <li>Kliknij na godzinę, aby zobaczyć dostępność</li>;
+        return <li>{t("answerMeeting.clickToReveal")}</li>;
       }
-      return <li>Najedź na godzinę, aby zobaczyć dostępność</li>;
+      return <li>{t("answerMeeting.hoverToReveal")}</li>;
     }
   };
 
@@ -467,8 +469,8 @@ export default function AnswerMeeting(props: any) {
   const formSchema = yup.object().shape({
     name: yup
       .string()
-      .required("Twoje imie jest wymagane.")
-      .max(20, "Imie może mieć maksymalnie 20 znaków."),
+      .required(t("answerMeeting.validate.name.required"))
+      .max(20, t("answerMeeting.validate.name.max")),
   });
 
   type Inputs = {
@@ -534,7 +536,7 @@ export default function AnswerMeeting(props: any) {
               {(mobileAnsweringMode && isMobile) || !isMobile ? (
                 <div>
                   <Input
-                    label="Twoje imie"
+                    label={t("answerMeeting.input.name.label")}
                     type="text"
                     id="name"
                     register={register}
@@ -542,7 +544,7 @@ export default function AnswerMeeting(props: any) {
                     errorText={errors.name?.message?.toString()}
                     onChange={(e) => setUsername(e.target.value)}
                     value={username}
-                    placeholder="Twoje imie"
+                    placeholder={t("answerMeeting.input.name.placeholder")}
                   />
                 </div>
               ) : null}

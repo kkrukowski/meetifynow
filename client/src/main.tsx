@@ -8,6 +8,7 @@ import {
   createRoutesFromElements,
   useParams,
 } from "react-router-dom";
+import "./i18n";
 import "./index.css";
 
 // Moment
@@ -41,7 +42,9 @@ const router = createBrowserRouter(
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
-    <RouterProvider router={router} />
+    <React.Suspense>
+      <RouterProvider router={router} />
+    </React.Suspense>
   </React.StrictMode>
 );
 

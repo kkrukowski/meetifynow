@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useTranslation } from "react-i18next";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
@@ -26,6 +27,8 @@ import {
 import axios from "axios";
 
 export default function CreateMeeting() {
+  // Translation
+  const { t } = useTranslation();
   // Steps
   const [prevStep, setPrevStep] = useState(0);
   const [currStep, setCurrStep] = useState(0);
@@ -369,13 +372,13 @@ export default function CreateMeeting() {
   const validateDate = () => {
     if (selectedDates.length < 1) {
       setDateError(true);
-      setDateErrorText("Wybierz datę spotkania.");
+      setDateErrorText(t("createMeeting.validate.date.required"));
       return false;
     }
 
     if (selectedDates.length > 15) {
       setDateError(true);
-      setDateErrorText("Możesz wybrać maksymalnie 15 dat.");
+      setDateErrorText(t("createMeeting.validate.date.max"));
       return false;
     }
 
@@ -420,13 +423,13 @@ export default function CreateMeeting() {
   const formSchema = yup.object().shape({
     meeting__name: yup
       .string()
-      .required("Nazwa spotkania jest wymagana.")
-      .min(4, "Nazwa spotkania musi mieć co najmniej 4 znaki.")
-      .max(50, "Nazwa spotkania może mieć maksymalnie 50 znaków."),
+      .required(t("createMeeting.validate.meeting__name.required"))
+      .min(4, t("createMeeting.validate.meeting__name.min"))
+      .max(50, t("createMeeting.validate.meeting__name.max")),
     meeting__place: yup
       .string()
-      .max(100, "Miejsce spotkania może mieć maksymalnie 100 znaków."),
-    meeting__link: yup.string().url("Link do spotkania jest niepoprawny."),
+      .max(100, t("createMeeting.validate.meeting__place.max")),
+    meeting__link: yup.string().url(t("createMeeting.validate.meeting__link")),
   });
 
   type Inputs = {
@@ -442,14 +445,14 @@ export default function CreateMeeting() {
 
   const stepsInfo = [
     {
-      title: "Szczegóły spotkania",
+      title: t("createMeeting.step.one.title"),
       fields: ["meeting__name", "meeting__place", "meeting__link"],
     },
     {
-      title: "Wybierz daty spotkania",
+      title: t("createMeeting.step.two.title"),
     },
     {
-      title: "Wybierz godziny spotkania",
+      title: t("createMeeting.step.three.title"),
     },
   ];
 
@@ -491,7 +494,7 @@ export default function CreateMeeting() {
 
   return (
     <main className="flex flex-1 h-full flex-col px-5 py-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 lg:m-0 justify-center">
-      <Title text="Utwórz nowe spotkanie" />
+      <Title text={t("createMeeting.title")} />
       <StepsIndicator steps={4} stepsData={stepsInfo} currIndex={currStep} />
       <form
         id="create-meeting-form"
@@ -506,13 +509,13 @@ export default function CreateMeeting() {
               transition={{ duration: 0.3, ease: "easeInOut" }}
             >
               <Input
-                label="Nazwa spotkania"
+                label={t("createMeeting.input.meeting__name.label")}
                 type="text"
                 id="meeting__name"
                 register={register}
                 errorText={errors.meeting__name?.message?.toString()}
                 error={errors.meeting__name ? true : false}
-                placeholder="📝 Nazwa spotkania"
+                placeholder={t("createMeeting.input.meeting__name.placeholder")}
                 onChange={(e: {
                   target: { value: React.SetStateAction<string> };
                 }) =>
@@ -524,13 +527,15 @@ export default function CreateMeeting() {
                 required={true}
               />
               <Input
-                label="Miejsce spotkania"
+                label={t("createMeeting.input.meeting__place.label")}
                 type="text"
                 id="meeting__place"
                 register={register}
                 errorText={errors.meeting__place?.message?.toString()}
                 error={errors.meeting__place ? true : false}
-                placeholder="🏢 Miejsce spotkania"
+                placeholder={t(
+                  "createMeeting.input.meeting__place.placeholder"
+                )}
                 onChange={(e: {
                   target: { value: React.SetStateAction<string> };
                 }) =>
@@ -541,13 +546,13 @@ export default function CreateMeeting() {
                 }
               />
               <Input
-                label="Link do spotkania"
+                label={t("createMeeting.input.meeting__link.label")}
                 type="text"
                 id="meeting__link"
                 register={register}
                 errorText={errors.meeting__link?.message?.toString()}
                 error={errors.meeting__link ? true : false}
-                placeholder="🔗 Link do spotkania"
+                placeholder={t("createMeeting.input.meeting__link.placeholder")}
                 onChange={(e: {
                   target: { value: React.SetStateAction<string> };
                 }) =>
@@ -755,13 +760,15 @@ export default function CreateMeeting() {
       {currStep < 3 && (
         <div className="self-center">
           <Button
-            text="Wstecz"
+            text={t("button.back")}
             onClick={prev}
             className="mr-10"
             disabled={currStep === 0}
           />
           <Button
-            text={`${currStep === 2 ? "Utwórz spotkanie" : "Dalej"}`}
+            text={`${
+              currStep === 2 ? t("button.createMeeting") : t("button.next")
+            }`}
             onClick={next}
           />
         </div>

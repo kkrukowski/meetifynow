@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
 import Button from "../components/Button";
@@ -13,45 +14,47 @@ import TeamImg from "../assets/imgs/team.webp";
 import WaitImg from "../assets/imgs/wait.webp";
 
 export default function HomePage() {
+  const { t } = useTranslation();
+
   const InfoBlockData = [
     {
       img: FastImg,
       img_alt: "Illustration of a rocket",
       img_title: "Rocket Illustration",
-      title: "Szybkie i łatwe",
-      text: "MeetifyNow to Twój sposób na szybkie i łatwe planowanie spotkań! Stworzysz je w kilka sekund. Nasza aplikacja zapewnia łatwość obsługi i uczyni organizację spotkań przyjemnością.",
+      title: t("homePage.infoBlock.fast.title"),
+      text: t("homePage.infoBlock.fast.text"),
       reverse: false,
     },
     {
       img: TeamImg,
       img_alt: "Illustration of a team",
       img_title: "Team Illustration",
-      title: "Dla każdego",
-      text: "Niezależnie od tego, czy organizujesz spotkanie biznesowe, czy towarzyskie, skorzystaj z MeetifyNow i ciesz się szybkim, prostym i przyjemnym procesem planowania!",
+      title: t("homePage.infoBlock.everyone.title"),
+      text: t("homePage.infoBlock.everyone.text"),
       reverse: true,
     },
     {
       img: WaitImg,
       img_alt: "Illustration of a clock",
       img_title: "Clock Illustration",
-      title: "Oszczędź czas na logowanie",
-      text: "Z MeetifyNow planowanie spotkań staje się jeszcze łatwiejsze — możesz to robić bez konieczności logowania! Oszczędź cenny czas i błyskawicznie zaplanuj swoje spotkania!",
+      title: t("homePage.infoBlock.time.title"),
+      text: t("homePage.infoBlock.time.text"),
       reverse: false,
     },
     {
       img: OnlineMeetImg,
       img_alt: "Illustration of a video call",
       img_title: "Video Call Illustration",
-      title: "Wybór dostępności online",
-      text: "Nasza aplikacja umożliwia wybór dostępności na spotkaniu, nawet jeśli jesteś dostępny tylko zdalnie! W pełni dostosuj harmonogram spotkania do swoich potrzeb.",
+      title: t("homePage.infoBlock.online.title"),
+      text: t("homePage.infoBlock.online.text"),
       reverse: true,
     },
     {
       img: GroupImg,
       img_alt: "Illustration of a group of people",
       img_title: "Group Illustration",
-      title: "Niestandardowe godziny",
-      text: "Nie bądź ograniczony standardowymi przedziałami godzin! MeetifyNow pozwala na tworzenie spotkań według dowolnych godzin, dostosowując się do Twojego indywidualnego grafiku.",
+      title: t("homePage.infoBlock.flexibleHours.title"),
+      text: t("homePage.infoBlock.flexibleHours.text"),
       reverse: false,
     },
   ];
@@ -60,13 +63,12 @@ export default function HomePage() {
     <main className="w-full md:max-w-3xl lg:max-w-5xl p-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 flex flex-col items-center">
       <header className="flex flex-col items-center sm:flex-row mt-10 mb-20 md:my-40">
         <div className="flex flex-col items-center lg:items-start">
-          <Title text="Planowanie spotkań nigdy nie było prostsze!" />
+          <Title text={t("homePage.title")} />
           <p className="mb-5 text-lg text-dark text-justify">
-            MeetifyNow to łatwa w obsłudze platforma do planowania spotkań bez
-            potrzeby logowania.
+            {t("homePage.headerText")}
           </p>
           <Link to="/meet/new">
-            <Button text="Utwórz spotkanie" />
+            <Button text={t("homePage.createButton")} />
           </Link>
         </div>
         <img

@@ -6,7 +6,24 @@ export default function CopyLinkButton(props: {
   className?: string;
 }) {
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(props.link);
+    const currentUrl = window.location.href;
+    const urlObject = new URL(currentUrl);
+    const domainName = urlObject.hostname;
+
+    const segment = "/meet/";
+
+    const segmentIndex = currentUrl.indexOf(segment);
+
+    let urlWithoutSegment;
+    if (segmentIndex !== -1) {
+      urlWithoutSegment = currentUrl.slice(segmentIndex + segment.length);
+    } else {
+      urlWithoutSegment = currentUrl;
+    }
+
+    const link = `https://${domainName}/meet/${urlWithoutSegment}`;
+
+    navigator.clipboard.writeText(link);
   };
 
   return (

@@ -29,4 +29,8 @@ const getTimeRangeDatetimes = (datetime: number, from: number, to: number) => {
   return datetimes;
 };
 
-exports.module = { convertDatetimeToTime, isDatetime, getTimeRangeDatetimes };
+exports.module = {
+  convertDatetimeToTime,
+  isDatetime,
+  getTimeRangeDatetimes,
+};

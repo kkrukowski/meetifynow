@@ -1,5 +1,6 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
+import _ from "lodash";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, set, useForm } from "react-hook-form";
@@ -152,9 +153,10 @@ export default function AnswerMeeting(props: any) {
   // Table rendering
   const convertDatetimeToDate = (datetime: number) => {
     const date = moment(datetime);
-    const convertedDate = date.format("DD.MM dddd");
+    const convertedDate = date.format("DD.MM");
+    const convertedDayName = _.capitalize(date.format("dddd"));
     const convertedTime = date.format("HH:mm");
-    setLookedUpDate(convertedDate);
+    setLookedUpDate(`${convertedDate} ${convertedDayName}`);
     setLookedUpTime(convertedTime);
   };
 
@@ -361,7 +363,7 @@ export default function AnswerMeeting(props: any) {
               .toString()
               .padStart(2, "0")}`}
           </p>
-          <p className="text-dark">{dateMoment.format("ddd")}</p>
+          <p className="text-dark">{_.capitalize(dateMoment.format("ddd"))}</p>
         </th>
       );
     });

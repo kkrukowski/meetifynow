@@ -1,5 +1,6 @@
 import moment from "moment";
 import { useEffect, useState } from "react";
+import { generateShortDaysNames } from "../../utils/meeting/TimeFunctions";
 
 type DayTimesData = {
   date: number;
@@ -209,7 +210,7 @@ export default function DetailedTimepicker(props: {
     return timeCells;
   };
 
-  const daysNaming = ["Nd", "Pon", "Wt", "Śr", "Czw", "Pt", "Sob"];
+  const daysNaming = generateShortDaysNames();
 
   const renderDaysHeadings = () => {
     return days.map((day: any) => (
@@ -224,7 +225,7 @@ export default function DetailedTimepicker(props: {
             "." +
             (moment(day).month() + 1).toString().padStart(2, "0")}
         </p>
-        <p className="text-dark">{daysNaming[moment(day).day()]}</p>
+        <p className="text-dark">{daysNaming[moment(day).day() - 1]}</p>
       </th>
     ));
   };

@@ -1,7 +1,8 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { motion } from "framer-motion";
+import _ from "lodash";
 import moment from "moment";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
@@ -16,6 +17,7 @@ import Timepicker from "../components/CreateMeeting/Timepicker";
 import IconButton from "../components/IconButton";
 import Input from "../components/Input";
 import Title from "../components/Title";
+import { generateShortDaysNames } from "../utils/meeting/TimeFunctions";
 
 // Icons
 import {
@@ -311,9 +313,9 @@ export default function CreateMeeting() {
     return tableRows;
   };
 
-  const currentDate = new Date();
-  const [month, setMonth] = useState(currentDate.getMonth());
-  const [year, setYear] = useState(currentDate.getFullYear());
+  const currentDate = moment();
+  const [month, setMonth] = useState(currentDate.month());
+  const [year, setYear] = useState(currentDate.year());
 
   const prevMonth = (e: { preventDefault: () => void }) => {
     e.preventDefault();
@@ -335,37 +337,7 @@ export default function CreateMeeting() {
     }
   };
 
-  const monthName = [
-    "Styczeń",
-    "Luty",
-    "Marzec",
-    "Kwiecień",
-    "Maj",
-    "Czerwiec",
-    "Lipiec",
-    "Sierpień",
-    "Wrzesień",
-    "Pażdziernik",
-    "Listopad",
-    "Grudzień",
-  ];
-
-  const shortMonthName = [
-    "Sty",
-    "Lut",
-    "Mar",
-    "Kwi",
-    "Maj",
-    "Cze",
-    "Lip",
-    "Sie",
-    "Wrz",
-    "Paź",
-    "Lis",
-    "Gru",
-  ];
-
-  const daysName = ["Pon", "Wt", "Śr", "Czw", "Pt", "Sob", "Nd"];
+  const shortDaysNames = generateShortDaysNames();
 
   // VALIDATION
   // Date validation
@@ -589,7 +561,11 @@ export default function CreateMeeting() {
                             <IoChevronBack />
                           </button>
                           <span className="text-dark">
-                            {monthName[month] + " " + year}
+                            {_.capitalize(
+                              moment().month(month).format("MMMM")
+                            ) +
+                              " " +
+                              year}
                           </span>
                           <button
                             onClick={nextMonth}
@@ -601,7 +577,7 @@ export default function CreateMeeting() {
                       </th>
                     </tr>
                     <tr>
-                      {daysName.map((day) => (
+                      {shortDaysNames.map((day) => (
                         <th className="font-medium text-gray">{day}</th>
                       ))}
                     </tr>
@@ -702,7 +678,7 @@ export default function CreateMeeting() {
                                     {dateObj.date()}
                                   </p>
                                   <p className="text-center text-light leading-none">
-                                    {shortMonthName[dateObj.month()]}
+                                    {shortDaysNames[dateObj.day() - 1]}
                                   </p>
                                 </div>
                                 <div>

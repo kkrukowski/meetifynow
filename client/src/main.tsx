@@ -1,13 +1,7 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
 import ReactDOM from "react-dom/client";
-import {
-  BrowserRouter,
-  Navigate,
-  Route,
-  Routes,
-  useParams,
-} from "react-router-dom";
+import { BrowserRouter, Route, Routes, useParams } from "react-router-dom";
 import "./i18n";
 import "./index.css";
 import getWebsiteLanguage from "./utils/getWebsiteLanguage";

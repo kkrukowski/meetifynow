@@ -1,3 +1,4 @@
 User-agent: *
 Disallow: /meet/
+Disallow: /imgs/
 Sitemap: https://meetifynow.com/sitemap.xml

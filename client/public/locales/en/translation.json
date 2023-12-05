@@ -1,4 +1,7 @@
 {
+  "website.title": "MeetifyNow - A simple platform for scheduling meetings",
+  "website.description": "MeetifyNow is an easy-to-use meeting scheduling platform with no login required. The perfect solution for quickly scheduling meetings online!",
+  "website.url": "https://meetifynow.com/",
   "button.homePage": "Homepage",
   "button.back": "Back",
   "button.next": "Next",

@@ -568,7 +568,7 @@ export default function AnswerMeeting(props: any) {
             </div>
             {(mobileAnsweringMode && isMobile) || !isMobile ? (
               <div>
-                <Button text="Wyślij" />
+                <Button text={t("answerMeeting.button.submit")} />
                 <CopyLinkButton link={currentUrl} className="ml-6" />
               </div>
             ) : null}

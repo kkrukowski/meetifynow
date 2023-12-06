@@ -1,10 +1,14 @@
-import { useNavigate } from "react-router-dom";
-
 const getWebsiteLanguage = () => {
-  const navigate = useNavigate();
   const urlLanguage = window.location.pathname.split("/")[1];
-  const browserLanguage = navigator.language.split("-")[0];
   const languages = ["en", "", "pl"];
+  const isMeetingPath = window.location.pathname.split("/")[1] === "meet";
+  const isBrowserLanguagePl = navigator.language === "pl";
+
+  console.log(isMeetingPath);
+
+  if (urlLanguage === "pl" && isBrowserLanguagePl) {
+    return "pl";
+  }
 
   if (languages.includes(urlLanguage)) {
     return urlLanguage;

@@ -6,6 +6,8 @@
   "button.back": "Back",
   "button.next": "Next",
   "button.createMeeting": "Create meeting",
+  "button.copyLink": "Copy link",
+  "button.copyLink.copied": "Copied!",
   "homePage.headerText": "MeetifyNow is an easy-to-use meeting scheduling platform with no login required.",
   "homePage.title": "Scheduling appointments has never been easier!",
   "homePage.createButton": "Create Meeting",
@@ -45,5 +47,6 @@
   "answerMeeting.validate.name.required": "Your name is required.",
   "answerMeeting.validate.name.max": "The name can have a maximum of 20 characters.",
   "answerMeeting.input.name.label": "Your name",
-  "answerMeeting.input.name.placeholder": "📝 Your name"
+  "answerMeeting.input.name.placeholder": "📝 Your name",
+  "answerMeeting.button.submit": "Send"
 }

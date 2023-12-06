@@ -6,6 +6,8 @@
   "button.back": "Wróć",
   "button.next": "Dalej",
   "button.createMeeting": "Utwórz spotkanie",
+  "button.copyLink": "Skopiuj link",
+  "button.copyLink.copied": "Skopiowano!",
   "homePage.headerText": "MeetifyNow to łatwa w obsłudze platforma do planowania spotkań bez potrzeby logowania.",
   "homePage.title": "Planowanie spotkań nigdy nie było prostsze!",
   "homePage.createButton": "Utwórz spotkanie",
@@ -45,5 +47,6 @@
   "answerMeeting.validate.name.required": "Twoje imie jest wymagane.",
   "answerMeeting.validate.name.max": "Imie może mieć maksymalnie 20 znaków.",
   "answerMeeting.input.name.label": "Twoje imie",
-  "answerMeeting.input.name.placeholder": "📝 Twoje imie"
+  "answerMeeting.input.name.placeholder": "📝 Twoje imie",
+  "answerMeeting.button.submit": "Wyślij"
 }

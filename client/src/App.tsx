@@ -36,9 +36,19 @@ export default function App() {
 
     useEffect(() => {
       const isMeetingPath = location.pathname.startsWith("/meet/");
+      const urlLanguage = window.location.pathname.split("/")[1];
+      const languages = ["en", "pl"];
+      const isLanguageInUrl = languages.includes(urlLanguage);
       const browserLanguage = navigator.language;
 
-      if (isMeetingPath && language !== "pl" && browserLanguage === "pl") {
+      console.log(isLanguageInUrl);
+
+      if (
+        isMeetingPath &&
+        !isLanguageInUrl &&
+        language !== "pl" &&
+        browserLanguage === "pl"
+      ) {
         setLanguage("pl");
         i18n.changeLanguage("pl");
         return navigate(location.pathname.replace("/meet/", "/pl/meet/"));

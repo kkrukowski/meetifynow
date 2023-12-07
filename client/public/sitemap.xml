@@ -12,10 +12,9 @@
               rel="alternate"
               hreflang="pl"
               href="https://meetifynow.com/pl"/>
-  >
 </url>
 <url>
-<loc>https://meetifynow.com/pl</loc>
+  <loc>https://meetifynow.com/pl</loc>
   <xhtml:link
               rel="alternate"
               hreflang="en"

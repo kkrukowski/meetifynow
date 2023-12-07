@@ -14,6 +14,10 @@ import "./i18n";
 import "./index.css";
 import getWebsiteLanguage from "./utils/getWebsiteLanguage";
 
+// Moment
+import moment from "moment";
+import "moment/dist/locale/pl";
+
 // Layout
 import RootLayout from "./layouts/RootLayout";
 
@@ -28,6 +32,8 @@ import HomePage from "./routes/HomePage";
 export default function App() {
   const [language, setLanguage] = useState(getWebsiteLanguage());
 
+  moment.locale(language === "" ? "en" : language);
+
   // Redirect to correct language before render AnswerMeeting
   function useLanguageHandler() {
     const { i18n } = useTranslation();
@@ -40,8 +46,6 @@ export default function App() {
       const languages = ["en", "pl"];
       const isLanguageInUrl = languages.includes(urlLanguage);
       const browserLanguage = navigator.language;
-
-      console.log(isLanguageInUrl);
 
       if (
         isMeetingPath &&

@@ -18,11 +18,6 @@ export default function RootLayout() {
         <link rel="canonical" href={t("website.url")} />
         <link rel="alternate" hrefLang="en" href="https://meetifynow.com/" />
         <link rel="alternate" hrefLang="pl" href="https://meetifynow.com/pl" />
-        <link
-          rel="alternate"
-          hrefLang="x-default"
-          href="https://meetifynow.com/"
-        />
       </Helmet>
       <Navbar />
       <Outlet />

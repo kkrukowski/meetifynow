@@ -4,12 +4,27 @@
       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
             http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
-<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
 
 
 <url>
   <loc>https://meetifynow.com/</loc>
-  <lastmod>2023-11-16T12:24:20+00:00</lastmod>
+  <xhtml:link
+               rel="alternate"
+               hreflang="en"
+               href="https://meetifynow.com"/>
+    <xhtml:link
+               rel="alternate"
+               hreflang="pl"
+               href="https://meetifynow.com/pl"/>
+  <loc>https://meetifynow.com/pl</loc>
+  <xhtml:link
+               rel="alternate"
+               hreflang="en"
+               href="https://meetifynow.com"/>
+    <xhtml:link
+               rel="alternate"
+               hreflang="pl"
+               href="https://meetifynow.com/pl"/>
 </url>
 
 

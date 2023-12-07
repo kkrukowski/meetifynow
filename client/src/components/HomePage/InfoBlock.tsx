@@ -19,7 +19,9 @@ const InfoBlock = (props: {
           src={props.img}
           alt={props.img_alt}
           title={props.img_title}
-          className="m-0 sm:ml-10 mt-10 sm:mb-0 h-48 md:h-64 lg:h-auto"
+          className={`m-0 ${
+            props.reverse && "sm:ml-10"
+          } mt-10 sm:mb-0 h-48 md:h-64 lg:h-auto`}
         />
       </div>
       <div

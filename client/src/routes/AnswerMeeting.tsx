@@ -437,14 +437,14 @@ export default function AnswerMeeting(props: any) {
       setIsSendingReq(true);
 
       const answerResponse = await axios.post(
-        `${import.meta.env.VITE_SERVER_URL}/meet/${props.appointmentId}`,
+        `${import.meta.env.NEXT_PUBLIC_SERVER_URL}/meet/${props.appointmentId}`,
         { username, dates: selectedTimecells }
       );
 
       if (answerResponse.status !== 200) return;
 
       const updatedMeetResponse = await axios.get(
-        `${import.meta.env.VITE_SERVER_URL}/meet/${props.appointmentId}`
+        `${import.meta.env.NEXT_PUBLIC_SERVER_URLL}/meet/${props.appointmentId}`
       );
 
       if (updatedMeetResponse.status === 200) {

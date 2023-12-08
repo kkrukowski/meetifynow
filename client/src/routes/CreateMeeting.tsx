@@ -372,7 +372,7 @@ export default function CreateMeeting() {
         return;
       }
       const response = await axios.post(
-        `${import.meta.env.VITE_SERVER_URL}/meet/new`,
+        `${import.meta.env.NEXT_PUBLIC_SERVER_URL}/meet/new`,
         {
           meetName: meetDetails?.name,
           meetPlace: meetDetails?.place,

@@ -15,9 +15,6 @@ export default function RootLayout() {
         <meta property="og:description" content={t("website.description")} />
         <meta name="twitter:description" content={t("website.description")} />
         <meta property="twitter:url" content={t("website.url")} />
-        <link rel="canonical" href={t("website.url")} />
-        <link rel="alternate" hrefLang="en" href="https://meetifynow.com/" />
-        <link rel="alternate" hrefLang="pl" href="https://meetifynow.com/pl" />
       </Helmet>
       <Navbar />
       <Outlet />

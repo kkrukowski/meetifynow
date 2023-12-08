@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
@@ -14,7 +15,7 @@ import TeamImg from "../assets/imgs/team.webp";
 import WaitImg from "../assets/imgs/wait.webp";
 
 export default function HomePage() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const InfoBlockData = [
     {
@@ -61,6 +62,11 @@ export default function HomePage() {
 
   return (
     <main className="w-full md:max-w-3xl lg:max-w-5xl p-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 flex flex-col items-center">
+      <Helmet htmlAttributes={{ lang: i18n.language }}>
+        <link rel="canonical" href={t("website.url")} />
+        <link rel="alternate" hrefLang="en" href="https://meetifynow.com/" />
+        <link rel="alternate" hrefLang="pl" href="https://meetifynow.com/pl" />
+      </Helmet>
       <header className="flex flex-col items-center sm:flex-row mt-10 mb-20 md:my-40">
         <div className="flex flex-col items-center lg:items-start">
           <Title text={t("homePage.title")} />

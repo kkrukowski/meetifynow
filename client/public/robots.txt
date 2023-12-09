@@ -1,5 +1,0 @@
-User-agent: *
-Disallow: /meet/
-Disallow: /imgs/
-Disallow: /assets/
-Sitemap: https://meetifynow.com/sitemap.xml

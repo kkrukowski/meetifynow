@@ -1,4 +1,5 @@
-import { Helmet } from "react-helmet";
+import { useTranslations } from "next-intl";
+import Image from "next/image";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
@@ -62,13 +63,8 @@ export default function HomePage() {
 
   return (
     <main className="w-full md:max-w-3xl lg:max-w-5xl p-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 flex flex-col items-center">
-      <Helmet htmlAttributes={{ lang: i18n.language }}>
-        <link rel="canonical" href={t("website.url")} />
-        <link rel="alternate" hrefLang="en" href="https://meetifynow.com/" />
-        <link rel="alternate" hrefLang="pl" href="https://meetifynow.com/pl" />
-      </Helmet>
       <header className="flex flex-col items-center sm:flex-row mt-10 mb-20 md:my-40">
-        <div className="flex flex-col items-center lg:items-start">
+        <div className="flex flex-col items-center lg:items-start sm:w-auto lg:w-1/2">
           <Title text={t("homePage.title")} />
           <p className="mb-5 text-lg text-dark text-justify">
             {t("homePage.headerText")}
@@ -77,11 +73,12 @@ export default function HomePage() {
             <Button text={t("homePage.createButton")} />
           </Link>
         </div>
-        <img
+
+        <Image
           src={CalendarImg}
           alt="Illustration of a calendar"
           title="Calendar Illustration"
-          className="m-0 mt-20 sm:mt-0 sm:ml-10 h-64 sm:w-auto lg:w-1/2 h-48 md:h-64 lg:h-auto"
+          className="m-0 mt-20 sm:mt-0 sm:ml-10 w-auto sm:w-auto lg:w-1/2 h-48 md:h-64 lg:h-auto"
         />
       </header>
       <div>

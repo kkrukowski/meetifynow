@@ -1,6 +1,7 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 
+import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import {
   BrowserRouter,
@@ -18,9 +19,6 @@ import getWebsiteLanguage from "./utils/getWebsiteLanguage";
 import moment from "moment";
 import "moment/dist/locale/pl";
 
-// Layout
-import RootLayout from "./layouts/RootLayout";
-
 // Views
 import AnswerMeeting from "./routes/AnswerMeeting";
 import AnswerMeetingLoader from "./routes/AnswerMeetingLoader";
@@ -30,7 +28,8 @@ import Error404 from "./routes/Error404";
 import HomePage from "./routes/HomePage";
 
 export default function App() {
-  const [language, setLanguage] = useState(getWebsiteLanguage());
+  const router = useRouter();
+  const language = router.locale;
 
   moment.locale(language === "" ? "en" : language);
 
@@ -47,16 +46,15 @@ export default function App() {
       const isLanguageInUrl = languages.includes(urlLanguage);
       const browserLanguage = navigator.language;
 
-      if (
-        isMeetingPath &&
-        !isLanguageInUrl &&
-        language !== "pl" &&
-        browserLanguage === "pl"
-      ) {
-        setLanguage("pl");
-        i18n.changeLanguage("pl");
-        return navigate(location.pathname.replace("/meet/", "/pl/meet/"));
-      }
+      // if (
+      //   isMeetingPath &&
+      //   !isLanguageInUrl &&
+      //   language !== "pl" &&
+      //   browserLanguage === "pl"
+      // ) {
+      //   i18n.changeLanguage("pl");
+      //   return navigate(location.pathname.replace("/meet/", "/pl/meet/"));
+      // }
     }, [location, navigate, navigator]);
   }
 
@@ -70,7 +68,7 @@ export default function App() {
 
     useEffect(() => {
       axios
-        .get(import.meta.env.VITE_SERVER_URL + `/meet/${id}`)
+        .get(process.env.NEXT_PUBLIC_SERVER_URL + `/meet/${id}`)
         .then((res) => {
           if (res.status === 200) {
             console.log(res.data);
@@ -101,7 +99,7 @@ export default function App() {
   return (
     <BrowserRouter basename={`/${language}`}>
       <Routes>
-        <Route path="/" element={<RootLayout />}>
+        <Route path="/">
           <Route index element={<HomePage />} />
           <Route path="meet">
             <Route path="new" element={<CreateMeeting />} />

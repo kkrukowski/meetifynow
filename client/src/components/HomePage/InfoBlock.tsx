@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 import Heading from "../Heading";
 
 const InfoBlock = (props: {
@@ -15,13 +17,13 @@ const InfoBlock = (props: {
       }`}
     >
       <div className="flex justify-center sm:w-1/2">
-        <img
+        <Image
           src={props.img}
           alt={props.img_alt}
           title={props.img_title}
           className={`m-0 ${
             props.reverse && "sm:ml-10"
-          } mt-10 sm:mb-0 h-48 md:h-64 lg:h-auto`}
+          } mt-10 sm:mb-0 w-auto h-48 md:h-64 lg:h-auto`}
         />
       </div>
       <div

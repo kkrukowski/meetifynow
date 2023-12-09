@@ -1,4 +1,7 @@
 import type { Metadata } from "next";
+import Script from "next/script";
+import Footer from "../components/Footer";
+import Navbar from "../components/Navbar";
 // import { useTranslation } from "react-i18next";
 
 // const { t } = useTranslation();
@@ -25,28 +28,35 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html>
       <head>
-        {/* <script type="application/ld+json">
+        <Script type="application/ld+json">
+          {`
             {
-            "@context" : "https://schema.org",
-            "@type" : "WebSite",
-            "name" : "MeetifyNow",
-            "alternateName" : "MN",
-            "url" : "https://meetifynow.com/"
+                "@context" : "https://schema.org",
+                "@type" : "WebSite",
+                "name" : "MeetifyNow",
+                "alternateName" : "MN",
+                "url" : "https://meetifynow.com/"
             }
-        </script>
-        <script async src=" https://www.googletagmanager.com/gtag/js?id=G-17HZ4W39MP">
-        </script>
-        <script>
+        `}
+        </Script>
+        <Script
+          async
+          src="https://www.googletagmanager.com/gtag/js?id=G-17HZ4W39MP"
+        ></Script>
+        <Script>
+          {`
             window.dataLayer = window.dataLayer || [];
             function gtag() { dataLayer.push(arguments); }
             gtag('js', new Date());
 
             gtag('config', 'G-17HZ4W39MP');
-        </script> */}
+            `}
+        </Script>
       </head>
-
       <body>
-        <div id="root">{children}</div>
+        <Navbar />
+        {children}
+        <Footer />
       </body>
     </html>
   );

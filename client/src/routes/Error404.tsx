@@ -9,7 +9,7 @@ import { Link } from "react-router-dom";
 export default function Error404() {
   const { t } = useTranslation();
   return (
-    <div className="flex flex-col justify-center items-center h-full">
+    <div className="flex flex-1 flex-col justify-center items-center h-full">
       <BigText text="404" />
       <Heading text={t("errorPage.title")} />
       <Link to="/">

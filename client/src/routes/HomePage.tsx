@@ -1,5 +1,6 @@
 import { useTranslations } from "next-intl";
 import Image from "next/image";
+import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 
@@ -8,6 +9,7 @@ import InfoBlock from "../components/HomePage/InfoBlock";
 import Title from "../components/Title";
 
 // Images
+import { useEffect } from "react";
 import CalendarImg from "../assets/imgs/calendar.webp";
 import FastImg from "../assets/imgs/fast.webp";
 import GroupImg from "../assets/imgs/group-meet.webp";

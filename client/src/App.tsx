@@ -1,7 +1,9 @@
+"use client";
+
 import axios from "axios";
 import { useEffect, useState } from "react";
+import { Locale } from "../i18n.config";
 
-import { useRouter } from "next/router";
 import { useTranslation } from "react-i18next";
 import {
   BrowserRouter,
@@ -27,35 +29,36 @@ import CreateMeeting from "./routes/CreateMeeting";
 import Error404 from "./routes/Error404";
 import HomePage from "./routes/HomePage";
 
-export default function App() {
-  const router = useRouter();
-  const language = router.locale;
+export default function App({ lang }: { lang: Locale }) {
+  // const language = i18next.language;
+  //useEffect(() => {
+  //   const language = router.locale;
+  //   moment.locale(language);
+  // }, []);
 
-  moment.locale(language === "" ? "en" : language);
-
+  const language = "";
   // Redirect to correct language before render AnswerMeeting
   function useLanguageHandler() {
-    const { i18n } = useTranslation();
-    const location = useLocation();
-    const navigate = useNavigate();
-
-    useEffect(() => {
-      const isMeetingPath = location.pathname.startsWith("/meet/");
-      const urlLanguage = window.location.pathname.split("/")[1];
-      const languages = ["en", "pl"];
-      const isLanguageInUrl = languages.includes(urlLanguage);
-      const browserLanguage = navigator.language;
-
-      // if (
-      //   isMeetingPath &&
-      //   !isLanguageInUrl &&
-      //   language !== "pl" &&
-      //   browserLanguage === "pl"
-      // ) {
-      //   i18n.changeLanguage("pl");
-      //   return navigate(location.pathname.replace("/meet/", "/pl/meet/"));
-      // }
-    }, [location, navigate, navigator]);
+    // const { i18n } = useTranslation();
+    // const location = useLocation();
+    // const navigate = useNavigate();
+    // useEffect(() => {
+    //   const isMeetingPath = location.pathname.startsWith("/meet/");
+    //   const urlLanguage = window.location.pathname.split("/")[1];
+    //   const languages = ["en", "pl"];
+    //   const isLanguageInUrl = languages.includes(urlLanguage);
+    //   const browserLanguage = navigator.language;
+    //   console.log(language);
+    //   if (
+    //     isMeetingPath &&
+    //     !isLanguageInUrl &&
+    //     language !== "pl" &&
+    //     browserLanguage === "pl"
+    //   ) {
+    //     i18n.changeLanguage("pl");
+    //     return navigate(location.pathname.replace("/meet/", "/pl/meet/"));
+    //   }
+    // }, [location, navigate, navigator]);
   }
 
   function RenderAnswerMeeting() {
@@ -97,7 +100,7 @@ export default function App() {
   }
 
   return (
-    <BrowserRouter basename={`/${language}`}>
+    <BrowserRouter>
       <Routes>
         <Route path="/">
           <Route index element={<HomePage />} />
@@ -106,7 +109,7 @@ export default function App() {
             <Route path=":id" element={<RenderAnswerMeeting />} />
           </Route>
 
-          <Route path="*" element={<Error404 />} />
+          <Route path="*" element={<Error404 lang={lang} />} />
         </Route>
       </Routes>
     </BrowserRouter>

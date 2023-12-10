@@ -1,7 +1,8 @@
 import type { Metadata } from "next";
 import Script from "next/script";
-import Footer from "../components/Footer";
-import Navbar from "../components/Navbar";
+import { Locale, i18n } from "../../../i18n.config";
+import Footer from "../../components/Footer";
+import Navbar from "../../components/Navbar";
 // import { useTranslation } from "react-i18next";
 
 // const { t } = useTranslation();
@@ -24,9 +25,19 @@ import Navbar from "../components/Navbar";
 //   },
 // };
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export async function generateStaticParams() {
+  return i18n.locales.map((locale: Locale) => ({ lang: locale }));
+}
+
+export default function Layout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: { lang: Locale };
+}) {
   return (
-    <html>
+    <html lang={params.lang}>
       <head>
         <Script type="application/ld+json">
           {`

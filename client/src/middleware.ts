@@ -1,21 +1,42 @@
 import { NextRequest, NextResponse } from "next/server";
 
-const PUBLIC_FILE = /\.(.*)$/;
+import { match as matchLocale } from "@formatjs/intl-localematcher";
+import Negotiator from "negotiator";
+import { i18n } from "../i18n.config";
+
+function getLocale(req: NextRequest): string | undefined {
+  const negotiatorHeaders: Record<string, string> = {};
+  req.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
+
+  const locales: string[] = i18n.locales;
+  const languages = new Negotiator({ headers: negotiatorHeaders }).languages();
+
+  const locale = matchLocale(languages, locales, i18n.defaultLocale);
+  return locale;
+}
 
 export async function middleware(req: NextRequest) {
-  if (
-    req.nextUrl.pathname.startsWith("/_next") ||
-    req.nextUrl.pathname.includes("/api/") ||
-    PUBLIC_FILE.test(req.nextUrl.pathname)
-  ) {
-    return;
-  }
+  const locales: string[] = i18n.locales;
+  const { pathname } = req.nextUrl;
+  const pathnameHasLocale = locales.some(
+    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
+  );
 
-  if (req.nextUrl.locale === "default") {
-    const locale = req.cookies.get("NEXT_LOCALE")?.value || "en";
+  if (pathnameHasLocale) return;
 
-    return NextResponse.redirect(
-      new URL(`/${locale}${req.nextUrl.pathname}${req.nextUrl.search}`, req.url)
-    );
-  }
+  // Redirect if there is no locale
+  const locale = getLocale(req);
+  req.nextUrl.pathname = `/${locale}${pathname}`;
+  // e.g. incoming request is /products
+  // The new URL is now /en-US/products
+  return Response.redirect(req.nextUrl);
 }
+
+export const config = {
+  matcher: [
+    // Skip all internal paths (_next)
+    "/((?!_next).*)",
+    // Optional: only run on root (/) URL
+    // '/'
+  ],
+};

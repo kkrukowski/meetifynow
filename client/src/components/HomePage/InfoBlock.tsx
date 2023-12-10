@@ -3,7 +3,7 @@ import Image from "next/image";
 import Heading from "../Heading";
 
 const InfoBlock = (props: {
-  img: string;
+  img: any;
   img_alt: string;
   img_title: string;
   title: string;

@@ -4,18 +4,9 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { Locale } from "../i18n.config";
 
-import { useTranslation } from "react-i18next";
-import {
-  BrowserRouter,
-  Route,
-  Routes,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
+import { BrowserRouter, Route, Routes, useParams } from "react-router-dom";
 import "./i18n";
 import "./index.css";
-import getWebsiteLanguage from "./utils/getWebsiteLanguage";
 
 // Moment
 import moment from "moment";
@@ -30,40 +21,9 @@ import Error404 from "./routes/Error404";
 import HomePage from "./routes/HomePage";
 
 export default function App({ lang }: { lang: Locale }) {
-  // const language = i18next.language;
-  //useEffect(() => {
-  //   const language = router.locale;
-  //   moment.locale(language);
-  // }, []);
-
-  const language = "";
-  // Redirect to correct language before render AnswerMeeting
-  function useLanguageHandler() {
-    // const { i18n } = useTranslation();
-    // const location = useLocation();
-    // const navigate = useNavigate();
-    // useEffect(() => {
-    //   const isMeetingPath = location.pathname.startsWith("/meet/");
-    //   const urlLanguage = window.location.pathname.split("/")[1];
-    //   const languages = ["en", "pl"];
-    //   const isLanguageInUrl = languages.includes(urlLanguage);
-    //   const browserLanguage = navigator.language;
-    //   console.log(language);
-    //   if (
-    //     isMeetingPath &&
-    //     !isLanguageInUrl &&
-    //     language !== "pl" &&
-    //     browserLanguage === "pl"
-    //   ) {
-    //     i18n.changeLanguage("pl");
-    //     return navigate(location.pathname.replace("/meet/", "/pl/meet/"));
-    //   }
-    // }, [location, navigate, navigator]);
-  }
+  moment.locale(lang);
 
   function RenderAnswerMeeting() {
-    useLanguageHandler();
-
     const { id } = useParams<{ id: string }>();
     const [isLoading, setIsLoading] = useState(true);
     const [isMeetingFound, setIsMeetingFound] = useState(false);
@@ -96,16 +56,16 @@ export default function App({ lang }: { lang: Locale }) {
       return <AnswerMeeting {...meetingData} />;
     }
 
-    return <AnswerNotFound />;
+    return <AnswerNotFound lang={lang} />;
   }
 
   return (
-    <BrowserRouter>
+    <BrowserRouter basename={`/${lang}`}>
       <Routes>
         <Route path="/">
-          <Route index element={<HomePage />} />
+          <Route index element={<HomePage lang={lang} />} />
           <Route path="meet">
-            <Route path="new" element={<CreateMeeting />} />
+            <Route path="new" element={<CreateMeeting lang={lang} />} />
             <Route path=":id" element={<RenderAnswerMeeting />} />
           </Route>
 

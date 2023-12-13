@@ -1,5 +1,115 @@
 {
-  "products": {
-    "cart": "Add to Cart"
+  "website": {
+    "title": "MeetifyNow - Simple Meeting Scheduling Tool",
+    "description": "MeetifyNow is a simple-to-use meeting scheduling tool that doesn't require logging in. The perfect solution for quick online scheduling!",
+    "url": "https://meetifynow.com/pl"
+  },
+  "button": {
+    "homePage": "Homepage",
+    "back": "Back",
+    "next": "Next",
+    "createMeeting": "Create Meeting",
+    "copyLink": "Copy Link",
+    "copyLink.copied": "Copied!"
+  },
+  "page": {
+    "error": {
+      "title": "No such page found 😥"
+    },
+    "home": {
+      "headerText": "MeetifyNow is a simple-to-use meeting scheduling tool that doesn't require logging in.",
+      "title": "Meeting scheduling has never been easier!",
+      "createButton": "Create meeting",
+      "infoBlock": {
+        "fast": {
+          "title": "Fast and easy",
+          "text": "MeetifyNow is your way to schedule meetings quickly and easily! Create them in seconds. Our app is easy to use and will make organizing meetings a pleasure."
+        },
+        "everyone": {
+          "title": "For everyone",
+          "text": "Whether you're having a business meeting or a social gathering, use MeetifyNow and enjoy a fast, simple, and fun planning process!"
+        },
+        "time": {
+          "title": "Don't waste time logging in",
+          "text": "With MeetifyNow, scheduling meetings becomes even easier - you can do it without logging in! Save valuable time and schedule your meetings in no time!"
+        },
+        "online": {
+          "title": "Select availability online",
+          "text": "Our app allows you to select your availability for a meeting, even if you are only available remotely! Fully customize your meeting schedule to suit your needs."
+        },
+        "flexibleHours": {
+          "title": "Custom Hours",
+          "text": "Don't be limited to standard time slots! MeetifyNow allows you to create meetings at any time, adapting to your individual schedule."
+        }
+      }
+    },
+    "createMeeting": {
+      "title": "Create a new meeting",
+      "createButton": "Create meeting",
+      "step": {
+        "one": {
+          "title": "Meeting Details"
+        },
+        "two": {
+          "title": "Choose Meeting Dates"
+        },
+        "three": {
+          "title": "Choose Meeting Times"
+        }
+      },
+      "validate": {
+        "meeting__name": {
+          "required": "Meeting name is required.",
+          "min": "Meeting name must be at least 4 characters long.",
+          "max": "Meeting name can have a maximum of 50 characters."
+        },
+        "meeting__place": {
+          "max": "Meeting place can have a maximum of 100 characters."
+        },
+        "date": {
+          "required": "Select a date for the meeting.",
+          "max": "You can select up to 15 dates."
+        },
+        "meeting__link": "Meeting link is incorrect."
+      },
+      "input": {
+        "meeting__name": {
+          "label": "Meeting name",
+          "placeholder": "📝 Meeting name"
+        },
+        "meeting__place": {
+          "label": "Meeting place",
+          "placeholder": "🏢 Meeting place"
+        },
+        "meeting__link": {
+          "label": "Meeting link",
+          "placeholder": "🔗 Meeting link"
+        }
+      }
+    },
+    "answerMeeting": {
+      "nobodyAvailable": "Nobody is available on the selected date 😥",
+      "clickToReveal": "Click on a time to see availability",
+      "hoverToReveal": "Hover over the hour to see availability",
+      "input": {
+        "name": {
+          "label": "Your name",
+          "placeholder": "📝 Your name"
+        }
+      },
+      "validate": {
+        "name": {
+          "required": "Your name is required.",
+          "min": "Your name must be at least 4 characters long."
+        }
+      },
+      "button": {
+        "submit": "Send"
+      }
+    },
+    "answerNotFoundPage": {
+      "title": "No such appointment found 😥",
+      "heading": "You can always create your own 😎"
+    }
   }
 }

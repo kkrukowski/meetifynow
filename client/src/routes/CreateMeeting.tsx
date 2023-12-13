@@ -4,10 +4,11 @@ import _ from "lodash";
 import moment from "moment";
 import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
+import { Locale } from "../../i18n.config";
+import { getDictionary } from "../lib/dictionary";
 
 // Components
 import Button from "../components/Button";
@@ -28,9 +29,10 @@ import {
 
 import axios from "axios";
 
-export default function CreateMeeting() {
+export default async function CreateMeeting({ lang }: { lang: Locale }) {
   // Translation
-  const { t } = useTranslation();
+  const dict = await getDictionary(lang);
+
   // Steps
   const [prevStep, setPrevStep] = useState(0);
   const [currStep, setCurrStep] = useState(0);
@@ -344,13 +346,13 @@ export default function CreateMeeting() {
   const validateDate = () => {
     if (selectedDates.length < 1) {
       setDateError(true);
-      setDateErrorText(t("createMeeting.validate.date.required"));
+      setDateErrorText(dict.page.createMeeting.validate.date.required);
       return false;
     }
 
     if (selectedDates.length > 15) {
       setDateError(true);
-      setDateErrorText(t("createMeeting.validate.date.max"));
+      setDateErrorText(dict.page.createMeeting.validate.date.max);
       return false;
     }
 
@@ -395,13 +397,15 @@ export default function CreateMeeting() {
   const formSchema = yup.object().shape({
     meeting__name: yup
       .string()
-      .required(t("createMeeting.validate.meeting__name.required"))
-      .min(4, t("createMeeting.validate.meeting__name.min"))
-      .max(50, t("createMeeting.validate.meeting__name.max")),
+      .required(dict.page.createMeeting.validate.meeting__name.required)
+      .min(4, dict.page.createMeeting.validate.meeting__name.min)
+      .max(50, dict.page.createMeeting.validate.meeting__name.max),
     meeting__place: yup
       .string()
-      .max(100, t("createMeeting.validate.meeting__place.max")),
-    meeting__link: yup.string().url(t("createMeeting.validate.meeting__link")),
+      .max(100, dict.page.createMeeting.validate.meeting__place.max),
+    meeting__link: yup
+      .string()
+      .url(dict.page.createMeeting.validate.meeting__link),
   });
 
   type Inputs = {
@@ -417,14 +421,14 @@ export default function CreateMeeting() {
 
   const stepsInfo = [
     {
-      title: t("createMeeting.step.one.title"),
+      title: dict.page.createMeeting.step.one.title,
       fields: ["meeting__name", "meeting__place", "meeting__link"],
     },
     {
-      title: t("createMeeting.step.two.title"),
+      title: dict.page.createMeeting.step.two.title,
     },
     {
-      title: t("createMeeting.step.three.title"),
+      title: dict.page.createMeeting.step.three.title,
     },
   ];
 
@@ -466,7 +470,7 @@ export default function CreateMeeting() {
 
   return (
     <main className="flex flex-1 h-full flex-col px-5 py-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 lg:m-0 justify-center">
-      <Title text={t("createMeeting.title")} />
+      <Title text={dict.page.createMeeting.title} />
       <StepsIndicator steps={4} stepsData={stepsInfo} currIndex={currStep} />
       <form
         id="create-meeting-form"
@@ -481,13 +485,15 @@ export default function CreateMeeting() {
               transition={{ duration: 0.3, ease: "easeInOut" }}
             >
               <Input
-                label={t("createMeeting.input.meeting__name.label")}
+                label={dict.page.createMeeting.input.meeting__name.label}
                 type="text"
                 id="meeting__name"
                 register={register}
                 errorText={errors.meeting__name?.message?.toString()}
                 error={errors.meeting__name ? true : false}
-                placeholder={t("createMeeting.input.meeting__name.placeholder")}
+                placeholder={
+                  dict.page.createMeeting.input.meeting__name.placeholder
+                }
                 onChange={(e: {
                   target: { value: React.SetStateAction<string> };
                 }) =>
@@ -499,15 +505,15 @@ export default function CreateMeeting() {
                 required={true}
               />
               <Input
-                label={t("createMeeting.input.meeting__place.label")}
+                label={dict.page.createMeeting.input.meeting__place.label}
                 type="text"
                 id="meeting__place"
                 register={register}
                 errorText={errors.meeting__place?.message?.toString()}
                 error={errors.meeting__place ? true : false}
-                placeholder={t(
-                  "createMeeting.input.meeting__place.placeholder"
-                )}
+                placeholder={
+                  dict.page.createMeeting.input.meeting__place.placeholder
+                }
                 onChange={(e: {
                   target: { value: React.SetStateAction<string> };
                 }) =>
@@ -518,13 +524,15 @@ export default function CreateMeeting() {
                 }
               />
               <Input
-                label={t("createMeeting.input.meeting__link.label")}
+                label={dict.page.createMeeting.input.meeting__link.label}
                 type="text"
                 id="meeting__link"
                 register={register}
                 errorText={errors.meeting__link?.message?.toString()}
                 error={errors.meeting__link ? true : false}
-                placeholder={t("createMeeting.input.meeting__link.placeholder")}
+                placeholder={
+                  dict.page.createMeeting.input.meeting__link.placeholder
+                }
                 onChange={(e: {
                   target: { value: React.SetStateAction<string> };
                 }) =>
@@ -736,14 +744,16 @@ export default function CreateMeeting() {
       {currStep < 3 && (
         <div className="self-center">
           <Button
-            text={t("button.back")}
+            text={dict.button.back}
             onClick={prev}
             className="mr-10"
             disabled={currStep === 0}
           />
           <Button
             text={`${
-              currStep === 2 ? t("button.createMeeting") : t("button.next")
+              currStep === 2
+                ? dict.page.createMeeting.createButton
+                : dict.button.next
             }`}
             onClick={next}
           />

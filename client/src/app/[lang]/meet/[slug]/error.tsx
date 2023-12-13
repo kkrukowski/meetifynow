@@ -1,10 +1,12 @@
-import { Locale } from "../../i18n.config";
-import { getDictionary } from "../lib/dictionary";
+"use client";
+
+import { Locale } from "../../../../../i18n.config";
+import { getDictionary } from "../../../../lib/dictionary";
 
 import { Link } from "react-router-dom";
-import Button from "../components/Button";
-import Heading from "../components/Heading";
-import Title from "../components/Title";
+import Button from "../../../../components/Button";
+import Heading from "../../../../components/Heading";
+import Title from "../../../../components/Title";
 
 export default async function AnswetNotFound({ lang }: { lang: Locale }) {
   // Translation

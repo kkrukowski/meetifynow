@@ -8,17 +8,17 @@ import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 import { Locale } from "../../i18n.config";
-import { getDictionary } from "../lib/dictionary";
+import { getDictionary } from "../app/lib/dictionary";
 
 // Components
-import Button from "../components/Button";
-import DetailedTimepicker from "../components/CreateMeeting/DetailedTimepicker";
-import StepsIndicator from "../components/CreateMeeting/StepsIndicator";
-import Timepicker from "../components/CreateMeeting/Timepicker";
-import IconButton from "../components/IconButton";
-import Input from "../components/Input";
-import Title from "../components/Title";
-import { generateShortDaysNames } from "../utils/meeting/TimeFunctions";
+import { generateShortDaysNames } from "../../utils/meeting/TimeFunctions";
+import Button from "../app/components/Button";
+import DetailedTimepicker from "../app/components/CreateMeeting/DetailedTimepicker";
+import StepsIndicator from "../app/components/CreateMeeting/StepsIndicator";
+import Timepicker from "../app/components/CreateMeeting/Timepicker";
+import IconButton from "../app/components/IconButton";
+import Input from "../app/components/Input";
+import Title from "../app/components/Title";
 
 // Icons
 import {

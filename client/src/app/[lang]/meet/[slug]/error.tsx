@@ -1,7 +1,7 @@
 "use client";
 
 import { Locale } from "../../../../../i18n.config";
-import { getDictionary } from "../../../../lib/dictionary";
+import { getDictionary } from "../../../lib/dictionary";
 
 import { Link } from "react-router-dom";
 import Button from "../../../../components/Button";

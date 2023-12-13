@@ -8,19 +8,19 @@ import { useTranslation } from "react-i18next";
 import * as yup from "yup";
 
 // Components
-import Button from "../components/Button";
-import CopyLinkButton from "../components/CopyLinkButton";
-import Heading from "../components/Heading";
-import Input from "../components/Input";
-import LinkButton from "../components/LinkButton";
-import SwitchButton from "../components/SwitchButton";
-import Title from "../components/Title";
+import Button from "../app/components/Button";
+import CopyLinkButton from "../app/components/CopyLinkButton";
+import Heading from "../app/components/Heading";
+import Input from "../app/components/Input";
+import LinkButton from "../app/components/LinkButton";
+import SwitchButton from "../app/components/SwitchButton";
+import Title from "../app/components/Title";
 
 // Utils
-import { getAvailabilityInfo } from "../utils/meeting/answer/getAvailabilityInfo";
-import { getUnavailableUsersInfo } from "../utils/meeting/answer/getUnavailableUsersInfo";
-import useIsMobile from "../utils/useIsMobile";
-import useMouseDown from "../utils/useIsMouseDown";
+import { getAvailabilityInfo } from "../../utils/meeting/answer/getAvailabilityInfo";
+import { getUnavailableUsersInfo } from "../../utils/meeting/answer/getUnavailableUsersInfo";
+import useIsMobile from "../../utils/useIsMobile";
+import useMouseDown from "../../utils/useIsMouseDown";
 
 export default function AnswerMeeting(props: any) {
   const { t } = useTranslation();

@@ -1,9 +1,9 @@
 import { Locale } from "../../i18n.config";
-import { getDictionary } from "../lib/dictionary";
+import { getDictionary } from "../app/lib/dictionary";
 
-import BigText from "../components/BigText";
-import Button from "../components/Button";
-import Heading from "../components/Heading";
+import BigText from "../app/components/BigText";
+import Button from "../app/components/Button";
+import Heading from "../app/components/Heading";
 
 import { Link } from "react-router-dom";
 

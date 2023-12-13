@@ -1,9 +1,9 @@
+import Footer from "@/components/Footer";
+import Navbar from "@/components/Navbar";
+import "@/global.css";
 import type { Metadata } from "next";
 import Script from "next/script";
 import { Locale, i18n } from "../../../i18n.config";
-import Footer from "../../components/Footer";
-import Navbar from "../../components/Navbar";
-import "../global.css";
 // import { useTranslation } from "react-i18next";
 
 // const { t } = useTranslation();

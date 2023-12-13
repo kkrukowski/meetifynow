@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import useIsMobile from "../utils/useIsMobile";
+import useIsMobile from "../../utils/useIsMobile";
 
 const AnswerMeetingLoader = () => {
   const isMobile = useIsMobile();

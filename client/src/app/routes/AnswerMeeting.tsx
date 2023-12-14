@@ -1,20 +1,22 @@
+"use client";
+
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
 import _ from "lodash";
 import moment from "moment";
 import React, { useEffect, useState } from "react";
-import { SubmitHandler, set, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import { useTranslation } from "react-i18next";
 import * as yup from "yup";
 
 // Components
-import Button from "@/components/Button";
-import CopyLinkButton from "@/components/CopyLinkButton";
-import Heading from "@/components/Heading";
-import Input from "@/components/Input";
-import LinkButton from "@/components/LinkButton";
-import SwitchButton from "@/components/SwitchButton";
-import Title from "@/components/Title";
+import Button from "../components/Button";
+import CopyLinkButton from "../components/CopyLinkButton";
+import Heading from "../components/Heading";
+import Input from "../components/Input";
+import LinkButton from "../components/LinkButton";
+import SwitchButton from "../components/SwitchButton";
+import Title from "../components/Title";
 
 // Utils
 import { getAvailabilityInfo } from "@/utils/meeting/answer/getAvailabilityInfo";
@@ -23,6 +25,24 @@ import useIsMobile from "@/utils/useIsMobile";
 import useMouseDown from "@/utils/useIsMouseDown";
 
 export default function AnswerMeeting(props: any) {
+  const [meetingData, setMeetingData] = useState<any>({});
+  // Check if meeting is exists
+  useEffect(() => {
+    console.log(props.id);
+    axios
+      .get(process.env.NEXT_PUBLIC_SERVER_URL + `/meet/${props.id}`)
+      .then((res) => {
+        if (res.status === 200) {
+          console.log(res.data);
+          setMeetingData(res.data);
+          console.log(meetingData);
+        }
+      })
+      .catch((err) => {
+        console.error(err);
+      });
+  });
+
   const { t } = useTranslation();
   const [selectedTimecells, setSelectedTimecells] = useState<MeetingDate[]>([]);
 

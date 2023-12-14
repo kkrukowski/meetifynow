@@ -1,5 +1,6 @@
 import { faGithub } from "@fortawesome/free-brands-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -7,13 +8,17 @@ export default function Footer() {
       <div className="flex flex-col justify-center items-center w-fit">
         <div className="w-full h-px bg-dark mb-2"></div>
         <p className="text-dark">
-          <a href="https://github.com/kkrukowski" className="flex items-center">
+          <Link
+            href="https://github.com/kkrukowski"
+            target="_blank"
+            className="flex items-center"
+          >
             <span>@kkrukowski</span>
 
             <span className="ml-2 h-5 w-5">
               <FontAwesomeIcon icon={faGithub} />
             </span>
-          </a>
+          </Link>
         </p>
         <p className="text-center text-dark text-sm">2023 © meetifynow.com</p>
       </div>

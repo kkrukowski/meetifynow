@@ -1,5 +1,10 @@
-import dynamic from "next/dynamic";
+import CreateMeeting from "@/routes/CreateMeeting";
+import { Locale } from "@root/i18n.config";
 
-export default function Page() {
-  return <h1>Meet new</h1>;
+export default function Page({
+  params: { lang },
+}: {
+  params: { lang: Locale };
+}) {
+  return <CreateMeeting lang={lang} />;
 }

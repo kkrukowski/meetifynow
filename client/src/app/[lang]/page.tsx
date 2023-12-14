@@ -1,13 +1,10 @@
-import dynamic from "next/dynamic";
-import { Locale } from "../../../i18n.config";
-
-const App = dynamic(() => import("../../App"), { ssr: false });
+import HomePage from "@/routes/HomePage";
+import { Locale } from "@root/i18n.config";
 
 export default function Page({
   params: { lang },
 }: {
   params: { lang: Locale };
 }) {
-  // return <App lang={lang} />;
-  return <h1>App</h1>;
+  return <HomePage lang={lang} />;
 }

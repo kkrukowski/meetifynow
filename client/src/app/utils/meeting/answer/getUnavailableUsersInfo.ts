@@ -1,5 +1,3 @@
-import { useEffect } from "react";
-
 export const getUnavailableUsersInfo = (answers: any) => {
   const unavailableUsers = answers.filter(
     (answer: any) => answer.dates.length === 0

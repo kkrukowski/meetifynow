@@ -1,4 +1,8 @@
+"use client";
+
+import { getDictionary } from "@/lib/dictionary";
 import { yupResolver } from "@hookform/resolvers/yup";
+import { Locale } from "@root/i18n.config";
 import { motion } from "framer-motion";
 import _ from "lodash";
 import moment from "moment";
@@ -7,18 +11,16 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
-import { Locale } from "../../i18n.config";
-import { getDictionary } from "../app/lib/dictionary";
 
 // Components
-import { generateShortDaysNames } from "../../utils/meeting/TimeFunctions";
-import Button from "../app/components/Button";
-import DetailedTimepicker from "../app/components/CreateMeeting/DetailedTimepicker";
-import StepsIndicator from "../app/components/CreateMeeting/StepsIndicator";
-import Timepicker from "../app/components/CreateMeeting/Timepicker";
-import IconButton from "../app/components/IconButton";
-import Input from "../app/components/Input";
-import Title from "../app/components/Title";
+import Button from "@/components/Button";
+import DetailedTimepicker from "@/components/CreateMeeting/DetailedTimepicker";
+import StepsIndicator from "@/components/CreateMeeting/StepsIndicator";
+import Timepicker from "@/components/CreateMeeting/Timepicker";
+import IconButton from "@/components/IconButton";
+import Input from "@/components/Input";
+import Title from "@/components/Title";
+import { generateShortDaysNames } from "@/utils/meeting/TimeFunctions";
 
 // Icons
 import {
@@ -32,7 +34,6 @@ import axios from "axios";
 export default async function CreateMeeting({ lang }: { lang: Locale }) {
   // Translation
   const dict = await getDictionary(lang);
-
   // Steps
   const [prevStep, setPrevStep] = useState(0);
   const [currStep, setCurrStep] = useState(0);

@@ -1,12 +1,10 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import "@/global.css";
+import { Locale, i18n } from "@root/i18n.config";
 import type { Metadata } from "next";
 import Script from "next/script";
-import { Locale, i18n } from "../../../i18n.config";
-// import { useTranslation } from "react-i18next";
 
-// const { t } = useTranslation();
 // const metadata: Metadata = {
 //   title: t("website.title"),
 //   description: t("website.description"),
@@ -35,7 +33,7 @@ export default function Layout({
   params,
 }: {
   children: React.ReactNode;
-  params: { lang: Locale };
+  params: { lang: Locale; id?: string };
 }) {
   return (
     <html lang={params.lang}>

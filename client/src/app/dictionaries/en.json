@@ -14,7 +14,14 @@
   },
   "page": {
     "error": {
-      "title": "No such page found 😥"
+      "404": {
+        "title": "No such page found 😥",
+        "heading": "404"
+      },
+      "500": {
+        "title": "Something went wrong 😥",
+        "heading": "500"
+      }
     },
     "home": {
       "headerText": "MeetifyNow is a simple-to-use meeting scheduling tool that doesn't require logging in.",

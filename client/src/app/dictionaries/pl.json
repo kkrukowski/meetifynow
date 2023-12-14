@@ -14,7 +14,14 @@
   },
   "page": {
     "error": {
-      "title": "Nie znaleziono takiej strony 😥"
+      "404": {
+        "title": "Nie znaleziono takiej strony 😥",
+        "heading": "404"
+      },
+      "500": {
+        "title": "Coś poszło nie tak 😥",
+        "heading": "500"
+      }
     },
     "home": {
       "headerText": "MeetifyNow to łatwa w obsłudze platforma do planowania spotkań bez potrzeby logowania.",

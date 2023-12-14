@@ -1,10 +1,10 @@
-import { Locale } from "../../i18n.config";
-import { getDictionary } from "../app/lib/dictionary";
+import { getDictionary } from "@/lib/dictionary";
+import { Locale } from "@root/i18n.config";
 
-import { Link } from "react-router-dom";
-import Button from "../app/components/Button";
-import Heading from "../app/components/Heading";
-import Title from "../app/components/Title";
+import Button from "@/components/Button";
+import Heading from "@/components/Heading";
+import Title from "@/components/Title";
+import Link from "next/link";
 
 export default async function AnswetNotFound({ lang }: { lang: Locale }) {
   // Translation
@@ -13,7 +13,7 @@ export default async function AnswetNotFound({ lang }: { lang: Locale }) {
     <div className="flex flex-col justify-center items-center h-full mt-20 mx-10 lg:m-0">
       <Title text={dict.page.answerNotFoundPage.title} />
       <Heading text={dict.page.answerNotFoundPage.heading} />
-      <Link to="/meet/new">
+      <Link href="/meet/new">
         <Button text={dict.page.createMeeting.createButton} />
       </Link>
     </div>

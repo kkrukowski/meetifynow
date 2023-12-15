@@ -6,8 +6,10 @@
   },
   "button": {
     "homePage": "Strona główna",
-    "copyLink": "Skopiuj link",
-    "copyLink.copied": "Skopiowano!",
+    "copyLink": {
+      "copy": "Skopiuj link",
+      "copied": "Skopiowano!"
+    },
     "back": "Wróć",
     "next": "Dalej",
     "submit": "Wyślij"

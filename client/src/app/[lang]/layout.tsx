@@ -64,7 +64,7 @@ export default function Layout({
         </Script>
       </head>
       <body>
-        <Navbar />
+        <Navbar lang={params.lang} />
         {children}
         <Footer />
       </body>

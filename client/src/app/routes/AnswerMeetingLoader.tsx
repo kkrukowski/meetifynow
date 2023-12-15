@@ -1,8 +1,28 @@
 import React, { useEffect, useState } from "react";
-import useIsMobile from "../../utils/useIsMobile";
 
 const AnswerMeetingLoader = () => {
-  const isMobile = useIsMobile();
+  const [isMobile, setIsMobile] = useState(false);
+  const [windowSize, setWindowSize] = useState([0, 0]);
+
+  useEffect(() => {
+    if (window.innerWidth === 0) {
+      setWindowSize([window.innerWidth, window.innerHeight]);
+    }
+
+    const handleWindowResize = () => {
+      setWindowSize([window.innerWidth, window.innerHeight]);
+    };
+
+    window.addEventListener("resize", handleWindowResize);
+
+    if (windowSize[0] !== 0) {
+      setIsMobile(windowSize[0] < 1024);
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleWindowResize);
+    };
+  });
 
   return (
     <main className="animate-pulse flex flex-1 h-full flex-col lg:justify-center p-5 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 h-screen w-full lg:w-[800px] overflow-hidden">

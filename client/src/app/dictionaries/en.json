@@ -9,8 +9,10 @@
     "back": "Back",
     "next": "Next",
     "createMeeting": "Create Meeting",
-    "copyLink": "Copy Link",
-    "copyLink.copied": "Copied!"
+    "copyLink": {
+      "copy": "Copy Link",
+      "copied": "Copied!"
+    }
   },
   "page": {
     "error": {

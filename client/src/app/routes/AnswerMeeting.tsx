@@ -4,46 +4,39 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
 import _ from "lodash";
 import moment from "moment";
+import "moment/locale/pl";
+import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import { useTranslation } from "react-i18next";
 import * as yup from "yup";
 
 // Components
-import Button from "../components/Button";
-import CopyLinkButton from "../components/CopyLinkButton";
-import Heading from "../components/Heading";
-import Input from "../components/Input";
-import LinkButton from "../components/LinkButton";
-import SwitchButton from "../components/SwitchButton";
-import Title from "../components/Title";
+import Button from "@/components/Button";
+import CopyLinkButton from "@/components/CopyLinkButton";
+import Heading from "@/components/Heading";
+import Input from "@/components/Input";
+import LinkButton from "@/components/LinkButton";
+import SwitchButton from "@/components/SwitchButton";
+import Title from "@/components/Title";
 
 // Utils
 import { getAvailabilityInfo } from "@/utils/meeting/answer/getAvailabilityInfo";
 import { getUnavailableUsersInfo } from "@/utils/meeting/answer/getUnavailableUsersInfo";
-import useIsMobile from "@/utils/useIsMobile";
+// import useIsMobile from "@/utils/useIsMobile";
 import useMouseDown from "@/utils/useIsMouseDown";
+import { Locale } from "@root/i18n.config";
 
-export default function AnswerMeeting(props: any) {
-  const [meetingData, setMeetingData] = useState<any>({});
-  // Check if meeting is exists
-  useEffect(() => {
-    console.log(props.id);
-    axios
-      .get(process.env.NEXT_PUBLIC_SERVER_URL + `/meet/${props.id}`)
-      .then((res) => {
-        if (res.status === 200) {
-          console.log(res.data);
-          setMeetingData(res.data);
-          console.log(meetingData);
-        }
-      })
-      .catch((err) => {
-        console.error(err);
-      });
-  });
-
-  const { t } = useTranslation();
+export default function AnswerMeeting({
+  lang,
+  dict,
+  meetingData,
+}: {
+  lang: Locale;
+  dict: any;
+  meetingData: any;
+}) {
+  moment.locale(lang);
+  const pathname = usePathname();
   const [selectedTimecells, setSelectedTimecells] = useState<MeetingDate[]>([]);
 
   class MeetingDate {
@@ -61,19 +54,40 @@ export default function AnswerMeeting(props: any) {
   const [lookedUpTime, setLookedUpTime] = useState<string>();
   const [username, setUsername] = useState("");
   const [availableCount, setAvailableCount] = useState(0);
-  const [answers, setAnswers] = useState<any>(props.answers);
-  const [meetName, setMeetName] = useState(props.meetName);
-  const meetPlace = props.meetPlace;
-  const meetLink = props.meetLink;
+  const [answers, setAnswers] = useState<any>(meetingData.answers);
+  const [meetName, setMeetName] = useState(meetingData.meetName);
+  const meetPlace = meetingData.meetPlace;
+  const meetLink = meetingData.meetLink;
   const answersCount = answers.length;
-  const datesInfo = props.dates;
+  const datesInfo = meetingData.dates;
   const [unavailableUsersInfo, setUnavailableUsersInfo] = useState<any>([]);
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);
   const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
-  const currentUrl = window.location.href;
+  const currentUrl = pathname;
 
   // Checking mobile mode
-  const isMobile = useIsMobile();
+  const [isMobile, setIsMobile] = useState(false);
+  const [windowSize, setWindowSize] = useState([0, 0]);
+
+  useEffect(() => {
+    if (window.innerWidth === 0) {
+      setWindowSize([window.innerWidth, window.innerHeight]);
+    }
+
+    const handleWindowResize = () => {
+      setWindowSize([window.innerWidth, window.innerHeight]);
+    };
+
+    window.addEventListener("resize", handleWindowResize);
+
+    if (windowSize[0] !== 0) {
+      setIsMobile(windowSize[0] < 1024);
+    }
+
+    return () => {
+      window.removeEventListener("resize", handleWindowResize);
+    };
+  });
 
   // Handling mouse down
   const isMouseDown = useMouseDown();
@@ -89,7 +103,7 @@ export default function AnswerMeeting(props: any) {
     setMobileAnsweringMode((prevMode) => !prevMode);
 
   // Answering functionallity
-  const dates = props.dates.sort();
+  const dates = meetingData.dates.sort();
 
   const isDateSelected = (dateTime: number) =>
     selectedTimecells.some(
@@ -393,7 +407,9 @@ export default function AnswerMeeting(props: any) {
     if (lookedUpDatetime) {
       if (!availabilityInfo[lookedUpDatetime]) {
         return (
-          <li className="text-dark">{t("answerMeeting.nobodyAvailable")}</li>
+          <li className="text-dark">
+            {dict.page.answerMeeting.nobodyAvailable}
+          </li>
         );
       } else {
         const dayAvailabilityInfo = availabilityInfo[lookedUpDatetime];
@@ -438,9 +454,9 @@ export default function AnswerMeeting(props: any) {
       }
     } else {
       if (isMobile) {
-        return <li>{t("answerMeeting.clickToReveal")}</li>;
+        return <li>{dict.page.answerMeeting.clickToReveal}</li>;
       }
-      return <li>{t("answerMeeting.hoverToReveal")}</li>;
+      return <li>{dict.page.answerMeeting.hoverToReveal}</li>;
     }
   };
 
@@ -457,14 +473,14 @@ export default function AnswerMeeting(props: any) {
       setIsSendingReq(true);
 
       const answerResponse = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${props.appointmentId}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`,
         { username, dates: selectedTimecells }
       );
 
       if (answerResponse.status !== 200) return;
 
       const updatedMeetResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${props.appointmentId}`
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`
       );
 
       if (updatedMeetResponse.status === 200) {
@@ -491,8 +507,8 @@ export default function AnswerMeeting(props: any) {
   const formSchema = yup.object().shape({
     name: yup
       .string()
-      .required(t("answerMeeting.validate.name.required"))
-      .max(20, t("answerMeeting.validate.name.max")),
+      .required(dict.page.answerMeeting.validate.name.required)
+      .max(20, dict.page.answerMeeting.validate.name.max),
   });
 
   type Inputs = {
@@ -558,7 +574,7 @@ export default function AnswerMeeting(props: any) {
               {(mobileAnsweringMode && isMobile) || !isMobile ? (
                 <div>
                   <Input
-                    label={t("answerMeeting.input.name.label")}
+                    label={dict.page.answerMeeting.input.name.label}
                     type="text"
                     id="name"
                     register={register}
@@ -566,7 +582,7 @@ export default function AnswerMeeting(props: any) {
                     errorText={errors.name?.message?.toString()}
                     onChange={(e) => setUsername(e.target.value)}
                     value={username}
-                    placeholder={t("answerMeeting.input.name.placeholder")}
+                    placeholder={dict.page.answerMeeting.input.name.placeholder}
                   />
                 </div>
               ) : null}
@@ -588,8 +604,12 @@ export default function AnswerMeeting(props: any) {
             </div>
             {(mobileAnsweringMode && isMobile) || !isMobile ? (
               <div>
-                <Button text={t("answerMeeting.button.submit")} />
-                <CopyLinkButton link={currentUrl} className="ml-6" />
+                <Button text={dict.page.answerMeeting.button.submit} />
+                <CopyLinkButton
+                  link={currentUrl}
+                  dict={dict}
+                  className="ml-6"
+                />
               </div>
             ) : null}
           </form>

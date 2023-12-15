@@ -70,7 +70,7 @@ export default async function HomePage({ lang }: { lang: Locale }) {
           <p className="mb-5 text-lg text-dark text-justify">
             {dict.page.home.headerText}
           </p>
-          <Link href="/meet/new">
+          <Link href="meet/new">
             <Button text={dict.page.home.createButton} />
           </Link>
         </div>

@@ -1,13 +1,11 @@
 import { faLink } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { useTranslation } from "react-i18next";
 
 export default function CopyLinkButton(props: {
   link: string;
   className?: string;
+  dict: any;
 }) {
-  const { t } = useTranslation();
-
   const copyToClipboard = () => {
     const currentUrl = window.location.href;
     const urlObject = new URL(currentUrl);
@@ -36,10 +34,10 @@ export default function CopyLinkButton(props: {
       onClick={copyToClipboard}
     >
       <p className="absolute opacity-0 group-focus:animate-copy-button-success w-full left-0">
-        {t("button.copyLink.copied")}
+        {props.dict.button.copyLink.copied}
       </p>
       <span className="flex items-center group-focus:animate-copy-button">
-        {t("button.copyLink")}
+        {props.dict.button.copyLink.copy}
         <div className="ml-2 transition-all group-hover:rotate-45">
           <FontAwesomeIcon icon={faLink} />
         </div>

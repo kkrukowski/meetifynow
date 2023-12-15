@@ -27,16 +27,9 @@ export async function middleware(req: NextRequest) {
   // Redirect if there is no locale
   const locale = getLocale(req);
   req.nextUrl.pathname = `/${locale}${pathname}`;
-  // e.g. incoming request is /products
-  // The new URL is now /en-US/products
   return Response.redirect(req.nextUrl);
 }
 
 export const config = {
-  matcher: [
-    // Skip all internal paths (_next)
-    "/((?!_next).*)",
-    // Optional: only run on root (/) URL
-    // '/'
-  ],
+  matcher: ["/((?!_next).*)"],
 };

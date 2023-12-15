@@ -1,15 +1,14 @@
 "use client";
 
-import { getDictionary } from "@/lib/dictionary";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { Locale } from "@root/i18n.config";
 import { motion } from "framer-motion";
 import _ from "lodash";
 import moment from "moment";
+import "moment/locale/pl";
+import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { IoChevronBack, IoChevronForward } from "react-icons/io5";
-import { useNavigate } from "react-router-dom";
 import * as yup from "yup";
 
 // Components
@@ -29,11 +28,22 @@ import {
   faCalendarDays,
 } from "@fortawesome/free-solid-svg-icons";
 
+import { Locale } from "@root/i18n.config";
 import axios from "axios";
 
-export default async function CreateMeeting({ lang }: { lang: Locale }) {
-  // Translation
-  const dict = await getDictionary(lang);
+export default function CreateMeeting({
+  lang,
+  dict,
+}: {
+  lang: Locale;
+  dict: any;
+}) {
+  // Moment locale
+  moment.locale(lang);
+
+  // Router
+  const router = useRouter();
+
   // Steps
   const [prevStep, setPrevStep] = useState(0);
   const [currStep, setCurrStep] = useState(0);
@@ -363,7 +373,6 @@ export default async function CreateMeeting({ lang }: { lang: Locale }) {
   };
 
   // Create meeting
-  const navigate = useNavigate();
   const [isRequestInProgress, setIsRequestInProgress] = useState(false);
   const createMeeting: SubmitHandler<Inputs> = async () => {
     if (isRequestInProgress) {
@@ -386,7 +395,7 @@ export default async function CreateMeeting({ lang }: { lang: Locale }) {
 
       const meetId = response.data.newMeet.appointmentId;
       const meetUrl = `/meet/${meetId}`;
-      navigate(meetUrl);
+      router.push(meetUrl);
     } catch (error) {
       console.error(error);
     } finally {

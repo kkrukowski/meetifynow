@@ -1,5 +1,5 @@
 import AnswerNotFound from "@/routes/AnswerNotFound";
 
-export default function NotFound() {
-  return <AnswerNotFound lang="en" />;
+export default async function NotFound() {
+  return <AnswerNotFound />;
 }

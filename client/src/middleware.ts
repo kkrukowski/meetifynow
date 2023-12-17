@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { match as matchLocale } from "@formatjs/intl-localematcher";
+import { i18n } from "@root/i18n.config";
 import Negotiator from "negotiator";
-import { i18n } from "../i18n.config";
 
-function getLocale(req: NextRequest): string | undefined {
+const headerName = "X-Language-Preference";
+
+function getLocale(req: NextRequest): string | "" {
   const negotiatorHeaders: Record<string, string> = {};
   req.headers.forEach((value, key) => (negotiatorHeaders[key] = value));
 
@@ -17,17 +19,31 @@ function getLocale(req: NextRequest): string | undefined {
 
 export async function middleware(req: NextRequest) {
   const locales: string[] = i18n.locales;
-  const { pathname } = req.nextUrl;
-  const pathnameHasLocale = locales.some(
-    (locale) => pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`
-  );
+  let siteLocale = i18n.defaultLocale;
 
-  if (pathnameHasLocale) return;
+  // Get the locale from the request and set headers
+  let response = NextResponse.next();
+  const { pathname } = req.nextUrl;
+  const pathnameHasLocale = locales.some((locale) => {
+    siteLocale = locale;
+    return pathname.startsWith(`/${locale}/`) || pathname === `/${locale}`;
+  });
+
+  if (pathnameHasLocale) {
+    response.headers.set(headerName, siteLocale);
+    return response;
+  }
 
   // Redirect if there is no locale
-  const locale = getLocale(req);
-  req.nextUrl.pathname = `/${locale}${pathname}`;
-  return Response.redirect(req.nextUrl);
+  siteLocale = getLocale(req);
+  req.nextUrl.pathname = `/${siteLocale}${pathname}`;
+  return new NextResponse(null, {
+    status: 302,
+    headers: {
+      headerName: siteLocale,
+      Location: req.nextUrl.toString(),
+    },
+  });
 }
 
 export const config = {

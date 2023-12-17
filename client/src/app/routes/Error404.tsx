@@ -5,10 +5,12 @@ import BigText from "@/components/BigText";
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 
+import { getLocale } from "@/layout";
 import Link from "next/link";
 
 export default async function Error404() {
-  const lang = "en" as Locale;
+  // Should get the language from the URL but it't not possible with params here
+  const lang = getLocale() as Locale;
   const dict = await getDictionary(lang);
 
   return (

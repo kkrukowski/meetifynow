@@ -2,8 +2,11 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import "@/global.css";
 import { Locale, i18n } from "@root/i18n.config";
+import { get } from "lodash";
 import type { Metadata } from "next";
+import { headers } from "next/headers";
 import Script from "next/script";
+import { cache } from "react";
 
 // const metadata: Metadata = {
 //   title: t("website.title"),
@@ -28,6 +31,12 @@ export async function generateStaticParams() {
   return i18n.locales.map((locale: Locale) => ({ lang: locale }));
 }
 
+export const getLocale = cache((): Locale => {
+  const preference = headers().get("X-Language-Preference");
+  console.log(preference);
+  return (preference ?? "en") as Locale;
+});
+
 export default function Layout({
   children,
   params,
@@ -35,6 +44,7 @@ export default function Layout({
   children: React.ReactNode;
   params: { lang: Locale; id?: string };
 }) {
+  console.log(getLocale());
   return (
     <html lang={params.lang}>
       <head>

@@ -73,11 +73,11 @@ export default function DetailedTimepicker(props: {
   const dates = props.dates;
   const days = dates.map((dateInfo: DayTimesData) => moment(dateInfo.date));
 
-  const getSelectedTimecell = (dateTime: number) => {
-    return selectedTimecells.find(
-      (meetDatetime: number) => meetDatetime === dateTime
-    );
-  };
+  // const getSelectedTimecell = (dateTime: number) => {
+  //   return selectedTimecells.find(
+  //     (meetDatetime: number) => meetDatetime === dateTime
+  //   );
+  // };
 
   const unselectTimecell = (dateTime: number) => {
     if (!isMobile()) {

@@ -2,51 +2,51 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import "@/global.css";
 import { Locale, i18n } from "@root/i18n.config";
-import { get } from "lodash";
-import type { Metadata } from "next";
+import { Metadata } from "next";
 import { headers } from "next/headers";
 import Script from "next/script";
 import { cache } from "react";
-
-// const metadata: Metadata = {
-//   title: t("website.title"),
-//   description: t("website.description"),
-//   openGraph: {
-//     images: "https://meetifynow.com/imgs/og-image.webp",
-//     url: t("website.url"),
-//     description: t("website.description"),
-//     siteName: "MeetifyNow",
-//     type: "website",
-//     title: "MeetifyNow",
-//   },
-//   twitter: {
-//     card: "summary_large_image",
-//     title: "MeetifyNow",
-//     description: t("website.description"),
-//     images: "https://meetifynow.com/imgs/og-image.webp",
-//   },
-// };
+import { getDictionary } from "./lib/dictionary";
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale: Locale) => ({ lang: locale }));
 }
 
-export const getLocale = cache((): Locale => {
+const getLocale = cache((): Locale => {
   const preference = headers().get("X-Language-Preference");
-  console.log(preference);
   return (preference ?? "en") as Locale;
 });
 
-export default function Layout({
-  children,
-  params,
-}: {
-  children: React.ReactNode;
-  params: { lang: Locale; id?: string };
-}) {
-  console.log(getLocale());
+export async function generateMetadata() {
+  const dict = await getDictionary(getLocale() as Locale);
+
+  const metadata: Metadata = {
+    title: dict.website.title,
+    description: dict.website.description,
+    openGraph: {
+      images: "https://meetifynow.com/imgs/og-image.webp",
+      url: dict.website.url,
+      description: dict.website.description,
+      siteName: "MeetifyNow",
+      type: "website",
+      title: "MeetifyNow",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: "MeetifyNow",
+      description: dict.website.description,
+      images: "https://meetifynow.com/imgs/og-image.webp",
+    },
+  };
+
+  return metadata;
+}
+
+export default function Layout({ children }: { children: React.ReactNode }) {
+  const locale = getLocale();
+
   return (
-    <html lang={params.lang}>
+    <html lang={locale}>
       <head>
         <Script type="application/ld+json">
           {`
@@ -74,7 +74,7 @@ export default function Layout({
         </Script>
       </head>
       <body>
-        <Navbar lang={params.lang} />
+        <Navbar lang={locale} />
         {children}
         <Footer />
       </body>

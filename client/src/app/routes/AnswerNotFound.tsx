@@ -1,8 +1,8 @@
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import Title from "@/components/Title";
-import { getLocale } from "@/layout";
 import { getDictionary } from "@/lib/dictionary";
+import { getLocale } from "@/utils/getWebLocale";
 import { Locale } from "@root/i18n.config";
 import Link from "next/link";
 

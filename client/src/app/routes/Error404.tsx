@@ -5,7 +5,7 @@ import BigText from "@/components/BigText";
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 
-import { getLocale } from "@/layout";
+import { getLocale } from "@/utils/getWebLocale";
 import Link from "next/link";
 
 export default async function Error404() {

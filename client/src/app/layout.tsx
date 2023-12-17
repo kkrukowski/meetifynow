@@ -37,6 +37,14 @@ export async function generateMetadata() {
       description: dict.website.description,
       images: "https://meetifynow.com/imgs/og-image.webp",
     },
+    alternates: {
+      canonical: "https://meetifynow.com",
+      languages: {
+        en: "https://meetifynow.com/en",
+        pl: "https://meetifynow.com/pl",
+        "x-default": "https://meetifynow.com",
+      },
+    },
   };
 
   return metadata;

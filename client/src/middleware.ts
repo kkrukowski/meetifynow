@@ -47,5 +47,7 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!favicon.ico|manifest.webmanifest|robots.txt|sitemap.xml).*)"],
+  matcher: [
+    "/((?!_next|favicon.ico|manifest.webmanifest|robots.txt|sitemap.xml).*)",
+  ],
 };

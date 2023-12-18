@@ -79,7 +79,10 @@ export default async function HomePage({ lang }: { lang: Locale }) {
           src={CalendarImg}
           alt="Illustration of a calendar"
           title="Calendar Illustration"
+          height={500}
+          width={500}
           className="m-0 mt-20 sm:mt-0 sm:ml-10 w-auto sm:w-auto lg:w-1/2 h-48 md:h-64 lg:h-auto"
+          priority
         />
       </header>
       <div>

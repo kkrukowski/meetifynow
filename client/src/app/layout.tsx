@@ -2,6 +2,7 @@ import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import "@/global.css";
 import { Locale, i18n } from "@root/i18n.config";
+import { Analytics } from "@vercel/analytics/react";
 import { Metadata } from "next";
 import { headers } from "next/headers";
 import Script from "next/script";
@@ -67,24 +68,12 @@ export default function Layout({ children }: { children: React.ReactNode }) {
             }
         `}
         </Script>
-        <Script
-          async
-          src="https://www.googletagmanager.com/gtag/js?id=G-17HZ4W39MP"
-        ></Script>
-        <Script>
-          {`
-            window.dataLayer = window.dataLayer || [];
-            function gtag() { dataLayer.push(arguments); }
-            gtag('js', new Date());
-
-            gtag('config', 'G-17HZ4W39MP');
-            `}
-        </Script>
       </head>
       <body>
         <Navbar lang={locale} />
         {children}
         <Footer />
+        <Analytics />
       </body>
     </html>
   );

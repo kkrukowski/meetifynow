@@ -1,4 +1,5 @@
 User-agent: *
+Allow: /meet/new
 Disallow: /meet/
 Disallow: /imgs/
 Disallow: /assets/

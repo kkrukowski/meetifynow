@@ -30,6 +30,7 @@ import {
 
 import { Locale } from "@root/i18n.config";
 import axios from "axios";
+import AnswerMeetingLoader from "./AnswerMeetingLoader";
 
 export default function CreateMeeting({
   lang,
@@ -376,7 +377,7 @@ export default function CreateMeeting({
   const [isRequestInProgress, setIsRequestInProgress] = useState(false);
   const createMeeting: SubmitHandler<Inputs> = async () => {
     if (isRequestInProgress) {
-      return;
+      return <AnswerMeetingLoader />;
     }
     try {
       setIsRequestInProgress(true);
@@ -398,8 +399,6 @@ export default function CreateMeeting({
       router.push(meetUrl);
     } catch (error) {
       console.error(error);
-    } finally {
-      setIsRequestInProgress(false);
     }
   };
 
@@ -472,303 +471,305 @@ export default function CreateMeeting({
   };
 
   const prev = () => {
+    if (currStep === 0) {
+      router.push("/");
+    }
     if (currStep > 0) {
       setPrevStep(currStep);
       setCurrStep(currStep - 1);
     }
   };
 
-  return (
-    <main className="flex flex-1 h-full flex-col px-5 py-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 lg:m-0 justify-center">
-      <Title text={dict.page.createMeeting.title} />
-      <StepsIndicator steps={4} stepsData={stepsInfo} currIndex={currStep} />
-      <form
-        id="create-meeting-form"
-        className="flex flex-col justify-center h-[400px]"
-      >
-        <div className="self-center">
-          {/* Meeting details */}
-          {currStep === 0 && (
-            <motion.div
-              initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-            >
-              <Input
-                label={dict.page.createMeeting.input.meeting__name.label}
-                type="text"
-                id="meeting__name"
-                register={register}
-                errorText={errors.meeting__name?.message?.toString()}
-                error={errors.meeting__name ? true : false}
-                placeholder={
-                  dict.page.createMeeting.input.meeting__name.placeholder
-                }
-                onChange={(e: {
-                  target: { value: React.SetStateAction<string> };
-                }) =>
-                  setMeetDetails({
-                    ...meetDetails,
-                    name: e.target.value.toString(),
-                  })
-                }
-                required={true}
-              />
-              <Input
-                label={dict.page.createMeeting.input.meeting__place.label}
-                type="text"
-                id="meeting__place"
-                register={register}
-                errorText={errors.meeting__place?.message?.toString()}
-                error={errors.meeting__place ? true : false}
-                placeholder={
-                  dict.page.createMeeting.input.meeting__place.placeholder
-                }
-                onChange={(e: {
-                  target: { value: React.SetStateAction<string> };
-                }) =>
-                  setMeetDetails({
-                    ...meetDetails,
-                    place: e.target.value.toString(),
-                  })
-                }
-              />
-              <Input
-                label={dict.page.createMeeting.input.meeting__link.label}
-                type="text"
-                id="meeting__link"
-                register={register}
-                errorText={errors.meeting__link?.message?.toString()}
-                error={errors.meeting__link ? true : false}
-                placeholder={
-                  dict.page.createMeeting.input.meeting__link.placeholder
-                }
-                onChange={(e: {
-                  target: { value: React.SetStateAction<string> };
-                }) =>
-                  setMeetDetails({
-                    ...meetDetails,
-                    link: e.target.value.toString(),
-                  })
-                }
-              />
-            </motion.div>
-          )}
+  if (isRequestInProgress) {
+    return <AnswerMeetingLoader />;
+  } else {
+    return (
+      <main className="flex flex-1 h-full flex-col px-5 py-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 lg:m-0 justify-center">
+        <Title text={dict.page.createMeeting.title} />
+        <StepsIndicator steps={4} stepsData={stepsInfo} currIndex={currStep} />
+        <form
+          id="create-meeting-form"
+          className="flex flex-col justify-center h-[400px]"
+        >
+          <div className="self-center">
+            {/* Meeting details */}
+            {currStep === 0 && (
+              <motion.div
+                initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+              >
+                <Input
+                  label={dict.page.createMeeting.input.meeting__name.label}
+                  type="text"
+                  id="meeting__name"
+                  register={register}
+                  errorText={errors.meeting__name?.message?.toString()}
+                  error={errors.meeting__name ? true : false}
+                  placeholder={
+                    dict.page.createMeeting.input.meeting__name.placeholder
+                  }
+                  onChange={(e: {
+                    target: { value: React.SetStateAction<string> };
+                  }) =>
+                    setMeetDetails({
+                      ...meetDetails,
+                      name: e.target.value.toString(),
+                    })
+                  }
+                  required={true}
+                />
+                <Input
+                  label={dict.page.createMeeting.input.meeting__place.label}
+                  type="text"
+                  id="meeting__place"
+                  register={register}
+                  errorText={errors.meeting__place?.message?.toString()}
+                  error={errors.meeting__place ? true : false}
+                  placeholder={
+                    dict.page.createMeeting.input.meeting__place.placeholder
+                  }
+                  onChange={(e: {
+                    target: { value: React.SetStateAction<string> };
+                  }) =>
+                    setMeetDetails({
+                      ...meetDetails,
+                      place: e.target.value.toString(),
+                    })
+                  }
+                />
+                <Input
+                  label={dict.page.createMeeting.input.meeting__link.label}
+                  type="text"
+                  id="meeting__link"
+                  register={register}
+                  errorText={errors.meeting__link?.message?.toString()}
+                  error={errors.meeting__link ? true : false}
+                  placeholder={
+                    dict.page.createMeeting.input.meeting__link.placeholder
+                  }
+                  onChange={(e: {
+                    target: { value: React.SetStateAction<string> };
+                  }) =>
+                    setMeetDetails({
+                      ...meetDetails,
+                      link: e.target.value.toString(),
+                    })
+                  }
+                />
+              </motion.div>
+            )}
 
-          {/* Choose date */}
-          {currStep === 1 && (
-            <motion.div
-              initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-            >
-              <div className="flex flex-col self-center">
-                <table
-                  className={`date__selection--table border border-2 border-separate border-spacing-0.5 box-content p-2 select-none w-[296px] ${
-                    dateError ? "rounded-lg border-red" : "border-transparent"
-                  }`}
-                >
-                  <thead>
-                    <tr>
-                      <th colSpan={7}>
-                        <div className="flex justify-between items-center">
-                          <button
-                            onClick={prevMonth}
-                            className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
-                          >
-                            <IoChevronBack />
-                          </button>
-                          <span className="text-dark">
-                            {_.capitalize(
-                              moment().month(month).format("MMMM")
-                            ) +
-                              " " +
-                              year}
-                          </span>
-                          <button
-                            onClick={nextMonth}
-                            className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
-                          >
-                            <IoChevronForward />
-                          </button>
-                        </div>
-                      </th>
-                    </tr>
-                    <tr>
-                      {shortDaysNames.map((day) => (
-                        <th className="font-medium text-gray">{day}</th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>{showCalendar(month, year)}</tbody>
-                </table>
-                <p className="text-sm relative mt-2 text-red font-medium">
-                  {dateError && dateErrorText}
-                </p>
-              </div>
-            </motion.div>
-          )}
-
-          {/* Choose time */}
-          {currStep === 2 && (
-            <motion.div
-              initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
-              animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.3, ease: "easeInOut" }}
-            >
-              <div className="flex justify-center mb-5">
-                <div className="flex flex-col justify-center items-center">
-                  <div className="mb-6">
-                    <IconButton
-                      icon={faCalendar}
-                      onClick={setTimepickerIndex}
-                      valueToChange={0}
-                      isCurrent={timepickerIndex === 0}
-                    />
-                    <IconButton
-                      icon={faCalendarDay}
-                      className="ml-6"
-                      onClick={setTimepickerIndex}
-                      valueToChange={1}
-                      isCurrent={timepickerIndex === 1}
-                    />
-                    <IconButton
-                      icon={faCalendarDays}
-                      className="ml-6"
-                      onClick={setTimepickerIndex}
-                      valueToChange={2}
-                      isCurrent={timepickerIndex === 2}
-                    />
-                  </div>
-                  <div
-                    className={`self-center overflow-y-auto h-[300px] ${
-                      timepickerIndex !== 2 && "p-2"
+            {/* Choose date */}
+            {currStep === 1 && (
+              <motion.div
+                initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+              >
+                <div className="flex flex-col self-center">
+                  <table
+                    className={`date__selection--table border border-2 border-separate border-spacing-0.5 box-content p-2 select-none w-[296px] ${
+                      dateError ? "rounded-lg border-red" : "border-transparent"
                     }`}
                   >
-                    {/* Main time picking */}
-                    {timepickerIndex === 0 && (
-                      <>
-                        <Timepicker
-                          from={true}
-                          fromTime={moment(
-                            getStartTime(dailyTimeRanges[0].date)
-                          ).hour()}
-                          toTime={moment(
-                            getEndTime(dailyTimeRanges[0].date)
-                          ).hour()}
-                          onChange={(e) =>
-                            handleDailyTimeRangeChange(e, -1, true)
-                          }
-                        />
-                        <span className="m-4"> - </span>
-                        <Timepicker
-                          from={false}
-                          fromTime={moment(
-                            getStartTime(dailyTimeRanges[0].date)
-                          ).hour()}
-                          toTime={moment(
-                            getEndTime(dailyTimeRanges[0].date)
-                          ).hour()}
-                          onChange={(e) =>
-                            handleDailyTimeRangeChange(e, -1, false)
-                          }
-                        />
-                      </>
-                    )}
+                    <thead>
+                      <tr>
+                        <th colSpan={7}>
+                          <div className="flex justify-between items-center">
+                            <button
+                              onClick={prevMonth}
+                              className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
+                            >
+                              <IoChevronBack />
+                            </button>
+                            <span className="text-dark">
+                              {_.capitalize(
+                                moment().month(month).format("MMMM")
+                              ) +
+                                " " +
+                                year}
+                            </span>
+                            <button
+                              onClick={nextMonth}
+                              className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
+                            >
+                              <IoChevronForward />
+                            </button>
+                          </div>
+                        </th>
+                      </tr>
+                      <tr>
+                        {shortDaysNames.map((day) => (
+                          <th className="font-medium text-gray">{day}</th>
+                        ))}
+                      </tr>
+                    </thead>
+                    <tbody>{showCalendar(month, year)}</tbody>
+                  </table>
+                  <p className="text-sm relative mt-2 text-red font-medium">
+                    {dateError && dateErrorText}
+                  </p>
+                </div>
+              </motion.div>
+            )}
 
-                    {/* Daily main time picking */}
-                    {timepickerIndex === 1 && (
-                      <>
-                        {dailyTimeRanges.map(
-                          (dayTimeRange: { date: number }) => {
-                            const dateObj = moment(dayTimeRange.date);
+            {/* Choose time */}
+            {currStep === 2 && (
+              <motion.div
+                initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+              >
+                <div className="flex justify-center mb-5">
+                  <div className="flex flex-col justify-center items-center">
+                    <div className="mb-6">
+                      <IconButton
+                        icon={faCalendar}
+                        onClick={setTimepickerIndex}
+                        valueToChange={0}
+                        isCurrent={timepickerIndex === 0}
+                      />
+                      <IconButton
+                        icon={faCalendarDay}
+                        className="ml-6"
+                        onClick={setTimepickerIndex}
+                        valueToChange={1}
+                        isCurrent={timepickerIndex === 1}
+                      />
+                      <IconButton
+                        icon={faCalendarDays}
+                        className="ml-6"
+                        onClick={setTimepickerIndex}
+                        valueToChange={2}
+                        isCurrent={timepickerIndex === 2}
+                      />
+                    </div>
+                    <div
+                      className={`self-center overflow-y-auto h-[300px] ${
+                        timepickerIndex !== 2 && "p-2"
+                      }`}
+                    >
+                      {/* Main time picking */}
+                      {timepickerIndex === 0 && (
+                        <>
+                          <Timepicker
+                            from={true}
+                            fromTime={moment(
+                              getStartTime(dailyTimeRanges[0].date)
+                            ).hour()}
+                            toTime={moment(
+                              getEndTime(dailyTimeRanges[0].date)
+                            ).hour()}
+                            onChange={(e) =>
+                              handleDailyTimeRangeChange(e, -1, true)
+                            }
+                          />
+                          <span className="m-4"> - </span>
+                          <Timepicker
+                            from={false}
+                            fromTime={moment(
+                              getStartTime(dailyTimeRanges[0].date)
+                            ).hour()}
+                            toTime={moment(
+                              getEndTime(dailyTimeRanges[0].date)
+                            ).hour()}
+                            onChange={(e) =>
+                              handleDailyTimeRangeChange(e, -1, false)
+                            }
+                          />
+                        </>
+                      )}
 
-                            const fromTime = moment(
-                              getStartTime(dayTimeRange.date)
-                            ).hour();
-                            const toTime = moment(
-                              getEndTime(dayTimeRange.date)
-                            ).hour();
-                            return (
-                              <div className="flex justify-between w-[310px] md:w-[400px] items-center mb-4 px-2">
-                                <div className="flex flex-col h-14 w-14 bg-primary rounded-lg justify-center">
-                                  <p className="text-3xl text-center text-light leading-none">
-                                    {dateObj.date()}
-                                  </p>
-                                  <p className="text-center text-light leading-none">
-                                    {shortDaysNames[dateObj.day() - 1]}
-                                  </p>
+                      {/* Daily main time picking */}
+                      {timepickerIndex === 1 && (
+                        <>
+                          {dailyTimeRanges.map(
+                            (dayTimeRange: { date: number }) => {
+                              const dateObj = moment(dayTimeRange.date);
+
+                              const fromTime = moment(
+                                getStartTime(dayTimeRange.date)
+                              ).hour();
+                              const toTime = moment(
+                                getEndTime(dayTimeRange.date)
+                              ).hour();
+                              return (
+                                <div className="flex justify-between w-[310px] md:w-[400px] items-center mb-4 px-2">
+                                  <div className="flex flex-col h-14 w-14 bg-primary rounded-lg justify-center">
+                                    <p className="text-3xl text-center text-light leading-none">
+                                      {dateObj.date()}
+                                    </p>
+                                    <p className="text-center text-light leading-none">
+                                      {shortDaysNames[dateObj.day() - 1]}
+                                    </p>
+                                  </div>
+                                  <div>
+                                    <Timepicker
+                                      from={true}
+                                      fromTime={fromTime}
+                                      toTime={toTime}
+                                      onChange={(e) => {
+                                        handleDailyTimeRangeChange(
+                                          e,
+                                          dateObj.valueOf(),
+                                          true
+                                        );
+                                      }}
+                                    />
+                                    <span className="m-2 md:m-4"> - </span>
+                                    <Timepicker
+                                      from={false}
+                                      fromTime={fromTime}
+                                      toTime={toTime}
+                                      onChange={(e) => {
+                                        handleDailyTimeRangeChange(
+                                          e,
+                                          dateObj.valueOf(),
+                                          false
+                                        );
+                                      }}
+                                    />
+                                  </div>
                                 </div>
-                                <div>
-                                  <Timepicker
-                                    from={true}
-                                    fromTime={fromTime}
-                                    toTime={toTime}
-                                    onChange={(e) => {
-                                      handleDailyTimeRangeChange(
-                                        e,
-                                        dateObj.valueOf(),
-                                        true
-                                      );
-                                    }}
-                                  />
-                                  <span className="m-2 md:m-4"> - </span>
-                                  <Timepicker
-                                    from={false}
-                                    fromTime={fromTime}
-                                    toTime={toTime}
-                                    onChange={(e) => {
-                                      handleDailyTimeRangeChange(
-                                        e,
-                                        dateObj.valueOf(),
-                                        false
-                                      );
-                                    }}
-                                  />
-                                </div>
-                              </div>
-                            );
-                          }
-                        )}
-                      </>
-                    )}
+                              );
+                            }
+                          )}
+                        </>
+                      )}
 
-                    {/* Detailed time picking */}
-                    {timepickerIndex === 2 && (
-                      <div className="w-auto max-w-[330px] md:max-w-[700px] lg:max-w-[350px]">
-                        <DetailedTimepicker
-                          dates={dailyTimeRanges}
-                          pushSelectedTimecell={pushSelectedTimecell}
-                          popUnselectedTimecell={popUnselectedTimecell}
-                        />
-                      </div>
-                    )}
+                      {/* Detailed time picking */}
+                      {timepickerIndex === 2 && (
+                        <div className="w-auto max-w-[330px] md:max-w-[700px] lg:max-w-[350px]">
+                          <DetailedTimepicker
+                            dates={dailyTimeRanges}
+                            pushSelectedTimecell={pushSelectedTimecell}
+                            popUnselectedTimecell={popUnselectedTimecell}
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </motion.div>
-          )}
-        </div>
-      </form>
-      {/* Navigation */}
-      {currStep < 3 && (
-        <div className="self-center">
-          <Button
-            text={dict.button.back}
-            onClick={prev}
-            className="mr-10"
-            disabled={currStep === 0}
-          />
-          <Button
-            text={`${
-              currStep === 2
-                ? dict.page.createMeeting.createButton
-                : dict.button.next
-            }`}
-            onClick={next}
-          />
-        </div>
-      )}
-    </main>
-  );
+              </motion.div>
+            )}
+          </div>
+        </form>
+        {/* Navigation */}
+        {currStep < 3 && (
+          <div className="self-center">
+            <Button text={dict.button.back} onClick={prev} className="mr-10" />
+            <Button
+              text={`${
+                currStep === 2
+                  ? dict.page.createMeeting.createButton
+                  : dict.button.next
+              }`}
+              onClick={next}
+            />
+          </div>
+        )}
+      </main>
+    );
+  }
 }

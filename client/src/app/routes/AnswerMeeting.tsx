@@ -368,6 +368,7 @@ export default function AnswerMeeting({
                       }`
                     : `${
                         (isMobileAnsweringMode || isDesktop) &&
+                        !isMobile &&
                         !unselectMode &&
                         "hover:border-none active:animate-cell-select hover:bg-primary"
                       }`

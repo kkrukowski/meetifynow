@@ -3,6 +3,7 @@ import Navbar from "@/components/Navbar";
 import "@/global.css";
 import { Locale, i18n } from "@root/i18n.config";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Metadata } from "next";
 import { headers } from "next/headers";
 import Script from "next/script";
@@ -74,6 +75,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <Footer />
         <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   );

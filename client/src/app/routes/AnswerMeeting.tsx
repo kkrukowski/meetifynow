@@ -2,11 +2,11 @@
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
-import _, { set } from "lodash";
+import _ from "lodash";
 import moment from "moment";
 import "moment/locale/pl";
 import { usePathname } from "next/navigation";
-import React, { Suspense, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useMediaQuery } from "react-responsive";
 import * as yup from "yup";

@@ -2,5 +2,6 @@ User-agent: *
 Allow: /meet/new
 Disallow: /meet/
 Disallow: /imgs/
+Disallow: /_next/image/
 Disallow: /assets/
 Sitemap: https://meetifynow.com/sitemap.xml

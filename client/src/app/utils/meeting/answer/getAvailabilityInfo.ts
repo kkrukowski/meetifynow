@@ -3,7 +3,7 @@ export const getAvailabilityInfo = (answers: any) => {
     .flatMap((answer: any) => {
       return answer.dates.map((date: any) => ({
         date: date.meetDate,
-        userData: { userId: answer.userId, username: answer.username },
+        userData: { userId: answer._id, username: answer.username },
         answerData: { isOnline: date.isOnline },
       }));
     })

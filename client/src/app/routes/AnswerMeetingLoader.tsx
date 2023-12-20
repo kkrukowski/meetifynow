@@ -1,27 +1,12 @@
-import React, { useEffect, useState } from "react";
+"use client";
+
+import React from "react";
+import { useMediaQuery } from "react-responsive";
 
 const AnswerMeetingLoader = () => {
-  const [isMobile, setIsMobile] = useState(false);
-  const [windowSize, setWindowSize] = useState([0, 0]);
-
-  useEffect(() => {
-    if (window.innerWidth === 0) {
-      setWindowSize([window.innerWidth, window.innerHeight]);
-    }
-
-    const handleWindowResize = () => {
-      setWindowSize([window.innerWidth, window.innerHeight]);
-    };
-
-    window.addEventListener("resize", handleWindowResize);
-
-    if (windowSize[0] !== 0) {
-      setIsMobile(windowSize[0] < 1024);
-    }
-
-    return () => {
-      window.removeEventListener("resize", handleWindowResize);
-    };
+  // Checking mobile mode
+  const isMobile = useMediaQuery({
+    query: "(max-width: 1024px)",
   });
 
   return (

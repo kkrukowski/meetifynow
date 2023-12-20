@@ -2,14 +2,14 @@
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
-import _ from "lodash";
+import _, { set } from "lodash";
 import moment from "moment";
 import "moment/locale/pl";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
+import { useMediaQuery } from "react-responsive";
 import * as yup from "yup";
-
 // Components
 import Button from "@/components/Button";
 import CopyLinkButton from "@/components/CopyLinkButton";
@@ -22,7 +22,6 @@ import Title from "@/components/Title";
 // Utils
 import { getAvailabilityInfo } from "@/utils/meeting/answer/getAvailabilityInfo";
 import { getUnavailableUsersInfo } from "@/utils/meeting/answer/getUnavailableUsersInfo";
-// import useIsMobile from "@/utils/useIsMobile";
 import useMouseDown from "@/utils/useIsMouseDown";
 import { Locale } from "@root/i18n.config";
 
@@ -66,27 +65,8 @@ export default function AnswerMeeting({
   const currentUrl = pathname;
 
   // Checking mobile mode
-  const [isMobile, setIsMobile] = useState(false);
-  const [windowSize, setWindowSize] = useState([0, 0]);
-
-  useEffect(() => {
-    if (window.innerWidth === 0) {
-      setWindowSize([window.innerWidth, window.innerHeight]);
-    }
-
-    const handleWindowResize = () => {
-      setWindowSize([window.innerWidth, window.innerHeight]);
-    };
-
-    window.addEventListener("resize", handleWindowResize);
-
-    if (windowSize[0] !== 0) {
-      setIsMobile(windowSize[0] < 1024);
-    }
-
-    return () => {
-      window.removeEventListener("resize", handleWindowResize);
-    };
+  const isMobile = useMediaQuery({
+    query: "(max-width: 1024px)",
   });
 
   // Handling mouse down
@@ -150,6 +130,7 @@ export default function AnswerMeeting({
         if (selectedTimecell?.isOnline) {
           // Selecting timecell online -> unselected (click)
           unselectTimecell(dateTime);
+          setOnlineSelectionMode(false);
         } else if (!onlineSelectionMode && !selectedTimecell?.isOnline) {
           // Selecting timecell offline -> online (click)
           setOnlineSelectionMode(true);
@@ -359,7 +340,7 @@ export default function AnswerMeeting({
                             }`
                       }`
                 }`
-              : `border border-gray ${!isMobile && "hover:border-none"} ${
+              : `border border-gray ${!isMobile && "hover:border-gray/50"} ${
                   isSelected
                     ? `border-none ${
                         selectedTimecell?.isOnline

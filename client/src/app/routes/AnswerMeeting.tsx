@@ -67,7 +67,7 @@ export default function AnswerMeeting({
 
   // Checking mobile mode
   const isMobile = useMediaQuery({
-    query: "(max-width: 1024px)",
+    query: "(max-width: 1023px)",
   });
 
   // Handling mouse down
@@ -367,12 +367,13 @@ export default function AnswerMeeting({
     );
 
   const renderDaysHeadings = () => {
-    return dates.map((day: any) => {
+    const daysHeadings = dates.map((day: any) => {
       const dateMoment = moment(day.date);
       const date = dateMoment.date();
       const month = dateMoment.month() + 1;
       const dayOfWeek = dateMoment.day();
       const classNames = dayOfWeek === 0 ? "pr-4" : "";
+
       return (
         <th key={date} className={`bg-light sticky top-0 z-10 ${classNames}`}>
           <p className="text-sm text-dark font-medium">
@@ -384,6 +385,8 @@ export default function AnswerMeeting({
         </th>
       );
     });
+
+    return daysHeadings;
   };
 
   const renderAvailabilityInfo = () => {
@@ -507,7 +510,7 @@ export default function AnswerMeeting({
   });
 
   return (
-    <main className="flex flex-1 flex-col lg:justify-center p-5 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 w-full lg:w-[800px]">
+    <main className="flex md:flex-1 flex-col lg:justify-center pb-10 md:p-5 lg:p-20 lg:pt-28 h-smd:pt-28 w-[356px] lg:w-[800px]">
       <Title text={meetName} />
       {/* Meeting details */}
       {(meetPlace || meetLink) && (
@@ -522,7 +525,7 @@ export default function AnswerMeeting({
       )}
 
       {/* Meeting data */}
-      <div className="flex flex-1 lg:flex-none justify-end items-center lg:items-start flex-col-reverse lg:justify-start lg:flex-row">
+      <div className="flex flex-1 lg:flex-none items-center lg:items-start flex-col-reverse justify-end lg:justify-start lg:flex-row">
         {(!mobileAnsweringMode && isMobile) || !isMobile ? (
           <section className="availability__info w-full lg:w-1/2 lg:mr-10">
             <p>
@@ -570,8 +573,8 @@ export default function AnswerMeeting({
                 </div>
               ) : null}
               <div
-                className={`self-center overflow-auto h-smd:max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[300px] w-auto max-w-[360px] md:max-w-[700px] lg:max-w-[350px] pr-3 mt-5 ${
-                  isMobile && "mb-5"
+                className={`self-center overflow-auto h-smd:max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[300px] w-auto max-w-[365px] md:max-w-[700px] lg:max-w-[350px] pr-3 mt-5 ${
+                  isMobile && "mb-10"
                 }`}
               >
                 <table className="time__seclection--table w-fit lg:mt-5 self-center select-none">

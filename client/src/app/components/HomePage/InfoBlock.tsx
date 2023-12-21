@@ -23,6 +23,7 @@ const InfoBlock = (props: {
           title={props.img_title}
           height={400}
           width={400}
+          loading="lazy"
           className={`m-0 ${
             props.reverse && "sm:ml-10"
           } mt-10 sm:mb-0 w-auto h-48 md:h-64 lg:h-auto`}

@@ -8,9 +8,12 @@ export default function Navbar({ lang }: { lang: Locale }) {
       <Link href={`/${lang}`}>
         <Image
           src={meetifyNowLogo}
+          height={32}
+          width={200}
           alt="Logo"
           title="MeetifyNow"
           className="h-8 w-auto"
+          priority
         />
       </Link>
     </nav>

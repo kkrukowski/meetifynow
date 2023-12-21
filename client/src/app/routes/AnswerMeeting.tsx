@@ -2,7 +2,7 @@
 
 import { yupResolver } from "@hookform/resolvers/yup";
 import axios from "axios";
-import _ from "lodash";
+import _, { set } from "lodash";
 import moment from "moment";
 import "moment/locale/pl";
 import { usePathname } from "next/navigation";
@@ -126,13 +126,21 @@ export default function AnswerMeeting({
     const isSelected = isDateSelected(dateTime);
     const selectedTimecell = getSelectedTimecell(dateTime);
 
+    console.log("toggleTimecell", {
+      isSelected,
+      selectedTimecell,
+      selectionMode,
+      onlineSelectionMode,
+      unselectMode,
+    });
+
     if (isSelected) {
       if (!selectionMode) {
         if (selectedTimecell?.isOnline) {
           // Selecting timecell online -> unselected (click)
           unselectTimecell(dateTime);
           setOnlineSelectionMode(false);
-        } else if (!onlineSelectionMode && !selectedTimecell?.isOnline) {
+        } else if (!selectedTimecell?.isOnline) {
           // Selecting timecell offline -> online (click)
           setOnlineSelectionMode(true);
           updateTimecell(dateTime, true);

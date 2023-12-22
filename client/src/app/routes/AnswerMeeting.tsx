@@ -17,12 +17,11 @@ import CopyLinkButton from "@/components/CopyLinkButton";
 import Heading from "@/components/Heading";
 import Input from "@/components/Input";
 import LinkButton from "@/components/LinkButton";
-import SwitchButton from "@/components/SwitchButton";
 import Title from "@/components/Title";
 
 // Utils
 import { getAvailabilityInfo } from "@/utils/meeting/answer/getAvailabilityInfo";
-import { getUnavailableUsersInfo } from "@/utils/meeting/answer/getUnavailableUsersInfo";
+// import { getUnavailableUsersInfo } from "@/utils/meeting/answer/getUnavailableUsersInfo";
 import useMouseDown from "@/utils/useIsMouseDown";
 import { Locale } from "@root/i18n.config";
 
@@ -60,7 +59,7 @@ export default function AnswerMeeting({
   const meetLink = meetingData.meetLink;
   const answersCount = answers.length;
   const datesInfo = meetingData.dates;
-  const [unavailableUsersInfo, setUnavailableUsersInfo] = useState<any>([]);
+  // const [unavailableUsersInfo, setUnavailableUsersInfo] = useState<any>([]);
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);
   const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
   const currentUrl = pathname;
@@ -74,9 +73,9 @@ export default function AnswerMeeting({
   const isMouseDown = useMouseDown();
 
   // Availability info
-  useEffect(() => {
-    setUnavailableUsersInfo(getUnavailableUsersInfo(answers));
-  }, [answers]);
+  // useEffect(() => {
+  //   setUnavailableUsersInfo(getUnavailableUsersInfo(answers));
+  // }, [answers]);
 
   const availabilityInfo = getAvailabilityInfo(answers);
 

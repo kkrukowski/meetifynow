@@ -80,8 +80,18 @@ export default function AnswerMeeting({
 
   const availabilityInfo = getAvailabilityInfo(answers);
 
-  const toggleAnsweringMode = () =>
+  const [toggleButtonName, setToggleButtonName] = useState(
+    dict.page.answerMeeting.toggleButton.showAvailability
+  );
+  const toggleAnsweringMode = () => {
     setMobileAnsweringMode((prevMode) => !prevMode);
+    if (mobileAnsweringMode)
+      setToggleButtonName(dict.page.answerMeeting.toggleButton.answerMeeting);
+    else
+      setToggleButtonName(
+        dict.page.answerMeeting.toggleButton.showAvailability
+      );
+  };
 
   // Answering functionallity
   const dates = meetingData.dates.sort();
@@ -401,13 +411,18 @@ export default function AnswerMeeting({
     if (lookedUpDatetime) {
       if (!availabilityInfo[lookedUpDatetime]) {
         return (
-          <li className="text-dark">
+          <span className="text-dark">
             {dict.page.answerMeeting.nobodyAvailable}
-          </li>
+          </span>
         );
       } else {
         const dayAvailabilityInfo = availabilityInfo[lookedUpDatetime];
         const availableUsers = dayAvailabilityInfo?.usersInfo;
+
+        // Sort avaulable users by username alphabetically
+        availableUsers?.sort((a: any, b: any) =>
+          a.userData.username.localeCompare(b.userData.username)
+        );
 
         const onlineAvailableUsers = availableUsers?.filter(
           (user: any) => user.isOnline === true
@@ -415,8 +430,9 @@ export default function AnswerMeeting({
 
         const listOfOnlineAvailableUsers = onlineAvailableUsers?.map(
           (userData: any) => (
-            <li key={userData.userData.userId}>
-              {userData.userData.username} 🛜
+            <li key={userData.userData.userId} className="flex items-center">
+              <span className="block h-3 w-3 rounded-full bg-gold mr-2"></span>
+              <span>{userData.userData.username}</span>
             </li>
           )
         );
@@ -427,30 +443,37 @@ export default function AnswerMeeting({
 
         const listOfOfflineAvailableUsers = offlineAvailableUsers?.map(
           (userData: any) => (
-            <li key={userData.userData.userId}>{userData.userData.username}</li>
-          )
-        );
-
-        const listOfUnavailableUsers = unavailableUsersInfo?.map(
-          (userData: any) => (
-            <li key={userData.userData.userId} className="text-gray">
-              <s>{userData.userData.username}</s>
+            <li key={userData.userData.userId} className="flex items-center">
+              <span className="block h-3 w-3 rounded-full bg-primary mr-2"></span>
+              <span>{userData.userData.username}</span>
             </li>
           )
         );
-        const listOfUsernames = [
-          listOfOnlineAvailableUsers,
-          listOfOfflineAvailableUsers,
-          listOfUnavailableUsers,
-        ];
+
+        // const listOfUnavailableUsers = unavailableUsersInfo?.map(
+        //   (userData: any) => (
+        //     <li key={userData.userData.userId} className="text-gray">
+        //       <s>{userData.userData.username}</s>
+        //     </li>
+        //   )
+        // );
+
+        const listOfAvailability = (
+          <ul>
+            {listOfOnlineAvailableUsers}
+            {listOfOfflineAvailableUsers}
+          </ul>
+        );
+
+        const listOfUsernames = listOfAvailability;
 
         return listOfUsernames;
       }
     } else {
       if (isMobile) {
-        return <li>{dict.page.answerMeeting.clickToReveal}</li>;
+        return <span>{dict.page.answerMeeting.clickToReveal}</span>;
       }
-      return <li>{dict.page.answerMeeting.hoverToReveal}</li>;
+      return <span>{dict.page.answerMeeting.hoverToReveal}</span>;
     }
   };
 
@@ -518,7 +541,7 @@ export default function AnswerMeeting({
   });
 
   return (
-    <main className="flex md:flex-1 flex-col lg:justify-center pb-10 md:p-5 lg:p-20 lg:pt-28 h-smd:pt-28 w-[356px] lg:w-[800px]">
+    <main className="flex md:flex-1 flex-col lg:justify-center px-5 pb-10 pt-20 md:pt-28 w-[356px] md:w-auto lg:w-[900px]">
       <Title text={meetName} />
       {/* Meeting details */}
       {(meetPlace || meetLink) && (
@@ -542,21 +565,20 @@ export default function AnswerMeeting({
             {lookedUpDate && (
               <Heading text={`${availableCount}/${answersCount}`} />
             )}
-            <ul className="overflow-auto max-h-[100px] h-hd:max-h-[300px]">
+            <div
+              className={`overflow-auto ${
+                isMobile && "max-h-[100px]"
+              } h-hd:max-h-[300px]`}
+            >
               {renderAvailabilityInfo()}
-            </ul>
+            </div>
           </section>
         ) : null}
 
         <section className="flex flex-col time__selection lg:w-1/2">
           {isMobile && (
             <div className="flex items-center justify-center">
-              <span className="text-2xl">✅</span>
-              <SwitchButton
-                isAnsweringMode={mobileAnsweringMode}
-                toggleAnsweringMode={toggleAnsweringMode}
-              />
-              <span className="text-2xl">👀</span>
+              <Button text={toggleButtonName} onClick={toggleAnsweringMode} />
             </div>
           )}
 
@@ -581,7 +603,7 @@ export default function AnswerMeeting({
                 </div>
               ) : null}
               <div
-                className={`self-center overflow-auto h-smd:max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[300px] w-auto max-w-[365px] md:max-w-[700px] lg:max-w-[350px] pr-3 mt-5 ${
+                className={`self-center overflow-auto max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[300px] w-auto max-w-[365px] md:max-w-[700px] lg:max-w-[350px] pr-3 mt-5 ${
                   isMobile && "mb-10"
                 }`}
               >

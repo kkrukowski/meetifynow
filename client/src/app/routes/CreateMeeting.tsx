@@ -484,12 +484,12 @@ export default function CreateMeeting({
     return <AnswerMeetingLoader />;
   } else {
     return (
-      <main className="flex flex-1 h-full flex-col px-5 py-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 lg:m-0 justify-center">
+      <main className="flex md:flex-1 h-full flex-col px-5 py-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 lg:m-0 justify-center">
         <Title text={dict.page.createMeeting.title} />
         <StepsIndicator steps={4} stepsData={stepsInfo} currIndex={currStep} />
         <form
           id="create-meeting-form"
-          className="flex flex-col justify-center h-[400px]"
+          className="flex flex-col justify-center md:h-[400px]"
         >
           <div className="self-center">
             {/* Meeting details */}

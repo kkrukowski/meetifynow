@@ -13,7 +13,7 @@ export async function generateMetadata({
   params: { id: string };
 }): Promise<Metadata> {
   const url = process.env.NEXT_PUBLIC_SERVER_URL + `/meet/${id}`;
-  const meetingData = await axios
+  meetingData = await axios
     .get(url)
     .then((res) => res)
     .catch((err) => err.response);

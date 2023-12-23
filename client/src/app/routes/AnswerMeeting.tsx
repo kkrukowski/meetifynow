@@ -9,6 +9,8 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useMediaQuery } from "react-responsive";
+import Popup from "reactjs-popup";
+import "reactjs-popup/dist/index.css";
 import * as yup from "yup";
 
 // Components
@@ -545,7 +547,7 @@ export default function AnswerMeeting({
       {/* Meeting details */}
       {(meetPlace || meetLink) && (
         <div className="mb-10">
-          {meetPlace && <p>🏢 {meetPlace}</p>}
+          {meetPlace && <p className="text-dark">🏢 {meetPlace}</p>}
           {meetLink && (
             <p>
               🔗 <LinkButton href={meetLink} text="Link do spotkania" />
@@ -558,7 +560,7 @@ export default function AnswerMeeting({
       <div className="flex flex-1 lg:flex-none items-center lg:items-start flex-col-reverse justify-end lg:justify-start lg:flex-row">
         {(!mobileAnsweringMode && isMobile) || !isMobile ? (
           <section className="availability__info w-full lg:w-1/2 lg:mr-10">
-            <p>
+            <p className="text-dark">
               {lookedUpDate} {lookedUpTime}
             </p>
             {lookedUpDate && (
@@ -619,6 +621,64 @@ export default function AnswerMeeting({
             </div>
             {(mobileAnsweringMode && isMobile) || !isMobile ? (
               <div>
+                <div className="mr-6 inline">
+                  <Popup
+                    trigger={
+                      <button
+                        type="button"
+                        className="bg-primary hover:bg-primary-hover active:bg-primary-active text-light font-medium h-6 w-6 rounded-full transition-colors"
+                      >
+                        ?
+                      </button>
+                    }
+                    modal
+                    nested
+                    closeOnDocumentClick
+                  >
+                    <div className="p-2 text-dark">
+                      <p>
+                        {dict.page.answerMeeting.help_popup.line1.segment1}
+                        <span className="font-medium">
+                          {dict.page.answerMeeting.help_popup.line1.segment2}
+                        </span>
+                        {dict.page.answerMeeting.help_popup.line1.segment3}
+                      </p>
+                      <p className="mb-2">
+                        {dict.page.answerMeeting.help_popup.line2}
+                      </p>
+                      <p className="font-medium">
+                        {dict.page.answerMeeting.help_popup.showMode.title}
+                      </p>
+                      <p className="flex items-center">
+                        <span className="block h-4 w-4 rounded-full bg-primary mr-2"></span>
+                        {dict.page.answerMeeting.help_popup.showMode.green}
+                      </p>
+                      <p className="flex items-center mb-2">
+                        <span className="block h-4 w-4 rounded-full bg-gold mr-2"></span>
+                        {dict.page.answerMeeting.help_popup.showMode.gold}
+                      </p>
+                      <p className="font-medium">
+                        {dict.page.answerMeeting.help_popup.answerMode.title}
+                      </p>
+                      <p className="flex items-center">
+                        <span className="block h-4 w-4 rounded-full bg-green mr-2"></span>
+                        {dict.page.answerMeeting.help_popup.answerMode.green}
+                      </p>
+                      <p className="flex items-center">
+                        <span className="block h-4 w-4 rounded-full bg-gold mr-2"></span>
+                        {dict.page.answerMeeting.help_popup.answerMode.gold}
+                      </p>
+                      <p className="flex items-center">
+                        <span className="block h-4 w-4 rounded-full bg-light-green mr-2"></span>
+                        {
+                          dict.page.answerMeeting.help_popup.answerMode
+                            .lightGreen
+                        }
+                      </p>
+                    </div>
+                  </Popup>
+                </div>
+
                 <Button text={dict.page.answerMeeting.button.submit} />
                 <CopyLinkButton
                   link={currentUrl}

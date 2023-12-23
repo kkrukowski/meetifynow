@@ -116,6 +116,25 @@
           "min": "Your name must be at least 4 characters long."
         }
       },
+      "help_popup": {
+        "line1": {
+          "segment1": "Not sure what the",
+          "segment2": " colors",
+          "segment3": " mean? It's easy!"
+        },
+        "line2": "Here's what they represent 👇",
+        "showMode": {
+          "title": "While selecting 👀:",
+          "green": "- Offline availability.",
+          "gold": "- Online availability."
+        },
+        "answerMode": {
+          "title": "When checking ☑️:",
+          "green": "- Most people available.",
+          "gold": "- Most people available online.",
+          "lightGreen": "- Date with less availability."
+        }
+      },
       "button": {
         "submit": "Send"
       }

@@ -25,10 +25,43 @@ html {
   -webkit-tap-highlight-color: transparent;
 }
 
+/* Style for popup window */
+@keyframes anvil {
+  0% {
+    transform: scale(1) translateY(0px);
+    opacity: 0;
+    box-shadow: 0 0 0 rgba(241, 241, 241, 0);
+  }
+  1% {
+    transform: scale(0.96) translateY(10px);
+    opacity: 0;
+    box-shadow: 0 0 0 rgba(241, 241, 241, 0);
+  }
+  100% {
+    transform: scale(1) translateY(0px);
+    opacity: 1;
+    box-shadow: 0 0 500px rgba(241, 241, 241, 0);
+  }
+}
+
+.popup-content {
+  width: auto !important;
+  border-radius: 0.5rem;
+  background-color: #f4fcff !important;
+  border: 1px solid #004466 !important;
+  animation: anvil 0.3s cubic-bezier(0.38, 0.1, 0.36, 0.9) forwards;
+}
+
 /* Responsive */
 @media (min-width: 1024px) and (min-height: 700px) {
   body {
     align-items: center;
     min-height: 100vh;
+  }
+}
+
+@media (max-width: 450px) {
+  .popup-content {
+    width: 80% !important;
   }
 }

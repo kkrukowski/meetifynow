@@ -116,6 +116,25 @@
           "max": "Imie może mieć maksymalnie 20 znaków."
         }
       },
+      "help_popup": {
+        "line1": {
+          "segment1": "Nie wiesz, co oznaczają dane",
+          "segment2": " kolory",
+          "segment3": "? To proste!"
+        },
+        "line2": "Oto co one reprezentują 👇",
+        "showMode": {
+          "title": "Podczas zaznaczania 👀:",
+          "green": "- Dostępność stacjonarna.",
+          "gold": "- Dostępność zdalna."
+        },
+        "answerMode": {
+          "title": "Podczas sprawdzania ☑️:",
+          "green": "- Najwięcej dostępnych osób.",
+          "gold": "- Najwięcej dostępnych osób zdalnie.",
+          "lightGreen": "- Data z mniejszą dostępnością."
+        }
+      },
       "button": {
         "submit": "Wyślij"
       }

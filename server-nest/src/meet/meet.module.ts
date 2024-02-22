@@ -1,12 +1,16 @@
 import { Module } from '@nestjs/common';
-import { DatabaseModule } from 'src/database/database.module';
+import { MongooseModule } from '@nestjs/mongoose';
+import { Appointment, AppointmentSchema } from 'src/schemas/appointment.schema';
 import { MeetController } from './meet.controller';
-import { meetProviders } from './meet.providers';
 import { MeetService } from './meet.service';
 
 @Module({
-  imports: [DatabaseModule],
+  imports: [
+    MongooseModule.forFeature([
+      { name: Appointment.name, schema: AppointmentSchema },
+    ]),
+  ],
   controllers: [MeetController],
-  providers: [MeetService, ...meetProviders],
+  providers: [MeetService],
 })
 export class MeetModule {}

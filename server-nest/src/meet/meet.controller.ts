@@ -1,7 +1,15 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { MeetService } from './meet.service';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { CreateMeetDto } from './dto/create-meet.dto';
 import { UpdateMeetDto } from './dto/update-meet.dto';
+import { MeetService } from './meet.service';
 
 @Controller('meet')
 export class MeetController {
@@ -19,7 +27,7 @@ export class MeetController {
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.meetService.findOne(+id);
+    return this.meetService.findOne(id);
   }
 
   @Patch(':id')

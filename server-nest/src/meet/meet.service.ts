@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Body, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Appointment } from '../schemas/appointment.schema';
@@ -11,20 +11,24 @@ export class MeetService {
     @InjectModel(Appointment.name) private meetModel: Model<Appointment>,
   ) {}
 
-  create(createMeetDto: CreateMeetDto) {
-    return 'This action adds a new meet';
+  async create(@Body() createMeetDto: CreateMeetDto) {
+    const createdMeet = await this.meetModel.create(createMeetDto);
   }
 
   async findAll() {
     const meet = await this.meetModel.find();
 
-    if (!meet) throw new Error('Unexpected error occurred. Please try again.');
+    if (meet.length === 0) throw new NotFoundException('No meets found.');
 
     return meet;
   }
 
-  findOne(id: string) {
-    return this.meetModel.findOne({ appointmentId: id });
+  async findOne(id: string) {
+    const meet = await this.meetModel.findOne({ appointmentId: id });
+
+    if (!meet) throw new NotFoundException('Meet not found.');
+
+    return meet;
   }
 
   update(id: number, updateMeetDto: UpdateMeetDto) {

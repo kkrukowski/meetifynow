@@ -31,13 +31,11 @@ export class MeetController {
     return this.meetService.findOne(id);
   }
 
-  @Patch(':id')
-  addAnswer(@Param() meetId: string, @Body() newAnswerDto: NewAnswerDto) {
+  @Patch(':meetId')
+  addAnswer(
+    @Param('meetId') meetId: string,
+    @Body() newAnswerDto: NewAnswerDto,
+  ) {
     return this.meetService.addAnswer(meetId, newAnswerDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.meetService.remove(+id);
   }
 }

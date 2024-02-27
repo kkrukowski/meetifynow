@@ -1,9 +1,11 @@
-import { NotFoundException } from '@nestjs/common';
+import { BadRequestException, NotFoundException } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 import mongoose, { Model, ObjectId } from 'mongoose';
+import { mock } from 'node:test';
 import { Appointment } from '../schemas/appointment.schema';
 import { CreateMeetDto } from './dto/create-meet.dto';
+import { NewAnswerDto } from './dto/new-answer.dto';
 import { MeetService } from './meet.service';
 
 describe('MeetService', () => {
@@ -31,6 +33,7 @@ describe('MeetService', () => {
     create: jest.fn(),
     find: jest.fn(),
     findOne: jest.fn(),
+    findOneAndUpdate: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -77,7 +80,7 @@ describe('MeetService', () => {
   describe('findAll', () => {
     it('should return an array of meets', async () => {
       // Mock the return value of the find method
-      jest.spyOn(model, 'find').mockResolvedValue([mockMeet]);
+      jest.spyOn(model, 'find').mockResolvedValueOnce([mockMeet]);
 
       const result = await meetService.findAll();
 
@@ -93,7 +96,7 @@ describe('MeetService', () => {
 
   describe('findOne', () => {
     it("should return a meet's details", async () => {
-      jest.spyOn(model, 'findOne').mockResolvedValue(mockMeet);
+      jest.spyOn(model, 'findOne').mockResolvedValueOnce(mockMeet);
 
       const result = await meetService.findOne(mockMeet.appointmentId);
 
@@ -101,11 +104,69 @@ describe('MeetService', () => {
     });
 
     it('should throw an error if the meet is not found', async () => {
-      jest.spyOn(model, 'findOne').mockResolvedValue(null);
+      jest.spyOn(model, 'findOne').mockResolvedValueOnce(null);
 
       await expect(meetService.findOne(mockMeet.appointmentId)).rejects.toThrow(
         NotFoundException,
       );
     });
+  });
+
+  describe('addAnswer', () => {
+    const newAnswerDto: NewAnswerDto = {
+      userId: null,
+      username: 'Test User',
+      dates: [
+        {
+          meetDate: 1700089200000,
+          isOnline: true,
+        },
+        {
+          meetDate: 1700089300000,
+          isOnline: false,
+        },
+      ],
+    };
+
+    const updatedMeet = mockMeet;
+    mockMeet.answers.push(newAnswerDto);
+
+    it('should add a new answer to the meet', async () => {
+      jest.spyOn(model, 'findOneAndUpdate').mockResolvedValueOnce(updatedMeet);
+
+      const result = await meetService.addAnswer(
+        mockMeet.appointmentId,
+        newAnswerDto,
+      );
+
+      expect(result).toEqual(updatedMeet);
+    });
+
+    // it('should throw an error if dates are not valid', async () => {
+    //   jest.spyOn(model, 'findOneAndUpdate').mockResolvedValue(null);
+
+    //   const invalidAnswerDto: NewAnswerDto = {
+    //     userId: null,
+    //     username: 'Test User',
+    //     dates: [],
+    //   };
+
+    //   const result = meetService.addAnswer(
+    //     mockMeet.appointmentId,
+    //     invalidAnswerDto,
+    //   );
+
+    //   await expect(result).rejects.toThrow(BadRequestException);
+    // });
+
+    // it('should throw an error if the meet is not found', async () => {
+    //   jest
+    //     .spyOn(model, 'findOneAndUpdate')
+    //     .mockResolvedValueOnce(NotFoundException);
+
+    //   const result = meetService.addAnswer('wrongId', newAnswerDto);
+
+    //   await expect(result).rejects.toBeInstanceOf(NotFoundException);
+    // });
   });
 });

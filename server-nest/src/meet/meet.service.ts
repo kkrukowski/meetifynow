@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { customAlphabet } from 'nanoid';
 import { Appointment } from '../schemas/appointment.schema';
 import { CreateMeetDto } from './dto/create-meet.dto';
+import { NewAnswerDto } from './dto/new-answer.dto';
 import { UpdateMeetDto } from './dto/update-meet.dto';
 
 const nanoid = customAlphabet(
@@ -44,8 +45,8 @@ export class MeetService {
     return meet;
   }
 
-  update(id: number, updateMeetDto: UpdateMeetDto) {
-    return `This action updates a #${id} meet`;
+  async addAnswer(meetId: string, @Body() newAnswerDto: NewAnswerDto) {
+    return { meetId, newAnswerDto };
   }
 
   remove(id: number) {

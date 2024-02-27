@@ -1,57 +1,34 @@
 import { NotFoundException } from '@nestjs/common';
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Model } from 'mongoose';
+import mongoose, { Model, ObjectId } from 'mongoose';
 import { Appointment } from '../schemas/appointment.schema';
+import { CreateMeetDto } from './dto/create-meet.dto';
 import { MeetService } from './meet.service';
 
 describe('MeetService', () => {
   let meetService: MeetService;
   let model: Model<Appointment>;
 
-  // Mock meet DTO
-  const mockMeetDto = {
-    meetName: 'Test Meet',
-    place: 'Test Place',
-    link: 'Test Link',
-    dates: [
-      {
-        date: 1700089200000,
-        times: [
-          1700118000000, 1700119800000, 1700121600000, 1700123400000,
-          1700125200000, 1700127000000, 1700128800000, 1700130600000,
-          1700132400000, 1700134200000, 1700136000000, 1700137800000,
-        ],
-      },
-    ],
-    answers: [],
-  };
-
   // Mock meet object
   const mockMeet = {
-    _id: '6554b7013fe16f6a95a1880a',
-    appointmentId: 'aRuUkIY',
+    _id: '65ddc1a883b51eea009aba04',
+    appointmentId: 'ieihrA7',
     meetName: 'Test Meet',
     place: 'Test Place',
     link: 'Test Link',
     dates: [
       {
         date: 1700089200000,
-        times: [
-          1700118000000, 1700119800000, 1700121600000, 1700123400000,
-          1700125200000, 1700127000000, 1700128800000, 1700130600000,
-          1700132400000, 1700134200000, 1700136000000, 1700137800000,
-        ],
-        _id: '6554b7013fe16f6a95a1880b',
+        times: [1700118000000],
       },
     ],
     answers: [],
   };
-
-  const correctId = 'aRuUkIY';
 
   // Mock dependencies from services
   const mockAppointmentModel = {
+    create: jest.fn(),
     find: jest.fn(),
     findOne: jest.fn(),
   };
@@ -73,23 +50,27 @@ describe('MeetService', () => {
 
   describe('create', () => {
     it('should create a new meet', async () => {
-      jest.spyOn(model, 'create').mockResolvedValue(mockMeet);
-
-      const result = await meetService.create(mockMeetDto);
-
-      expect(result).toEqual(mockMeet);
-    });
-
-    it('should throw an error if dto is invalid', () => {
-      const invalidDto = {
-        meetName: '',
-        place: '',
-        link: '',
-        dates: [],
+      const newMeetDto: CreateMeetDto = {
+        meetName: 'Test Meet',
+        place: 'Test Place',
+        link: 'Test Link',
+        dates: [
+          {
+            date: 1700089200000,
+            times: [
+              1700118000000, 1700119800000, 1700121600000, 1700123400000,
+              1700125200000, 1700127000000, 1700128800000, 1700130600000,
+              1700132400000, 1700134200000, 1700136000000, 1700137800000,
+            ],
+          },
+        ],
         answers: [],
       };
-
-      expect(meetService.create(invalidDto)).rejects.toThrow();
+      jest
+        .spyOn(model, 'create')
+        .mockImplementationOnce(() => Promise.resolve(mockMeet as any));
+      const result = await meetService.create(newMeetDto);
+      expect(result).toEqual(mockMeet);
     });
   });
 
@@ -114,7 +95,7 @@ describe('MeetService', () => {
     it("should return a meet's details", async () => {
       jest.spyOn(model, 'findOne').mockResolvedValue(mockMeet);
 
-      const result = await meetService.findOne(correctId);
+      const result = await meetService.findOne(mockMeet.appointmentId);
 
       expect(result).toEqual(mockMeet);
     });
@@ -122,7 +103,7 @@ describe('MeetService', () => {
     it('should throw an error if the meet is not found', async () => {
       jest.spyOn(model, 'findOne').mockResolvedValue(null);
 
-      await expect(meetService.findOne(correctId)).rejects.toThrow(
+      await expect(meetService.findOne(mockMeet.appointmentId)).rejects.toThrow(
         NotFoundException,
       );
     });

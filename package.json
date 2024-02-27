@@ -4,8 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "devDependencies": {
-    "concurrently": "^8.2.0",
-    "prettier": "^3.0.3"
+    "concurrently": "^8.2.0"
   },
   "scripts": {
     "dev": "concurrently \"cd server && npm run start\" \"cd client && npm run dev\"",

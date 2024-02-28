@@ -1,6 +1,5 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import * as csurf from 'csurf';
 import helmet from 'helmet';
 import { AppModule } from './app.module';
 

@@ -1,14 +1,13 @@
 {
-  "name": "time2meet",
+  "name": "meetifynow",
   "version": "1.0.0",
-  "main": "index.js",
   "license": "MIT",
   "devDependencies": {
     "concurrently": "^8.2.0"
   },
   "scripts": {
-    "dev": "concurrently \"cd server && npm run start\" \"cd client && npm run dev\"",
+    "dev": "concurrently \"cd server-nest && npm run start:dev\" \"cd client && npm run dev\"",
     "dev-client": "cd client && npm run start",
-    "dev-server": "cd server && npm run start"
+    "dev-server": "cd server-nest && npm run start"
   }
 }

@@ -14,9 +14,6 @@ async function bootstrap() {
     credentials: true,
   });
 
-  // Enable CSRF protection
-  app.use(csurf());
-
   // Enable security headers
   app.use(helmet());
 

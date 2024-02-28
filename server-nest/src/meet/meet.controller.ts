@@ -16,7 +16,7 @@ import { MeetService } from './meet.service';
 export class MeetController {
   constructor(private readonly meetService: MeetService) {}
 
-  @Post()
+  @Post('/new')
   create(@Body() createMeetDto: CreateMeetDto) {
     return this.meetService.create(createMeetDto);
   }

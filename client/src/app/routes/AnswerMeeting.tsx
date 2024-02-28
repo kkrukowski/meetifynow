@@ -490,7 +490,7 @@ export default function AnswerMeeting({
 
       setIsSendingReq(true);
 
-      const answerResponse = await axios.post(
+      const answerResponse = await axios.patch(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`,
         { username, dates: selectedTimecells }
       );

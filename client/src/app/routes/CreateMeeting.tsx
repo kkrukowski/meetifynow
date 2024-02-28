@@ -394,7 +394,7 @@ export default function CreateMeeting({
         }
       );
 
-      const meetId = response.data.newMeet.appointmentId;
+      const meetId = response.data.appointmentId;
       const meetUrl = `/meet/${meetId}`;
       router.push(meetUrl);
     } catch (error) {

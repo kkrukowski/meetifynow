@@ -1,4 +1,4 @@
-MeetifyNow - A simple platform for scheduling meetings
+# MeetifyNow - A simple platform for scheduling meetings
 
 
 

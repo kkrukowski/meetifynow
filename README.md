@@ -1,32 +1,35 @@
-# 🧐 About time2meet
+# 🧐 About MeetifyNow
 
 
 
-**time2meet** is a straightforward scheduling app. The primary purpose of time2meet is to create the simplest application for scheduling meetings. Creating schedules is very quick because there is no need to log in or perform additional actions to create a schedule. My goal in creating Time2meet was to learn how to use new technologies like Vite and TypeScript, as well as to gain experience in project development by using tools and techniques such as testing and code review.
+**MeetifyNow** is a straightforward scheduling app. The primary purpose of MeetifyNow is to create the simplest application for scheduling meetings. Creating schedules in MeetifyNow is very quick because there is no need to log in or perform additional actions to create a schedule. My goal in creating MeetifyNow is to learn how to use new technologies like NextJS, NestJS and TypeScript, as well as to gain experience in project development by using tools and techniques such as testing and code review.
 
 <div align="center" dir="auto">
 <p dir="auto">
 <strong>
-<a href="https://time2meet.onrender.com/">Website</a>
+<a href="https://meetifynow.com/">📅 MeetifyNow Website 📅</a>
 </strong>
 </p>
 </div>
 
 ## ⌚ Time spent
 
-Total time in programming this project - 90h
+Total time in programming this project - 160h
 
 
 ## 👨‍💻 Technologies
 
 Project is created with:
+### Frontend
 * React: v18.2.0
+* NextJS: v14.0.4
 * TypeScript: v5.0.4
 * Tailwind: v3.3.3
 * yup: v1.3.1
-* Vitest: v0.34.6
+### Backend
+* NestJS: v10
+* TypeScript: v5.1.3
 * Express.js: v4.18.2
-* MongoDB
 * Mongoose: v7.4.1
 * Jest: v29.6.2
 

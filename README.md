@@ -1,4 +1,4 @@
-# 🧐 About MeetifyNow
+MeetifyNow - A simple platform for scheduling meetings
 
 
 

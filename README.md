@@ -1,7 +1,7 @@
+![MeetifyNow Logo](https://github.com/kkrukowski/meetifynow/assets/11280310/91ae49ad-6932-48e8-b3db-987ecaa19d92)
+
+
 # MeetifyNow - A simple platform for scheduling meetings
-
-
-
 **MeetifyNow** is a straightforward scheduling app. The primary purpose of MeetifyNow is to create the simplest application for scheduling meetings. Creating schedules in MeetifyNow is very quick because there is no need to log in or perform additional actions to create a schedule. My goal in creating MeetifyNow is to learn how to use new technologies like NextJS, NestJS and TypeScript, as well as to gain experience in project development by using tools and techniques such as testing and code review.
 
 <div align="center" dir="auto">

@@ -12,12 +12,22 @@
 </p>
 </div>
 
-## ⌚ Time spent
+## Installation
+First in server and client folders fill example .env files and after that rename that files by removing ".example".
+
+Later in terminal enter below commands in root project folder.
+```
+npm install
+npm run install
+npm run start:dev
+```
+
+## Time spent
 
 Total time in programming this project - 160h
 
 
-## 👨‍💻 Technologies
+## Technologies
 
 Project is created with:
 ### Frontend

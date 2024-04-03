@@ -52,6 +52,28 @@
         }
       }
     },
+    "login": {
+      "title": "Zaloguj się do swojego konta",
+      "input": {
+        "email": {
+          "label": "Email",
+          "placeholder": "📧 Email"
+        },
+        "password": {
+          "label": "Hasło",
+          "placeholder": "🔑 Hasło"
+        }
+      },
+      "button": {
+        "login": "Zaloguj się",
+        "forgotPassword": "Zapomniałeś hasła?",
+        "rememberMe": "Zapamiętaj mnie"
+      },
+      "createAccount": {
+        "text": "Nie masz konta?",
+        "link": "Zarejestruj się"
+      }
+    },
     "createMeeting": {
       "title": "Utwórz nowe spotkanie",
       "createButton": "Utwórz spotkanie",

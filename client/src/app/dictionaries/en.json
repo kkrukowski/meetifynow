@@ -52,6 +52,28 @@
         }
       }
     },
+    "login": {
+      "title": "Log in to your Account",
+      "input": {
+          "email": {
+          "label": "Email",
+          "placeholder": "📧 Email"
+          },
+          "password": {
+          "label": "Password",
+          "placeholder": "🔑 Password"
+          }
+      },
+      "button": {
+        "login": "Log in",
+        "forgotPassword": "Forgot password?",
+        "rememberMe": "Remember me"
+      },
+      "createAccount": {
+        "text": "Don't have an account yet?",
+        "link": "Create one now!"
+      }
+    },
     "createMeeting": {
       "title": "Create a new meeting",
       "createButton": "Create meeting",

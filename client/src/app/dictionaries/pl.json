@@ -53,15 +53,15 @@
       }
     },
     "login": {
-      "title": "Zaloguj się do swojego konta",
+      "title": "Zaloguj się",
       "input": {
         "email": {
           "label": "Email",
-          "placeholder": "📧 Email"
+          "placeholder": "nazwa@domena.pl"
         },
         "password": {
           "label": "Hasło",
-          "placeholder": "🔑 Hasło"
+          "placeholder": "******"
         }
       },
       "button": {
@@ -69,9 +69,22 @@
         "forgotPassword": "Zapomniałeś hasła?",
         "rememberMe": "Zapamiętaj mnie"
       },
+      "socialLogin": {
+        "text": "Lub zaloguj się przez"
+      },
       "createAccount": {
         "text": "Nie masz konta?",
         "link": "Zarejestruj się"
+      },
+      "error": {
+        "email": {
+          "required": "Email jest wymagany.",
+          "email": "Niepoprawny format emaila."
+        },
+        "password": {
+          "required": "Hasło jest wymagane.",
+          "min": "Hasło musi mieć co najmniej 6 znaków."
+        }
       }
     },
     "createMeeting": {

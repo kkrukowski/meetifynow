@@ -54,16 +54,6 @@
     },
     "login": {
       "title": "Log in",
-      "input": {
-          "email": {
-          "label": "Email",
-          "placeholder": "name@domain.com"
-          },
-          "password": {
-          "label": "Password",
-          "placeholder": "******"
-          }
-      },
       "button": {
         "login": "Log in",
         "forgotPassword": "Forgot password?",
@@ -75,6 +65,35 @@
       "createAccount": {
         "text": "Don't have an account yet?",
         "link": "Create one now!"
+      }
+    },
+    "register": {
+      "title": "Register",
+      "button": {
+        "register": "Create an account"
+      },
+      "socialLogin": {
+        "text": "Or register with"
+      },
+      "logIn": {
+        "text": "Already have an account?",
+        "link": "Log in!"
+      }
+    },
+    "auth": {
+      "input": {
+        "name": {
+          "label": "Name",
+          "placeholder": "John Doe"
+        },
+        "email": {
+          "label": "Email",
+          "placeholder": "name@domain.com"
+        },
+        "password": {
+          "label": "Password",
+          "placeholder": "******"
+        }
       },
       "error": {
         "email": {
@@ -84,6 +103,10 @@
         "password": {
           "required": "Password is required.",
           "min": "Password must be at least 6 characters long."
+        },
+        "name": {
+          "required": "Name is required.",
+          "min": "Name must be at least 2 characters long."
         }
       }
     },

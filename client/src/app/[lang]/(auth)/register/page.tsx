@@ -1,4 +1,4 @@
-import LoginPage from '@/routes/auth/LoginPage';
+import RegisterPage from '@/routes/auth/RegisterPage';
 import {Locale} from "@root/i18n.config.ts";
 import {getDictionary} from "@/lib/dictionary.ts";
 
@@ -10,6 +10,6 @@ export default async function Page({
     const dict = await getDictionary(lang);
 
     return (
-        <LoginPage dict={dict}/>
+        <RegisterPage dict={dict}/>
     )
 }

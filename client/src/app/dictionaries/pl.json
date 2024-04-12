@@ -54,27 +54,46 @@
     },
     "login": {
       "title": "Zaloguj się",
+      "button": {
+        "login": "Zaloguj się",
+        "forgotPassword": "Nie pamiętasz hasła?",
+        "rememberMe": "Zapamiętaj mnie"
+      },
+      "socialLogin": {
+        "text": "Lub zaloguj się za pomocą"
+      },
+      "createAccount": {
+        "text": "Nie masz konta?",
+        "link": "Stwórz nowe!"
+      }
+    },
+    "register": {
+      "title": "Stwórz nowe konto",
+      "button": {
+        "register": "Stwórz konto"
+      },
+      "socialLogin": {
+        "text": "Lub zarejestruj się za pomocą"
+      },
+      "logIn": {
+        "text": "Posiadasz już konto?",
+        "link": "Zaloguj się!"
+      }
+    },
+    "auth": {
       "input": {
+        "name": {
+          "label": "Nazwa",
+          "placeholder": "Jan Kowalski"
+        },
         "email": {
           "label": "Email",
           "placeholder": "nazwa@domena.pl"
         },
         "password": {
-          "label": "Hasło",
+          "label": "Password",
           "placeholder": "******"
         }
-      },
-      "button": {
-        "login": "Zaloguj się",
-        "forgotPassword": "Zapomniałeś hasła?",
-        "rememberMe": "Zapamiętaj mnie"
-      },
-      "socialLogin": {
-        "text": "Lub zaloguj się przez"
-      },
-      "createAccount": {
-        "text": "Nie masz konta?",
-        "link": "Zarejestruj się"
       },
       "error": {
         "email": {
@@ -84,6 +103,10 @@
         "password": {
           "required": "Hasło jest wymagane.",
           "min": "Hasło musi mieć co najmniej 6 znaków."
+        },
+        "name": {
+          "required": "Nazwa jest wymagana.",
+          "min": "Nazwa musi mieć co najmniej 2 znaki."
         }
       }
     },

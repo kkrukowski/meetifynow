@@ -1,17 +1,25 @@
 import Link from "next/link";
 
-export default function LinkButton(props: {
-  href: string;
-  text: string;
-  className?: string;
-}) {
+type LinkButtonProps = {
+    href: string;
+    text: string;
+    className?: string;
+    target?: string;
+};
+
+export const LinkButton = ({
+    href,
+    text,
+    className,
+    target = "_blank",
+}: LinkButtonProps) => {
   return (
     <Link
-      href={props.href}
-      target="_blank"
-      className={`text-primary hover:text-primary-hover active:text-primary-active font-medium ${props.className}`}
+      href={href}
+      target={target}
+      className={`text-primary hover:text-primary-hover active:text-primary-active font-medium ${className}`}
     >
-      {props.text}
+      {text}
     </Link>
   );
 }

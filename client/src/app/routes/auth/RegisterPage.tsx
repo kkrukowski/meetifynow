@@ -14,20 +14,21 @@ import {
 } from "@fortawesome/free-brands-svg-icons";
 import { LinkButton } from "@/components/LinkButton.tsx";
 import * as yup from "yup";
-import { LoginInputs } from "@/inputs";
-import {login} from "@/api/login.ts";
-import {FormError} from "@/components/FormError.tsx";
+import { RegisterInputs } from "@/inputs";
+import { FormError } from "@/components/FormError.tsx";
+import { register as registerUserApi } from "@/api/register.ts";
 
-export default function LoginPage({ dict }: { dict: any }) {
+export default function RegisterPage({ dict }: { dict: any }) {
     const [error, setError] = useState<string | undefined>("" as string);
     const [success, setSuccess] = useState<string | undefined>("" as string);
     const [isPending, startTransition] = useTransition();
 
-    const [loginData, setLoginData] = useState({ email: "" as string, password: "" as string});
+    const [registerData, setRegisterData] = useState({ name: "" as string, email: "" as string, password: "" as string});
 
     const formSchema = yup.object().shape({
         email: yup.string().email(dict && dict.page.auth.error.email.email).required(dict && dict.page.auth.error.email.required),
         password: yup.string().required(dict && dict.page.auth.error.password.required).min(6, dict && dict.page.auth.error.password.min),
+        name: yup.string().required(dict && dict.page.auth.error.name.required).min(2, dict && dict.page.auth.error.name.min),
     });
 
     const {
@@ -36,9 +37,9 @@ export default function LoginPage({ dict }: { dict: any }) {
         formState: { errors },
     } = useForm({ resolver: yupResolver(formSchema) });
 
-    const loginHandler: SubmitHandler<LoginInputs> = async () => {
+    const registerHandler: SubmitHandler<RegisterInputs> = async () => {
         startTransition(async () => {
-            const res = await login(loginData)
+            const res = await registerUserApi(registerData)
 
             setError(res.error)
             setSuccess(res.success)
@@ -46,15 +47,34 @@ export default function LoginPage({ dict }: { dict: any }) {
     };
 
     return <main className="flex md:flex-1 h-full flex-col px-5 py-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 lg:m-0 justify-center items-center">
-        <Title text={dict.page.login.title}/>
+        <Title text={dict.page.register.title}/>
 
         {/*Credentials login*/}
         <motion.div
             initial={{x: "50%", opacity: 0}}
             animate={{x: 0, opacity: 1}}
             transition={{duration: 0.3, ease: "easeInOut"}}
-            className="flex flex-col w-full justify-center items-center"
+            className="flex flex-col w-fit justify-center items-center"
         >
+            <Input
+                label={dict.page.auth.input.name.label}
+                type="text"
+                id="name"
+                onChange={(e: {
+                    target: { value: React.SetStateAction<string> };
+                }) =>
+                    setRegisterData({
+                        ...registerData,
+                        name: e.target.value.toString(),
+                    })
+                }
+                required={true}
+                placeholder={dict.page.auth.input.name.placeholder}
+                register={register}
+                error={!!errors.name}
+                errorText={errors.name?.message?.toString()}
+                disabled={isPending}
+            />
             <Input
                 label={dict.page.auth.input.email.label}
                 type="text"
@@ -62,8 +82,8 @@ export default function LoginPage({ dict }: { dict: any }) {
                 onChange={(e: {
                     target: { value: React.SetStateAction<string> };
                 }) =>
-                    setLoginData({
-                        ...loginData,
+                    setRegisterData({
+                        ...registerData,
                         email: e.target.value.toString(),
                     })
                 }
@@ -81,8 +101,8 @@ export default function LoginPage({ dict }: { dict: any }) {
                 onChange={(e: {
                     target: { value: React.SetStateAction<string> };
                 }) =>
-                    setLoginData({
-                        ...loginData,
+                    setRegisterData({
+                        ...registerData,
                         password: e.target.value.toString(),
                     })
                 }
@@ -97,11 +117,13 @@ export default function LoginPage({ dict }: { dict: any }) {
             {success && <FormError text={success} error={false}/>}
 
             <div className="self-center w-full">
-                <Button text={dict.page.login.button.login} onClick={handleSubmit(loginHandler)} className="w-full"/>
+                <Button text={dict.page.register.button.register} onClick={handleSubmit(registerHandler)}
+                        className="w-full"/>
             </div>
+
             <div className="flex flex-row w-full justify-center items-center py-5">
                 <div className="w-full h-0.5 rounded-full bg-gray"></div>
-                <p className="whitespace-nowrap px-4 text-gray">{dict.page.login.socialLogin.text}</p>
+                <p className="whitespace-nowrap px-4 text-gray">{dict.page.register.socialLogin.text}</p>
                 <div className="w-full h-0.5 rounded-full bg-gray"></div>
             </div>
 
@@ -115,8 +137,8 @@ export default function LoginPage({ dict }: { dict: any }) {
 
             {/*Create account*/}
             <div className="flex flex-row justify-center mt-5">
-                <p className="mr-1">{dict.page.login.createAccount.text}</p>
-                <LinkButton href="/register" target="_self" text={dict.page.login.createAccount.link}/>
+                <p className="mr-1">{dict.page.register.logIn.text}</p>
+                <LinkButton href="/login" target="_self" text={dict.page.register.logIn.link}/>
             </div>
         </motion.div>
     </main>

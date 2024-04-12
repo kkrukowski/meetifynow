@@ -12,6 +12,7 @@ type Props = {
   value?: string;
   required?: boolean | undefined;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
 };
 
 const Input = ({
@@ -26,6 +27,7 @@ const Input = ({
   onChange,
   value,
   required = false,
+  disabled = false,
 }: Props) => {
   return (
     <div className="flex flex-col w-[300px] gap-2">
@@ -48,6 +50,7 @@ const Input = ({
         value={value}
         autoComplete="off"
         required={required}
+        disabled={disabled}
       />
       <p className="text-sm relative -top-1 text-red font-medium">
         {errorText}

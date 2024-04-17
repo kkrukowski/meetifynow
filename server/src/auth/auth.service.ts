@@ -1,13 +1,36 @@
 import { Injectable } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateAuthDto } from './dto/update-auth.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { UserService } from '../user/user.service';
+import { hash } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
-  create(createUserDto: CreateUserDto) {
-    if (createUserDto) {
-      return { success: 'Registered correctly!' };
+  constructor(private userService: UserService) {}
+
+  async register(createUserDto: CreateUserDto) {
+    if (!createUserDto) {
+      throw new Error('No data provided!');
+    }
+
+    const isUserExists = await this.userService.findByEmail(
+      createUserDto.email,
+    );
+
+    if (isUserExists.statusCode === 404) {
+      const newUser = await this.userService.create({
+        ...createUserDto,
+        password: await hash(createUserDto.password, 10),
+      });
+
+      return newUser;
+    }
+
+    if (isUserExists.statusCode === 200) {
+      return {
+        message: 'User already exists!',
+        statusCode: 400,
+      };
     }
 
     return { error: 'Some error!' };
@@ -19,10 +42,6 @@ export class AuthService {
     }
 
     return { error: 'Some error!' };
-  }
-
-  update(id: number, updateAuthDto: UpdateAuthDto) {
-    return `This action updates a #${id} auth`;
   }
 
   remove(id: number) {

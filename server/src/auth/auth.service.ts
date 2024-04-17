@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UserService } from '../user/user.service';
-import { hash } from 'bcrypt';
+import { hash, compare } from 'bcrypt';
 
 @Injectable()
 export class AuthService {
@@ -36,12 +36,43 @@ export class AuthService {
     return { error: 'Some error!' };
   }
 
-  login(loginUserDto: LoginUserDto) {
-    if (loginUserDto) {
-      return { success: 'Logged in correctly!' };
+  async login(loginUserDto: LoginUserDto) {
+    if (!loginUserDto) {
+      throw new Error('No data provided!');
     }
 
-    return { error: 'Some error!' };
+    const user = await this.validateUser(loginUserDto);
+
+    return user;
+
+    return { error: 'Some error!', statusCode: 400 };
+  }
+
+  async validateUser(loginUserDto: LoginUserDto) {
+    const user = await this.userService.findByEmail(loginUserDto.email);
+
+    if (user.statusCode === 404) {
+      return {
+        message: 'User not found!',
+        statusCode: 404,
+      };
+    }
+
+    const userData = user.userData;
+
+    const isPasswordCorrect = await compare(
+      loginUserDto.password,
+      userData.password,
+    );
+
+    if (isPasswordCorrect) {
+      return {
+        message: 'Password is correct!',
+        statusCode: 200,
+      };
+    }
+
+    throw new UnauthorizedException('Invalid credentials!');
   }
 
   remove(id: number) {

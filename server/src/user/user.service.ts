@@ -36,13 +36,13 @@ export class UserService {
 
     if (!user) {
       return {
-        message: 'User not found',
+        message: 'User not found!',
         statusCode: 404,
       };
     }
 
     return {
-      message: 'User not found',
+      message: 'User found!',
       statusCode: 200,
       userData: user,
     };

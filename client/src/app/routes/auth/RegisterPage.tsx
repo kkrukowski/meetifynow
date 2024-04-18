@@ -50,96 +50,98 @@ export default function RegisterPage({ dict }: { dict: any }) {
         <Title text={dict.page.register.title}/>
 
         {/*Credentials login*/}
-        <motion.div
-            initial={{x: "50%", opacity: 0}}
-            animate={{x: 0, opacity: 1}}
-            transition={{duration: 0.3, ease: "easeInOut"}}
-            className="flex flex-col w-fit justify-center items-center"
-        >
-            <Input
-                label={dict.page.auth.input.name.label}
-                type="text"
-                id="name"
-                onChange={(e: {
-                    target: { value: React.SetStateAction<string> };
-                }) =>
-                    setRegisterData({
-                        ...registerData,
-                        name: e.target.value.toString(),
-                    })
-                }
-                required={true}
-                placeholder={dict.page.auth.input.name.placeholder}
-                register={register}
-                error={!!errors.name}
-                errorText={errors.name?.message?.toString()}
-                disabled={isPending}
-            />
-            <Input
-                label={dict.page.auth.input.email.label}
-                type="text"
-                id="email"
-                onChange={(e: {
-                    target: { value: React.SetStateAction<string> };
-                }) =>
-                    setRegisterData({
-                        ...registerData,
-                        email: e.target.value.toString(),
-                    })
-                }
-                required={true}
-                placeholder={dict.page.auth.input.email.placeholder}
-                register={register}
-                error={!!errors.email}
-                errorText={errors.email?.message?.toString()}
-                disabled={isPending}
-            />
-            <Input
-                label={dict.page.auth.input.password.label}
-                type="password"
-                id="password"
-                onChange={(e: {
-                    target: { value: React.SetStateAction<string> };
-                }) =>
-                    setRegisterData({
-                        ...registerData,
-                        password: e.target.value.toString(),
-                    })
-                }
-                required={true}
-                placeholder={dict.page.auth.input.password.placeholder}
-                register={register}
-                error={!!errors.password}
-                errorText={errors.password?.message?.toString()}
-                disabled={isPending}
-            />
-            {error && <FormError text={error} error={true}/>}
-            {success && <FormError text={success} error={false}/>}
+        <form>
+            <motion.div
+                initial={{x: "50%", opacity: 0}}
+                animate={{x: 0, opacity: 1}}
+                transition={{duration: 0.3, ease: "easeInOut"}}
+                className="flex flex-col w-fit justify-center items-center"
+            >
+                <Input
+                    label={dict.page.auth.input.name.label}
+                    type="text"
+                    id="name"
+                    onChange={(e: {
+                        target: { value: React.SetStateAction<string> };
+                    }) =>
+                        setRegisterData({
+                            ...registerData,
+                            name: e.target.value.toString(),
+                        })
+                    }
+                    required={true}
+                    placeholder={dict.page.auth.input.name.placeholder}
+                    register={register}
+                    error={!!errors.name}
+                    errorText={errors.name?.message?.toString()}
+                    disabled={isPending}
+                />
+                <Input
+                    label={dict.page.auth.input.email.label}
+                    type="text"
+                    id="email"
+                    onChange={(e: {
+                        target: { value: React.SetStateAction<string> };
+                    }) =>
+                        setRegisterData({
+                            ...registerData,
+                            email: e.target.value.toString(),
+                        })
+                    }
+                    required={true}
+                    placeholder={dict.page.auth.input.email.placeholder}
+                    register={register}
+                    error={!!errors.email}
+                    errorText={errors.email?.message?.toString()}
+                    disabled={isPending}
+                />
+                <Input
+                    label={dict.page.auth.input.password.label}
+                    type="password"
+                    id="password"
+                    onChange={(e: {
+                        target: { value: React.SetStateAction<string> };
+                    }) =>
+                        setRegisterData({
+                            ...registerData,
+                            password: e.target.value.toString(),
+                        })
+                    }
+                    required={true}
+                    placeholder={dict.page.auth.input.password.placeholder}
+                    register={register}
+                    error={!!errors.password}
+                    errorText={errors.password?.message?.toString()}
+                    disabled={isPending}
+                />
+                {error && <FormError text={error} error={true}/>}
+                {success && <FormError text={success} error={false}/>}
 
-            <div className="self-center w-full">
-                <Button text={dict.page.register.button.register} onClick={handleSubmit(registerHandler)}
-                        className="w-full"/>
-            </div>
+                <div className="self-center w-full">
+                    <Button text={dict.page.register.button.register} onClick={handleSubmit(registerHandler)}
+                            className="w-full"/>
+                </div>
 
-            <div className="flex flex-row w-full justify-center items-center py-5">
-                <div className="w-full h-0.5 rounded-full bg-gray"></div>
-                <p className="whitespace-nowrap px-4 text-gray">{dict.page.register.socialLogin.text}</p>
-                <div className="w-full h-0.5 rounded-full bg-gray"></div>
-            </div>
+                <div className="flex flex-row w-full justify-center items-center py-5">
+                    <div className="w-full h-0.5 rounded-full bg-gray"></div>
+                    <p className="whitespace-nowrap px-4 text-gray">{dict.page.register.socialLogin.text}</p>
+                    <div className="w-full h-0.5 rounded-full bg-gray"></div>
+                </div>
 
-            {/*Social Login*/}
-            <div className="flex justify-center gap-5">
-                <SocialButton onClick={() => {
-                }} icon={faGoogle}/>
-                <SocialButton onClick={() => {
-                }} icon={faGithub}/>
-            </div>
+                {/*Social Login*/}
+                <div className="flex justify-center gap-5">
+                    <SocialButton onClick={() => {
+                    }} icon={faGoogle}/>
+                    <SocialButton onClick={() => {
+                    }} icon={faGithub}/>
+                </div>
 
-            {/*Create account*/}
-            <div className="flex flex-row justify-center mt-5">
-                <p className="mr-1">{dict.page.register.logIn.text}</p>
-                <LinkButton href="/login" target="_self" text={dict.page.register.logIn.link}/>
-            </div>
-        </motion.div>
+                {/*Create account*/}
+                <div className="flex flex-row justify-center mt-5">
+                    <p className="mr-1">{dict.page.register.logIn.text}</p>
+                    <LinkButton href="/login" target="_self" text={dict.page.register.logIn.link}/>
+                </div>
+            </motion.div>
+        </form>
     </main>
 }

@@ -4,6 +4,7 @@ type Props = {
   label: string;
   type: string;
   id: string;
+  name: string;
   register: any;
   placeholder: string;
   options?: any;
@@ -19,6 +20,7 @@ const Input = ({
   label,
   type,
   id,
+  name,
   register,
   placeholder,
   options,
@@ -39,6 +41,7 @@ const Input = ({
       </div>
       <input
         id={id}
+        name={name}
         {...register(id, { ...options })}
         type={type}
         className={

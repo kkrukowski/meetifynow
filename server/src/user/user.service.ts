@@ -27,8 +27,21 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findById(id: string) {
+    const user = await this.userModel.findOne({ _id: id });
+
+    if (!user) {
+      return {
+        message: 'User not found!',
+        statusCode: 404,
+      };
+    }
+
+    return {
+      message: 'User found!',
+      statusCode: 200,
+      user: user,
+    };
   }
 
   async findByEmail(email: string) {
@@ -44,7 +57,7 @@ export class UserService {
     return {
       message: 'User found!',
       statusCode: 200,
-      userData: user,
+      user: user,
     };
   }
 }

@@ -6,7 +6,7 @@ import {redirect} from "next/navigation";
 
 export default async function Page({params: { lang }}: { params: { lang: Locale } }) {
     const session = await auth()
-    if (session) return redirect("/profile")
+    if (session?.user) return redirect("/profile")
 
     const dict = await getDictionary(lang);
 

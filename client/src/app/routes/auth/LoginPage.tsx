@@ -17,8 +17,9 @@ import * as yup from "yup";
 import { LoginInputs } from "@/inputs";
 import {login} from "@/api/login.ts";
 import {FormError} from "@/components/FormError.tsx";
+import { Locale } from "@root/i18n.config.ts";
 
-export default function LoginPage({ dict }: { dict: any }) {
+export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
     const [error, setError] = useState<string | undefined>("" as string);
     const [success, setSuccess] = useState<string | undefined>("" as string);
     const [isPending, startTransition] = useTransition();
@@ -38,7 +39,7 @@ export default function LoginPage({ dict }: { dict: any }) {
 
     const loginHandler: SubmitHandler<LoginInputs> = async () => {
         startTransition(async () => {
-            const res = await login(loginData)
+            const res = await login(loginData, lang)
 
             console.log(res)
 
@@ -49,14 +50,15 @@ export default function LoginPage({ dict }: { dict: any }) {
 
     return <main className="flex md:flex-1 h-full flex-col px-5 py-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 lg:m-0 justify-center items-center">
         <Title text={dict.page.login.title}/>
-        <form>
+
             {/*Credentials login*/}
-            <motion.div
-                initial={{x: "50%", opacity: 0}}
-                animate={{x: 0, opacity: 1}}
-                transition={{duration: 0.3, ease: "easeInOut"}}
-                className="flex flex-col w-full justify-center items-center"
-            >
+        <motion.div
+            initial={{x: "50%", opacity: 0}}
+            animate={{x: 0, opacity: 1}}
+            transition={{duration: 0.3, ease: "easeInOut"}}
+            className="flex flex-col w-full justify-center items-center"
+        >
+            <form>
                 <Input
                     label={dict.page.auth.input.email.label}
                     type="email"
@@ -99,30 +101,31 @@ export default function LoginPage({ dict }: { dict: any }) {
                 />
                 {error && <FormError text={error} error={true}/>}
                 {success && <FormError text={success} error={false}/>}
+            </form>
 
-                <div className="self-center w-full">
-                    <Button text={dict.page.login.button.login} onClick={handleSubmit(loginHandler)} className="w-full"/>
-                </div>
-                <div className="flex flex-row w-full justify-center items-center py-5">
-                    <div className="w-full h-0.5 rounded-full bg-gray"></div>
-                    <p className="whitespace-nowrap px-4 text-gray">{dict.page.login.socialLogin.text}</p>
-                    <div className="w-full h-0.5 rounded-full bg-gray"></div>
-                </div>
+            <div className="self-center w-full">
+                <Button text={dict.page.login.button.login} onClick={handleSubmit(loginHandler)} className="w-full"/>
+            </div>
+            <div className="flex flex-row w-full justify-center items-center py-5">
+                <div className="w-full h-0.5 rounded-full bg-gray"></div>
+                <p className="whitespace-nowrap px-4 text-gray">{dict.page.login.socialLogin.text}</p>
+                <div className="w-full h-0.5 rounded-full bg-gray"></div>
+            </div>
 
-                {/*Social Login*/}
-                <div className="flex justify-center gap-5">
-                    <SocialButton onClick={() => {
-                    }} icon={faGoogle}/>
-                    <SocialButton onClick={() => {
-                    }} icon={faGithub}/>
-                </div>
+            {/*Social Login*/}
+            <div className="flex justify-center gap-5">
+                <SocialButton onClick={() => {
+                }} icon={faGoogle}/>
+                <SocialButton onClick={() => {
+                }} icon={faGithub}/>
+            </div>
 
-                {/*Create account*/}
-                <div className="flex flex-row justify-center mt-5">
-                    <p className="mr-1">{dict.page.login.createAccount.text}</p>
-                    <LinkButton href="/register" target="_self" text={dict.page.login.createAccount.link}/>
-                </div>
-            </motion.div>
-        </form>
+            {/*Create account*/}
+            <div className="flex flex-row justify-center mt-5">
+                <p className="mr-1">{dict.page.login.createAccount.text}</p>
+                <LinkButton href="/register" target="_self" text={dict.page.login.createAccount.link}/>
+            </div>
+        </motion.div>
+
     </main>
 }

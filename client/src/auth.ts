@@ -2,7 +2,7 @@ import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import axios from "axios";
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const { auth, handlers, signIn, signOut } = NextAuth({
     secret: process.env.AUTH_SECRET ?? "secret",
     pages: {
         signIn: "/login",
@@ -39,10 +39,9 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         },
 
         async session({session, token}) {
-            session.user = token.user
-
             return {
                 ...session,
+                user: token.user,
                 tokens: token.tokens
             }
         }

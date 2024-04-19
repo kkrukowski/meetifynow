@@ -4,4 +4,12 @@ declare module "next-auth" {
         name: string;
         email: string;
     }
+
+    interface Session {
+        user: User;
+        tokens: {
+            accessToken: string;
+            refreshToken: string;
+        }
+    }
 }

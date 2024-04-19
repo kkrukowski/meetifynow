@@ -7,24 +7,18 @@ import Button from "@/components/Button.tsx";
 interface LoginButtonProps {
     mode?: "modal" | "redirect";
     asChild?: boolean;
+    onClick?: () => void;
     text: string;
 }
 
-export const LoginButton = ({mode = "modal", text}: LoginButtonProps) => {
+export const LoginButton = ({mode = "modal", text, onClick}: LoginButtonProps) => {
     const router = useRouter();
 
-    const onClick = () => {
+    const redirectToLoginPage = () => {
         router.push("/login")
     }
 
-    if (mode === "modal") {
-        return (
-            <p>TODO: Implement modal login</p>
-        );
-    }
-
-
     return (
-        <Button onClick={onClick} text={text} className="mt-0"/>
+        <Button onClick={mode == "redirect" ? redirectToLoginPage : onClick} text={text} className={mode == "modal" ? "w-full mt-5" : ""} />
     );
 }

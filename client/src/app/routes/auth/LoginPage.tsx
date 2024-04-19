@@ -18,6 +18,7 @@ import { LoginInputs } from "@/inputs";
 import {login} from "@/api/login.ts";
 import {FormError} from "@/components/FormError.tsx";
 import { Locale } from "@root/i18n.config.ts";
+import {LoginButton} from "@/components/Auth/LoginButton.tsx";
 
 export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
     const [error, setError] = useState<string | undefined>("" as string);
@@ -104,21 +105,22 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
             </form>
 
             <div className="self-center w-full">
-                <Button text={dict.page.login.button.login} onClick={handleSubmit(loginHandler)} className="w-full"/>
-            </div>
-            <div className="flex flex-row w-full justify-center items-center py-5">
-                <div className="w-full h-0.5 rounded-full bg-gray"></div>
-                <p className="whitespace-nowrap px-4 text-gray">{dict.page.login.socialLogin.text}</p>
-                <div className="w-full h-0.5 rounded-full bg-gray"></div>
+                <LoginButton onClick={handleSubmit(loginHandler)} text={dict.page.login.button.login} />
             </div>
 
-            {/*Social Login*/}
-            <div className="flex justify-center gap-5">
-                <SocialButton onClick={() => {
-                }} icon={faGoogle}/>
-                <SocialButton onClick={() => {
-                }} icon={faGithub}/>
-            </div>
+            {/*<div className="flex flex-row w-full justify-center items-center py-5">*/}
+            {/*    <div className="w-full h-0.5 rounded-full bg-gray"></div>*/}
+            {/*    <p className="whitespace-nowrap px-4 text-gray">{dict.page.login.socialLogin.text}</p>*/}
+            {/*    <div className="w-full h-0.5 rounded-full bg-gray"></div>*/}
+            {/*</div>*/}
+
+            {/*/!*Social Login*!/*/}
+            {/*<div className="flex justify-center gap-5">*/}
+            {/*    <SocialButton onClick={() => {*/}
+            {/*    }} icon={faGoogle}/>*/}
+            {/*    <SocialButton onClick={() => {*/}
+            {/*    }} icon={faGithub}/>*/}
+            {/*</div>*/}
 
             {/*Create account*/}
             <div className="flex flex-row justify-center mt-5">

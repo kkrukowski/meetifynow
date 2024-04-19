@@ -107,7 +107,12 @@
         "name": {
           "required": "Nazwa jest wymagana.",
           "min": "Nazwa musi mieć co najmniej 2 znaki."
-        }
+        },
+        "userExists": "Uzytkownik już istnieje!"
+      },
+      "success": {
+        "register": "Utworzono konto!",
+        "login": "Poprawnie zalogowano!"
       }
     },
     "createMeeting": {

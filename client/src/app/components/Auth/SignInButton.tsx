@@ -25,6 +25,6 @@ export const SignInButton = ({mode = "modal", text}: SignInButtonProps) => {
 
 
     return (
-        <Button onClick={onClick} text={text} className="mt-0"/>
+        <Button onClick={onClick} text={text} />
     );
 }

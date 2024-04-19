@@ -38,11 +38,22 @@ export default function RegisterPage({ dict }: { dict: any }) {
     } = useForm({ resolver: yupResolver(formSchema) });
 
     const registerHandler: SubmitHandler<RegisterInputs> = async () => {
+        setError("")
+        setSuccess("")
         startTransition(async () => {
             const res = await registerUserApi(registerData)
 
-            setError(res.error)
-            setSuccess(res.success)
+            console.log(res)
+
+            if(res.statusCode === 400 && res.message === "User already exists!") {
+                return setError(dict.page.auth.error.userExists)
+            }
+
+            if(res.statusCode === 201 && res.message === "User created") {
+                // Clear form
+                setRegisterData({ name: "", email: "", password: "" })
+                return setSuccess(dict.page.auth.success.register)
+            }
         })
     };
 
@@ -61,6 +72,7 @@ export default function RegisterPage({ dict }: { dict: any }) {
                     label={dict.page.auth.input.name.label}
                     type="text"
                     id="name"
+                    name="name"
                     onChange={(e: {
                         target: { value: React.SetStateAction<string> };
                     }) =>
@@ -75,11 +87,13 @@ export default function RegisterPage({ dict }: { dict: any }) {
                     error={!!errors.name}
                     errorText={errors.name?.message?.toString()}
                     disabled={isPending}
+                    value={registerData.name}
                 />
                 <Input
                     label={dict.page.auth.input.email.label}
                     type="text"
                     id="email"
+                    name="email"
                     onChange={(e: {
                         target: { value: React.SetStateAction<string> };
                     }) =>
@@ -94,11 +108,13 @@ export default function RegisterPage({ dict }: { dict: any }) {
                     error={!!errors.email}
                     errorText={errors.email?.message?.toString()}
                     disabled={isPending}
+                    value={registerData.email}
                 />
                 <Input
                     label={dict.page.auth.input.password.label}
                     type="password"
                     id="password"
+                    name="password"
                     onChange={(e: {
                         target: { value: React.SetStateAction<string> };
                     }) =>
@@ -113,6 +129,7 @@ export default function RegisterPage({ dict }: { dict: any }) {
                     error={!!errors.password}
                     errorText={errors.password?.message?.toString()}
                     disabled={isPending}
+                    value={registerData.password}
                 />
                 {error && <FormError text={error} error={true}/>}
                 {success && <FormError text={success} error={false}/>}
@@ -122,19 +139,19 @@ export default function RegisterPage({ dict }: { dict: any }) {
                             className="w-full"/>
                 </div>
 
-                <div className="flex flex-row w-full justify-center items-center py-5">
-                    <div className="w-full h-0.5 rounded-full bg-gray"></div>
-                    <p className="whitespace-nowrap px-4 text-gray">{dict.page.register.socialLogin.text}</p>
-                    <div className="w-full h-0.5 rounded-full bg-gray"></div>
-                </div>
+                {/*<div className="flex flex-row w-full justify-center items-center py-5">*/}
+                {/*    <div className="w-full h-0.5 rounded-full bg-gray"></div>*/}
+                {/*    <p className="whitespace-nowrap px-4 text-gray">{dict.page.register.socialLogin.text}</p>*/}
+                {/*    <div className="w-full h-0.5 rounded-full bg-gray"></div>*/}
+                {/*</div>*/}
 
-                {/*Social Login*/}
-                <div className="flex justify-center gap-5">
-                    <SocialButton onClick={() => {
-                    }} icon={faGoogle}/>
-                    <SocialButton onClick={() => {
-                    }} icon={faGithub}/>
-                </div>
+                {/*/!*Social Login*!/*/}
+                {/*<div className="flex justify-center gap-5">*/}
+                {/*    <SocialButton onClick={() => {*/}
+                {/*    }} icon={faGoogle}/>*/}
+                {/*    <SocialButton onClick={() => {*/}
+                {/*    }} icon={faGithub}/>*/}
+                {/*</div>*/}
 
                 {/*Create account*/}
                 <div className="flex flex-row justify-center mt-5">

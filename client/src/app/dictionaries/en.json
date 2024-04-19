@@ -107,7 +107,12 @@
         "name": {
           "required": "Name is required.",
           "min": "Name must be at least 2 characters long."
-        }
+        },
+        "userExists": "User already exists!"
+      },
+      "success": {
+        "register": "User registered successfully!",
+        "login": "User logged in successfully!"
       }
     },
     "createMeeting": {

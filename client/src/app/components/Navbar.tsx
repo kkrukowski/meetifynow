@@ -6,6 +6,8 @@ import { LoginButton } from "@/components/Auth/LoginButton";
 import {getDictionary} from "@/lib/dictionary.ts";
 import {auth} from "@src/auth.ts";
 import {redirect} from "next/navigation";
+import { UserDropdown } from "@/components/Auth/UserDropdown";
+import UserDropdownMenu from "@/components/Auth/UserDropdownMenu.tsx";
 
 export default async function Navbar({ lang }: { lang: Locale }) {
     const dict = await getDictionary(lang);
@@ -14,7 +16,7 @@ export default async function Navbar({ lang }: { lang: Locale }) {
     let isLogged = !!session?.user
 
   return (
-    <nav className="fixed top-0 w-full max-w-[1250px] p-5 md:p-8 flex align-center justify-between">
+    <nav className="fixed top-0 w-full max-w-[1250px] p-5 md:p-8 flex align-center justify-between items-center">
       <Link href={`/${lang}`}>
         <Image
           src={meetifyNowLogo}
@@ -26,7 +28,7 @@ export default async function Navbar({ lang }: { lang: Locale }) {
           priority
         />
       </Link>
-        {isLogged ? (<p>{session.user.name}</p>) : (<LoginButton text={dict.page.login.button.login} mode="redirect" />)}
+        {isLogged ? (<UserDropdownMenu sessionUser={session.user} lang={lang} />) : (<LoginButton text={dict.page.login.button.login} mode="redirect" />)}
     </nav>
   );
 }

@@ -81,6 +81,11 @@
       }
     },
     "auth": {
+      "userDropdownMenu": {
+        "profile": "Profil",
+        "createMeeting": "Utwórz spotkanie",
+        "logout": "Wyloguj się"
+      },
       "input": {
         "name": {
           "label": "Name",

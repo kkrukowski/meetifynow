@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument } from 'mongoose';
+import * as mongoose from 'mongoose';
+import { User } from './user.schema';
 
 @Schema()
 export class DateData {
@@ -12,8 +14,12 @@ export class DateData {
 
 @Schema()
 export class Answer {
-  @Prop({ type: String, required: true })
-  userId: string;
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    set: (userId: string) => (userId === '' ? undefined : userId),
+  })
+  userId: User;
 
   @Prop({ type: String, required: true })
   username: string;
@@ -36,18 +42,25 @@ export class Appointment {
   @Prop({ type: String, required: true })
   appointmentId: string;
 
+  @Prop({
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User',
+    set: (authorId: string) => (authorId === '' ? undefined : authorId),
+  })
+  authorId: User;
+
   @Prop({ type: String, required: true })
   meetName: string;
 
   @Prop({
     type: String,
-    set: (place) => (place === '' ? undefined : place),
+    set: (place: string) => (place === '' ? undefined : place),
   })
   place: string;
 
   @Prop({
     type: String,
-    set: (link) => (link === '' ? undefined : link),
+    set: (link: string) => (link === '' ? undefined : link),
   })
   link: string;
 

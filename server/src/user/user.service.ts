@@ -1,8 +1,9 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, ObjectId } from 'mongoose';
 import { User } from '../schemas/user.schema';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
+import { AddAppointmentDto } from './dto/add-appointment.dto';
 
 @Injectable()
 export class UserService {
@@ -23,6 +24,26 @@ export class UserService {
       statusCode: 201,
     };
   }
+
+  async addAppointment(id: ObjectId, addAppointmentDto: AddAppointmentDto) {
+    const user = await this.userModel.findOne({ _id: id });
+
+    if (!user) {
+      return {
+        message: 'User not found!',
+        statusCode: 404,
+      };
+    }
+
+    user.appointments.push(addAppointmentDto.appointmentId);
+    await user.save();
+
+    return {
+      message: 'Appointment added to user!',
+      statusCode: 200,
+    };
+  }
+
   findAll() {
     return `This action returns all user`;
   }

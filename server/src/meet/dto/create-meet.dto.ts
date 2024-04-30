@@ -4,6 +4,8 @@ export class CreateMeetDto {
   @IsNotEmpty()
   meetName: string;
 
+  authorId: string;
+
   place: string;
 
   link: string;

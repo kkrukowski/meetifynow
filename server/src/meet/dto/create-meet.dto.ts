@@ -1,10 +1,11 @@
 import { IsNotEmpty } from 'class-validator';
+import { ObjectId } from 'mongoose';
 
 export class CreateMeetDto {
   @IsNotEmpty()
   meetName: string;
 
-  authorId: string;
+  authorId: ObjectId;
 
   place: string;
 

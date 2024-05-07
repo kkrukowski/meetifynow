@@ -69,6 +69,9 @@ export class Appointment {
 
   @Prop({ type: [Answer] })
   answers: Answer[];
+
+  @Prop({ type: Date })
+  createdAt: Date;
 }
 
 export type MeetDocument = HydratedDocument<Appointment>;

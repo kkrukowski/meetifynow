@@ -17,7 +17,10 @@ export class User {
     type: [mongoose.Schema.Types.ObjectId],
     ref: 'Appointment',
   })
-  appointments: Appointment[];
+  appointments: mongoose.Schema.Types.ObjectId[];
+
+  @Prop({ type: Date })
+  createdAt: Date;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

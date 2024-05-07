@@ -9,7 +9,12 @@ import { AddAppointmentDto } from './dto/add-appointment.dto';
 export class UserService {
   constructor(@InjectModel(User.name) private userModel: Model<User>) {}
   async create(createUserDto: CreateUserDto) {
-    const newUser = new this.userModel(createUserDto);
+    const userData = {
+      ...createUserDto,
+      createdAt: new Date(),
+    };
+
+    const newUser = new this.userModel(userData);
     const createdUser = await newUser.save();
 
     if (!createdUser) {
@@ -26,6 +31,8 @@ export class UserService {
   }
 
   async addAppointment(id: ObjectId, addAppointmentDto: AddAppointmentDto) {
+    console.log('add new appointment');
+
     const user = await this.userModel.findOne({ _id: id });
 
     if (!user) {
@@ -36,6 +43,7 @@ export class UserService {
     }
 
     user.appointments.push(addAppointmentDto.appointmentId);
+
     await user.save();
 
     return {

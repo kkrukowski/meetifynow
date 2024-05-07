@@ -10,6 +10,9 @@ import { customAlphabet } from 'nanoid';
 import { Appointment, DateData } from '../schemas/appointment.schema';
 import { CreateMeetDto } from './dto/create-meet.dto';
 import { NewAnswerDto } from './dto/new-answer.dto';
+import { UserService } from '../user/user.service';
+import { AddAppointmentDto } from '../user/dto/add-appointment.dto';
+const { ObjectId } = require('mongodb');
 
 const nanoid = customAlphabet(
   '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -20,15 +23,27 @@ const nanoid = customAlphabet(
 export class MeetService {
   constructor(
     @InjectModel(Appointment.name) private meetModel: Model<Appointment>,
+    readonly userService: UserService,
   ) {}
 
   async create(@Body() createMeetDto: CreateMeetDto): Promise<Appointment> {
     const meetData = {
       ...createMeetDto,
       appointmentId: nanoid(),
+      createdAt: new Date(),
     };
 
+    console.log(meetData);
+
     const createdMeet = await this.meetModel.create(meetData);
+
+    if (meetData.authorId) {
+      const meetId: AddAppointmentDto = {
+        appointmentId: createdMeet.id,
+      };
+
+      await this.userService.addAppointment(meetData.authorId, meetId);
+    }
 
     return createdMeet;
   }

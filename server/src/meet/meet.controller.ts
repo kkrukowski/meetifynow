@@ -31,6 +31,11 @@ export class MeetController {
     return this.meetService.findOne(id);
   }
 
+  @Get('db/:id')
+  findOneByDbId(@Param('id') id: string) {
+    return this.meetService.findOneByDbId(id);
+  }
+
   @Patch(':meetId')
   addAnswer(
     @Param('meetId') meetId: string,

@@ -33,8 +33,6 @@ export class MeetService {
       createdAt: new Date(),
     };
 
-    console.log(meetData);
-
     const createdMeet = await this.meetModel.create(meetData);
 
     if (meetData.authorId) {
@@ -58,6 +56,14 @@ export class MeetService {
 
   async findOne(id: string): Promise<Appointment> {
     const meet = await this.meetModel.findOne({ appointmentId: id });
+
+    if (!meet) throw new NotFoundException('Meet not found.');
+
+    return meet;
+  }
+
+  async findOneByDbId(id: string): Promise<Appointment> {
+    const meet = await this.meetModel.findOne({ _id: id });
 
     if (!meet) throw new NotFoundException('Meet not found.');
 

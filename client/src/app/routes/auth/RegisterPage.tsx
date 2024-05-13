@@ -27,7 +27,7 @@ export default function RegisterPage({ dict }: { dict: any }) {
 
     const formSchema = yup.object().shape({
         email: yup.string().email(dict && dict.page.auth.error.email.email).required(dict && dict.page.auth.error.email.required),
-        password: yup.string().required(dict && dict.page.auth.error.password.required).min(6, dict && dict.page.auth.error.password.min),
+        password: yup.string().required(dict && dict.page.auth.error.password.required).min(8, dict && dict.page.auth.error.password.min).matches(/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$ %^&*-.]).{8,}$/, dict && dict.page.auth.error.password.match),
         name: yup.string().required(dict && dict.page.auth.error.name.required).min(2, dict && dict.page.auth.error.name.min),
     });
 
@@ -42,8 +42,6 @@ export default function RegisterPage({ dict }: { dict: any }) {
         setSuccess("")
         startTransition(async () => {
             const res = await registerUserApi(registerData)
-
-            console.log(res)
 
             if(res.statusCode === 400 && res.message === "User already exists!") {
                 return setError(dict.page.auth.error.userExists)
@@ -136,7 +134,7 @@ export default function RegisterPage({ dict }: { dict: any }) {
 
                 <div className="self-center w-full">
                     <Button text={dict.page.register.button.register} onClick={handleSubmit(registerHandler)}
-                            className="w-full"/>
+                            className="w-full mt-5"/>
                 </div>
 
                 {/*<div className="flex flex-row w-full justify-center items-center py-5">*/}

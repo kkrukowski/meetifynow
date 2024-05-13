@@ -96,7 +96,7 @@
           "placeholder": "nazwa@domena.pl"
         },
         "password": {
-          "label": "Password",
+          "label": "Hasło",
           "placeholder": "******"
         }
       },
@@ -107,7 +107,8 @@
         },
         "password": {
           "required": "Hasło jest wymagane.",
-          "min": "Hasło musi mieć co najmniej 6 znaków."
+          "min": "Hasło musi mieć co najmniej 8 znaków.",
+          "match": "Hasło musi zawierać co najmniej jedną dużą literę, małą literę, cyfrę i znak specjalny."
         },
         "name": {
           "required": "Nazwa jest wymagana.",

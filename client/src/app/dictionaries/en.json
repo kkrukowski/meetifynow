@@ -107,7 +107,8 @@
         },
         "password": {
           "required": "Password is required.",
-          "min": "Password must be at least 6 characters long."
+          "min": "Password must be at least 8 characters long.",
+          "match": "The password must contain at least one uppercase letter, a lowercase letter, a number and a special character."
         },
         "name": {
           "required": "Name is required.",

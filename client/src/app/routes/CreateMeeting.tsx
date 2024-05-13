@@ -395,9 +395,12 @@ export default function CreateMeeting({
         dates: dailyTimeRanges,
       }
 
+      console.log(meetData)
+
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/new`, meetData
       );
+
 
       const meetId = response.data.appointmentId;
       const meetUrl = `/meet/${meetId}`;

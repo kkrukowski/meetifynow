@@ -56,13 +56,13 @@ export class Appointment {
     type: String,
     set: (place: string) => (place === '' ? undefined : place),
   })
-  place: string;
+  meetPlace: string;
 
   @Prop({
     type: String,
     set: (link: string) => (link === '' ? undefined : link),
   })
-  link: string;
+  meetLink: string;
 
   @Prop({ type: [DayTimes], required: true })
   dates: DayTimes[];

@@ -11,6 +11,7 @@ import { CreateMeetDto } from './dto/create-meet.dto';
 import { NewAnswerDto } from './dto/new-answer.dto';
 import { UpdateMeetDto } from './dto/update-meet.dto';
 import { MeetService } from './meet.service';
+import { SearchManyIdDto } from './dto/search-many-id.dto';
 
 @Controller('meet')
 export class MeetController {
@@ -32,8 +33,14 @@ export class MeetController {
   }
 
   @Get('db/:id')
-  findOneByDbId(@Param('id') id: string) {
+  findOneByDbId(@Param('id') id: string[]) {
     return this.meetService.findOneByDbId(id);
+  }
+
+  @Post('db/many')
+  findMany(@Body() req: any) {
+    const id = req.data.id;
+    return this.meetService.findMany(id);
   }
 
   @Patch(':meetId')

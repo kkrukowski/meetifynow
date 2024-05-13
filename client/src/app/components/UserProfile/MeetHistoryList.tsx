@@ -7,12 +7,12 @@ export default function MeetHistoryList ({meetList}: { meetList: any[] }) {
     return (
         <div>
             <Heading text={"Poprzednie spotkania"} />
-            <section className="max-h-[300px]">
+            <ul className="max-h-[350px] overflow-auto">
+                {meetList.map((meet) => (
+                    <MeetHistoryItem meetId={meet.appointmentId} meetName={meet.meetName} meetPlace={meet.meetPlace} />
+                ))}
+            </ul>
 
-            </section>
-            {meetList.map((meet) => (
-                <MeetHistoryItem />
-            ))}
         </div>
     )
 }

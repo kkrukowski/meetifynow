@@ -1,9 +1,9 @@
 import {auth} from "@src/auth";
 import Title from "@/components/Title.tsx";
-import {LogoutButton} from "@/components/Auth/LogoutButton.tsx";
 import {Locale} from "@root/i18n.config.ts";
 import MeetHistoryList from "@/components/UserProfile/MeetHistoryList.tsx";
 import UserInfoField from "@/components/UserProfile/UserInfoField.tsx";
+import Heading from "@/components/Heading.tsx";
 
 export default async function UserProfile({ lang, dict, meetHistory }: { lang: Locale, dict: any, meetHistory: any }) {
     const session = await auth()
@@ -15,8 +15,11 @@ export default async function UserProfile({ lang, dict, meetHistory }: { lang: L
           <main className="flex h-full">
               {/* User Info */}
               <section>
-                  <UserInfoField fieldName={"Nazwa"} fieldValue={session.user.name} />
-                  <UserInfoField fieldName={"Nazwa"} fieldValue={session.user.name} />
+                  <Heading text={"Informacje o użytkowniku"} />
+                  <div>
+                    <UserInfoField fieldName={"Nazwa"} fieldValue={session.user.name} />
+                    <UserInfoField fieldName={"Email"} fieldValue={session.user.email} />
+                  </div>
               </section>
 
               <div className="h-[200px] w-0.5 bg-dark rounded-full mx-10"></div>

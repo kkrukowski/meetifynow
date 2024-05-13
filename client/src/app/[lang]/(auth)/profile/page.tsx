@@ -14,9 +14,7 @@ export default async function Page({params: { lang }}: { params: { lang: Locale 
 
     const userMeetHistory = await getUserMeetHistory(session.user._id, accessToken);
 
-    const userMeetData = await Promise.all(userMeetHistory.map(async (meet) => {
-        return await getMeetData(meet, accessToken)
-    }));
+    const userMeetData = await getMeetData(userMeetHistory, accessToken)
 
     const dict = await getDictionary(lang);
 

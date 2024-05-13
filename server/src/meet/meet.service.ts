@@ -12,6 +12,7 @@ import { CreateMeetDto } from './dto/create-meet.dto';
 import { NewAnswerDto } from './dto/new-answer.dto';
 import { UserService } from '../user/user.service';
 import { AddAppointmentDto } from '../user/dto/add-appointment.dto';
+import { SearchManyIdDto } from './dto/search-many-id.dto';
 const { ObjectId } = require('mongodb');
 
 const nanoid = customAlphabet(
@@ -62,8 +63,16 @@ export class MeetService {
     return meet;
   }
 
-  async findOneByDbId(id: string): Promise<Appointment> {
+  async findOneByDbId(id: string[]): Promise<Appointment> {
     const meet = await this.meetModel.findOne({ _id: id });
+
+    if (!meet) throw new NotFoundException('Meet not found.');
+
+    return meet;
+  }
+
+  async findMany(id: string[]): Promise<Appointment[]> {
+    const meet = await this.meetModel.find({ _id: id });
 
     if (!meet) throw new NotFoundException('Meet not found.');
 

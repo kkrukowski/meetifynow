@@ -72,7 +72,7 @@ export class MeetService {
   }
 
   async findMany(id: string[]): Promise<Appointment[]> {
-    const meet = await this.meetModel.find({ _id: id });
+    const meet = await this.meetModel.find({ _id: id }).sort({ createdAt: -1 });
 
     if (!meet) throw new NotFoundException('Meet not found.');
 

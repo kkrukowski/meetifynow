@@ -13,6 +13,8 @@ export const LinkButton = ({
     className,
     target = "_blank",
 }: LinkButtonProps) => {
+    console.log(href, text, className, target);
+
   return (
     <Link
       href={href}

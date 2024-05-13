@@ -18,7 +18,7 @@ import Button from "@/components/Button";
 import CopyLinkButton from "@/components/CopyLinkButton";
 import Heading from "@/components/Heading";
 import Input from "@/components/Input";
-import LinkButton from "@/components/LinkButton";
+import { LinkButton } from "@/components/LinkButton";
 import Title from "@/components/Title";
 
 // Utils
@@ -26,7 +26,6 @@ import { getAvailabilityInfo } from "@/utils/meeting/answer/getAvailabilityInfo"
 // import { getUnavailableUsersInfo } from "@/utils/meeting/answer/getUnavailableUsersInfo";
 import useMouseDown from "@/utils/useIsMouseDown";
 import { Locale } from "@root/i18n.config";
-
 export default function AnswerMeeting({
   lang,
   dict,
@@ -600,7 +599,7 @@ export default function AnswerMeeting({
                     onChange={(e) => setUsername(e.target.value)}
                     value={username}
                     placeholder={dict.page.answerMeeting.input.name.placeholder}
-                  />
+                    name="name"/>
                 </div>
               ) : null}
               <div

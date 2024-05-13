@@ -9,7 +9,7 @@ import {
 import {Locale} from "@root/i18n.config.ts";
 import {getDictionary} from "@/lib/dictionary.ts";
 
-import { FaUser, FaAngleDown } from "react-icons/fa6";
+import { FaUser, FaAngleDown, FaPlus } from "react-icons/fa6";
 import Link from "next/link";
 import {LogoutButton} from "@/components/Auth/LogoutButton.tsx";
 import {logout} from "@/api/logout.ts";
@@ -38,6 +38,12 @@ export default async function UserDropdownMenu(props : UserDropdownMenuProps) {
                     <Link href={`/${props.lang}/profile`} className="flex items-center">
                         <FaUser className="mr-2" />
                         <span>{dict.page.auth.userDropdownMenu.profile}</span>
+                    </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem className="cursor-pointer text-base">
+                    <Link href={`/${props.lang}/meet/new/`} className="flex items-center">
+                        <FaPlus className="mr-2" />
+                        <span>{dict.page.auth.userDropdownMenu.createMeeting}</span>
                     </Link>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />

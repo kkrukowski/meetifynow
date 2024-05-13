@@ -52,6 +52,18 @@
         }
       }
     },
+    "profile": {
+        "title": "Profil użytkownika",
+        "userInfo": {
+          "title": "Twoje informacje",
+          "name": "Nazwa",
+          "email": "Email"
+        },
+        "meetings": {
+          "title": "Twoje spotkania",
+          "noMeetings": "Nie masz żadnych spotkań."
+        }
+    },
     "login": {
       "title": "Zaloguj się",
       "button": {

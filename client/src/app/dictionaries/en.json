@@ -52,6 +52,18 @@
         }
       }
     },
+    "profile": {
+      "title": "User profile",
+      "userInfo": {
+        "title": "User information",
+        "name": "Name",
+        "email": "Email"
+      },
+      "meetings": {
+        "title": "Your meetings",
+        "noMeetings": "You haven't created any meetings yet."
+      }
+    },
     "login": {
       "title": "Log in",
       "button": {
@@ -82,9 +94,9 @@
     },
     "auth": {
       "userDropdownMenu": {
-        "profile": "Profil",
-        "createMeeting": "Utwórz spotkanie",
-        "logout": "Wyloguj się"
+        "profile": "Profile",
+        "createMeeting": "Create meeting",
+        "logout": "Logout"
       },
       "input": {
         "name": {

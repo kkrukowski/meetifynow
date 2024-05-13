@@ -11,14 +11,14 @@ export default async function UserProfile({ lang, dict, meetHistory }: { lang: L
 
   return (
       <div className="flex flex-1 flex-col justify-center items-center h-full">
-          <Title text="Profil użytkownika"/>
+          <Title text={dict.page.profile.title}/>
           <main className="flex h-full">
               {/* User Info */}
               <section>
-                  <Heading text={"Informacje o użytkowniku"} />
+                  <Heading text={dict.page.profile.userInfo.title} />
                   <div>
-                    <UserInfoField fieldName={"Nazwa"} fieldValue={session.user.name} />
-                    <UserInfoField fieldName={"Email"} fieldValue={session.user.email} />
+                    <UserInfoField fieldName={dict.page.profile.userInfo.name} fieldValue={session.user.name} />
+                    <UserInfoField fieldName={dict.page.profile.userInfo.email} fieldValue={session.user.email} />
                   </div>
               </section>
 
@@ -26,7 +26,7 @@ export default async function UserProfile({ lang, dict, meetHistory }: { lang: L
 
               {/* Meet History */}
               <section>
-                  { meetHistory == null ? <p>Brak spotkań.</p> : <MeetHistoryList meetList={meetHistory}/> }
+                  { meetHistory == null ? <p>{dict.page.profile.meetings.noMeetings}</p> : <MeetHistoryList meetList={meetHistory} title={dict.page.profile.meetings.title}/> }
               </section>
           </main>
       </div>

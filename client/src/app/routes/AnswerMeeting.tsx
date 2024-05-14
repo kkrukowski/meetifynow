@@ -53,7 +53,7 @@ export default function AnswerMeeting({
   }
 
   // Auth
-  const isUserLoggedIn = !!session.user;
+  const isUserLoggedIn = !!session?.user;
   const [selectionMode, setSelectionMode] = useState(false);
   const [lookedUpDatetime, setLookedUpDatetime] = useState<number>();
   const [lookedUpDate, setLookedUpDate] = useState<string>();

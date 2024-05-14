@@ -1,13 +1,9 @@
-export const getUnavailableUsersInfo = (answers: any) => {
+export const getUnavailableUsersInfo = (answers: any, availableUsers: any[]) => {
   const unavailableUsers = answers.filter(
-    (answer: any) => answer.dates.length === 0
-  );
+    (answer: any) => !availableUsers.find((user: any) => user.userData.userId === answer._id)
+  )
 
-  const unavailableUsersInfo = unavailableUsers.map((user: any) => ({
-    date: null,
-    userData: { userId: user.userId, username: user.username },
-    answerData: { isOnline: null },
-  }));
+  console.log(unavailableUsers)
 
-  return unavailableUsersInfo;
+  return unavailableUsers;
 };

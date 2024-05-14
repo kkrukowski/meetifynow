@@ -26,6 +26,7 @@ import { getAvailabilityInfo } from "@/utils/meeting/answer/getAvailabilityInfo"
 // import { getUnavailableUsersInfo } from "@/utils/meeting/answer/getUnavailableUsersInfo";
 import useMouseDown from "@/utils/useIsMouseDown";
 import { Locale } from "@root/i18n.config";
+import {getUnavailableUsersInfo} from "@/utils/meeting/answer/getUnavailableUsersInfo.ts";
 export default function AnswerMeeting({
   lang,
   dict,
@@ -65,7 +66,6 @@ export default function AnswerMeeting({
   const meetLink = meetingData.meetLink;
   const answersCount = answers.length;
   const datesInfo = meetingData.dates;
-  // const [unavailableUsersInfo, setUnavailableUsersInfo] = useState<any>([]);
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);
   const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
   const currentUrl = pathname;
@@ -77,11 +77,6 @@ export default function AnswerMeeting({
 
   // Handling mouse down
   const isMouseDown = useMouseDown();
-
-  // Availability info
-  // useEffect(() => {
-  //   setUnavailableUsersInfo(getUnavailableUsersInfo(answers));
-  // }, [answers]);
 
   const availabilityInfo = getAvailabilityInfo(answers);
 
@@ -455,18 +450,22 @@ export default function AnswerMeeting({
           )
         );
 
-        // const listOfUnavailableUsers = unavailableUsersInfo?.map(
-        //   (userData: any) => (
-        //     <li key={userData.userData.userId} className="text-gray">
-        //       <s>{userData.userData.username}</s>
-        //     </li>
-        //   )
-        // );
+        const unavailableUsers = getUnavailableUsersInfo(answers, availableUsers);
+
+        const listOfUnavailableUsers = unavailableUsers?.map(
+          (userData: any) => (
+              <li key={userData._id} className="text-gray flex items-center">
+                <span className="block h-3 w-3 rounded-full bg-gray mr-2"></span>
+                <s>{userData.username}</s>
+              </li>
+          )
+        );
 
         const listOfAvailability = (
-          <ul>
+            <ul>
             {listOfOnlineAvailableUsers}
             {listOfOfflineAvailableUsers}
+            {listOfUnavailableUsers}
           </ul>
         );
 

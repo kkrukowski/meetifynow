@@ -575,7 +575,7 @@ export default function AnswerMeeting({
   });
 
   return (
-    <main className="flex md:flex-1 flex-col lg:justify-center px-5 pb-10 pt-20 md:pt-28 w-[356px] md:w-auto lg:w-[900px]">
+    <main className="flex md:flex-1 flex-col px-5 py-10 pt-24 lg:p-20 lg:pt-28 h-smd:pt-30 lg:m-0 w-[356px] md:w-auto lg:w-[900px]">
       <Title text={meetName} />
       {/* Meeting details */}
       {(meetPlace || meetLink) && (
@@ -611,7 +611,7 @@ export default function AnswerMeeting({
 
         <section className="flex flex-col time__selection lg:w-1/2">
           {isMobile && (
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center mb-5">
               <Button text={toggleButtonName} onClick={toggleAnsweringMode} />
             </div>
           )}

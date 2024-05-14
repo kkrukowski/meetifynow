@@ -10,9 +10,9 @@ export default async function UserProfile({ lang, dict, meetHistory }: { lang: L
     if(!session?.user) return null
 
   return (
-      <div className="flex flex-1 flex-col justify-center items-center h-full">
+      <main className="flex flex-1 flex-col justify-center items-center h-full px-5 pb-10 pt-20 md:pt-28">
           <Title text={dict.page.profile.title}/>
-          <main className="flex h-full">
+          <section className="flex-col lg:flex-row flex h-full">
               {/* User Info */}
               <section>
                   <Heading text={dict.page.profile.userInfo.title} />
@@ -22,13 +22,13 @@ export default async function UserProfile({ lang, dict, meetHistory }: { lang: L
                   </div>
               </section>
 
-              <div className="h-[200px] w-0.5 bg-dark rounded-full mx-10"></div>
+              <div className="h-0.5 lg:h-[200px] w-full lg:w-0.5 bg-dark rounded-full my-10 lg:mx-10"></div>
 
               {/* Meet History */}
               <section>
                   { meetHistory == null ? <p>{dict.page.profile.meetings.noMeetings}</p> : <MeetHistoryList meetList={meetHistory} title={dict.page.profile.meetings.title}/> }
               </section>
-          </main>
-      </div>
+          </section>
+      </main>
   );
 }

@@ -35,7 +35,7 @@ export default async function UserDropdownMenu(props : UserDropdownMenuProps) {
             </DropdownMenuTrigger>
             <DropdownMenuContent>
                 <DropdownMenuItem className="cursor-pointer text-base">
-                    <Link href={`/${props.lang}/profile`} className="flex items-center">
+                    <Link href={`/${props.lang}/profile`} className="flex items-center w-full">
                         <FaUser className="mr-2" />
                         <span>{dict.page.auth.userDropdownMenu.profile}</span>
                     </Link>

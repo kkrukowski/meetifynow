@@ -5,7 +5,7 @@ import Link from "next/link";
 export default function MeetHistoryItem ({ meetId, meetName, meetPlace }: { meetId: string, meetName: string, meetPlace: string }) {
     return (
         <li key={meetId}>
-            <Link href={`/meet/` + meetId} className="flex flex-col w-[500px] mb-2 rounded-lg p-4 bg-light-hover hover:bg-light-primary active:bg-light-active transition-colors">
+            <Link href={`/meet/` + meetId} className="flex flex-col w-[356px] md:w-[500px] mb-2 rounded-lg p-4 bg-light-hover hover:bg-light-primary active:bg-light-active transition-colors">
                 <Subheading text={meetName} />
 
                 {/* Meet place */}

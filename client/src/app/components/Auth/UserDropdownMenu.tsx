@@ -2,7 +2,6 @@ import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
-    DropdownMenuLabel,
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
@@ -11,8 +10,6 @@ import {getDictionary} from "@/lib/dictionary.ts";
 
 import { FaUser, FaAngleDown, FaPlus } from "react-icons/fa6";
 import Link from "next/link";
-import {LogoutButton} from "@/components/Auth/LogoutButton.tsx";
-import {logout} from "@/api/logout.ts";
 import {DropdownLogoutButton} from "@/components/Auth/Dropdown/DropdownLogoutButton.tsx";
 
 type UserDropdownMenuProps = {
@@ -22,10 +19,6 @@ type UserDropdownMenuProps = {
 
 export default async function UserDropdownMenu(props : UserDropdownMenuProps) {
     const dict = await getDictionary(props.lang);
-
-    const logoutHandler = async () => {
-        await logout()
-    }
 
     return (
         <DropdownMenu>

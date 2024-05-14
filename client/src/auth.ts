@@ -2,6 +2,7 @@ import NextAuth from "next-auth"
 import Credentials from "next-auth/providers/credentials"
 import axios from "axios";
 
+// @ts-ignore
 export const { auth, handlers, signIn, signOut } = NextAuth({
     secret: process.env.AUTH_SECRET ?? "secret",
     pages: {
@@ -32,13 +33,13 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
         }
     })],
     callbacks: {
-        async jwt({token, user}) {
+        async jwt({token, user}: {token: any, user: any}) {
             if (user) return { ...token, ...user }
 
             return token
         },
 
-        async session({session, token}) {
+        async session({session, token}: {session: any, token: any}) {
             return {
                 ...session,
                 user: token.user,

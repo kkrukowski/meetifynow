@@ -7,11 +7,11 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import React, { useState, useTransition } from "react";
 import { motion } from "framer-motion";
 import Button from "@/components/Button.tsx";
-import {SocialButton} from "@/components/Auth/SocialButton.tsx";
-import {
-    faGithub,
-    faGoogle
-} from "@fortawesome/free-brands-svg-icons";
+// import {SocialButton} from "@/components/Auth/SocialButton.tsx";
+// import {
+//     faGithub,
+//     faGoogle
+// } from "@fortawesome/free-brands-svg-icons";
 import { LinkButton } from "@/components/LinkButton.tsx";
 import * as yup from "yup";
 import { RegisterInputs } from "@/inputs";

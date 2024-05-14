@@ -5,8 +5,6 @@ import meetifyNowLogo from "../assets/imgs/meetifynow-logo.webp";
 import { LoginButton } from "@/components/Auth/LoginButton";
 import {getDictionary} from "@/lib/dictionary.ts";
 import {auth} from "@src/auth.ts";
-import {redirect} from "next/navigation";
-import { UserDropdown } from "@/components/Auth/UserDropdown";
 import UserDropdownMenu from "@/components/Auth/UserDropdownMenu.tsx";
 
 export default async function Navbar({ lang }: { lang: Locale }) {

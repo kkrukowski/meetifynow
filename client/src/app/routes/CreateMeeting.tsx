@@ -509,6 +509,7 @@ export default function CreateMeeting({
               >
                 <Input
                   label={dict.page.createMeeting.input.meeting__name.label}
+                  name="meeting__name"
                   type="text"
                   id="meeting__name"
                   register={register}
@@ -529,6 +530,7 @@ export default function CreateMeeting({
                 />
                 <Input
                   label={dict.page.createMeeting.input.meeting__place.label}
+                  name="meeting__place"
                   type="text"
                   id="meeting__place"
                   register={register}
@@ -548,6 +550,7 @@ export default function CreateMeeting({
                 />
                 <Input
                   label={dict.page.createMeeting.input.meeting__link.label}
+                  name="meeting__link"
                   type="text"
                   id="meeting__link"
                   register={register}

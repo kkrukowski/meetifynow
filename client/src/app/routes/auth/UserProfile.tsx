@@ -5,7 +5,7 @@ import MeetHistoryList from "@/components/UserProfile/MeetHistoryList.tsx";
 import UserInfoField from "@/components/UserProfile/UserInfoField.tsx";
 import Heading from "@/components/Heading.tsx";
 
-export default async function UserProfile({ lang, dict, meetHistory }: { lang: Locale, dict: any, meetHistory: any }) {
+export default async function UserProfile({ dict, meetHistory }: { lang: Locale, dict: any, meetHistory: any }) {
     const session = await auth()
     if(!session?.user) return null
 

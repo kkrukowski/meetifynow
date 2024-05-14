@@ -2,7 +2,7 @@ import "@testing-library/jest-dom/vitest";
 import { render, screen } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
 import Button from "../components/Button";
-import LinkButton from "../components/LinkButton";
+import {LinkButton} from "../components/LinkButton";
 
 describe("Button", () => {
   test("renders Button with provided text, onClick, and className", () => {

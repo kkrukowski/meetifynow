@@ -6,12 +6,12 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { SubmitHandler, useForm } from "react-hook-form";
 import React, { useState, useTransition } from "react";
 import { motion } from "framer-motion";
-import Button from "@/components/Button.tsx";
-import {SocialButton} from "@/components/Auth/SocialButton.tsx";
-import {
-    faGithub,
-    faGoogle
-} from "@fortawesome/free-brands-svg-icons";
+    // import Button from "@/components/Button.tsx";
+    // import {SocialButton} from "@/components/Auth/SocialButton.tsx";
+    // import {
+    //     faGithub,
+    //     faGoogle
+    // } from "@fortawesome/free-brands-svg-icons";
 import { LinkButton } from "@/components/LinkButton.tsx";
 import * as yup from "yup";
 import { LoginInputs } from "@/inputs";
@@ -42,10 +42,8 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
         startTransition(async () => {
             const res = await login(loginData, lang)
 
-            console.log(res)
-
-            // setError(res.error)
-            // setSuccess(res.success)
+            setError(res.error)
+            setSuccess(res.success)
         })
     };
 

@@ -52,6 +52,87 @@
         }
       }
     },
+    "profile": {
+      "title": "User profile",
+      "userInfo": {
+        "title": "User information",
+        "name": "Name",
+        "email": "Email"
+      },
+      "meetings": {
+        "title": "Your meetings",
+        "noMeetings": "You haven't created any meetings yet."
+      }
+    },
+    "login": {
+      "title": "Log in",
+      "button": {
+        "login": "Log in",
+        "forgotPassword": "Forgot password?",
+        "rememberMe": "Remember me"
+      },
+      "socialLogin": {
+        "text": "Or log in with"
+      },
+      "createAccount": {
+        "text": "Don't have an account yet?",
+        "link": "Create one now!"
+      }
+    },
+    "register": {
+      "title": "Register",
+      "button": {
+        "register": "Create an account"
+      },
+      "socialLogin": {
+        "text": "Or register with"
+      },
+      "logIn": {
+        "text": "Already have an account?",
+        "link": "Log in!"
+      }
+    },
+    "auth": {
+      "userDropdownMenu": {
+        "profile": "Profile",
+        "createMeeting": "Create meeting",
+        "logout": "Logout"
+      },
+      "input": {
+        "name": {
+          "label": "Name",
+          "placeholder": "John Doe"
+        },
+        "email": {
+          "label": "Email",
+          "placeholder": "name@domain.com"
+        },
+        "password": {
+          "label": "Password",
+          "placeholder": "******"
+        }
+      },
+      "error": {
+        "email": {
+          "required": "Email is required.",
+          "email": "Email is incorrect."
+        },
+        "password": {
+          "required": "Password is required.",
+          "min": "Password must be at least 8 characters long.",
+          "match": "The password must contain at least one uppercase letter, a lowercase letter, a number and a special character."
+        },
+        "name": {
+          "required": "Name is required.",
+          "min": "Name must be at least 2 characters long."
+        },
+        "userExists": "User already exists!"
+      },
+      "success": {
+        "register": "User registered successfully!",
+        "login": "User logged in successfully!"
+      }
+    },
     "createMeeting": {
       "title": "Create a new meeting",
       "createButton": "Create meeting",

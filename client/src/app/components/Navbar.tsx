@@ -2,9 +2,19 @@ import { Locale } from "@root/i18n.config";
 import Image from "next/image";
 import Link from "next/link";
 import meetifyNowLogo from "../assets/imgs/meetifynow-logo.webp";
-export default function Navbar({ lang }: { lang: Locale }) {
+import { LoginButton } from "@/components/Auth/LoginButton";
+import {getDictionary} from "@/lib/dictionary.ts";
+import {auth} from "@src/auth.ts";
+import UserDropdownMenu from "@/components/Auth/UserDropdownMenu.tsx";
+
+export default async function Navbar({ lang }: { lang: Locale }) {
+    const dict = await getDictionary(lang);
+
+    const session = await auth()
+    let isLogged = !!session?.user
+
   return (
-    <nav className="absolute left-0 top-0 w-full p-5 md:p-8 flex align-center">
+    <nav className="fixed top-0 w-full max-w-[1250px] p-5 md:p-8 flex align-center justify-between items-center">
       <Link href={`/${lang}`}>
         <Image
           src={meetifyNowLogo}
@@ -16,6 +26,7 @@ export default function Navbar({ lang }: { lang: Locale }) {
           priority
         />
       </Link>
+        {isLogged ? (<UserDropdownMenu sessionUser={session.user} lang={lang} />) : (<LoginButton text={dict.page.login.button.login} mode="redirect" />)}
     </nav>
   );
 }

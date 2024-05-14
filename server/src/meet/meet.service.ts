@@ -10,6 +10,10 @@ import { customAlphabet } from 'nanoid';
 import { Appointment, DateData } from '../schemas/appointment.schema';
 import { CreateMeetDto } from './dto/create-meet.dto';
 import { NewAnswerDto } from './dto/new-answer.dto';
+import { UserService } from '../user/user.service';
+import { AddAppointmentDto } from '../user/dto/add-appointment.dto';
+import { SearchManyIdDto } from './dto/search-many-id.dto';
+const { ObjectId } = require('mongodb');
 
 const nanoid = customAlphabet(
   '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -20,15 +24,25 @@ const nanoid = customAlphabet(
 export class MeetService {
   constructor(
     @InjectModel(Appointment.name) private meetModel: Model<Appointment>,
+    readonly userService: UserService,
   ) {}
 
   async create(@Body() createMeetDto: CreateMeetDto): Promise<Appointment> {
     const meetData = {
       ...createMeetDto,
       appointmentId: nanoid(),
+      createdAt: new Date(),
     };
 
     const createdMeet = await this.meetModel.create(meetData);
+
+    if (meetData.authorId) {
+      const meetId: AddAppointmentDto = {
+        appointmentId: createdMeet.id,
+      };
+
+      await this.userService.addAppointment(meetData.authorId, meetId);
+    }
 
     return createdMeet;
   }
@@ -43,6 +57,22 @@ export class MeetService {
 
   async findOne(id: string): Promise<Appointment> {
     const meet = await this.meetModel.findOne({ appointmentId: id });
+
+    if (!meet) throw new NotFoundException('Meet not found.');
+
+    return meet;
+  }
+
+  async findOneByDbId(id: string[]): Promise<Appointment> {
+    const meet = await this.meetModel.findOne({ _id: id });
+
+    if (!meet) throw new NotFoundException('Meet not found.');
+
+    return meet;
+  }
+
+  async findMany(id: string[]): Promise<Appointment[]> {
+    const meet = await this.meetModel.find({ _id: id }).sort({ createdAt: -1 });
 
     if (!meet) throw new NotFoundException('Meet not found.');
 

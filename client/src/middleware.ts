@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+export { auth as authMiddleware } from "@src/auth"
 
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import { i18n } from "@root/i18n.config";

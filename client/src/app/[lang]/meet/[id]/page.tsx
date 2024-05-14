@@ -3,7 +3,8 @@ import AnswerMeeting from "@/routes/AnswerMeeting";
 import { Locale } from "@root/i18n.config";
 import axios from "axios";
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import {notFound} from "next/navigation";
+import {auth} from "@src/auth.ts";
 
 let meetingData;
 
@@ -34,6 +35,8 @@ export default async function Page({
 }: {
   params: { lang: Locale; id: string };
 }) {
+  const session = await auth()
+
   // Get the dictionary for the given language
   const dict = await getDictionary(lang);
 
@@ -45,7 +48,7 @@ export default async function Page({
     .catch((err) => err.response);
 
   if (res.status === 200) {
-    return <AnswerMeeting lang={lang} dict={dict} meetingData={res.data} />;
+    return <AnswerMeeting lang={lang} dict={dict} meetingData={res.data} session={session} />;
   }
 
   return notFound();

@@ -35,9 +35,11 @@ import AnswerMeetingLoader from "./AnswerMeetingLoader";
 export default function CreateMeeting({
   lang,
   dict,
+  auth,
 }: {
   lang: Locale;
   dict: any;
+  auth: any;
 }) {
   // Moment locale
   moment.locale(lang);
@@ -384,15 +386,21 @@ export default function CreateMeeting({
       if (!validateDate()) {
         return;
       }
+
+      const meetData = {
+        meetName: meetDetails?.name,
+        authorId: auth?.user._id,
+        meetPlace: meetDetails?.place,
+        meetLink: meetDetails?.link,
+        dates: dailyTimeRanges,
+      }
+
+      console.log(meetData)
+
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/new`,
-        {
-          meetName: meetDetails?.name,
-          meetPlace: meetDetails?.place,
-          meetLink: meetDetails?.link,
-          dates: dailyTimeRanges,
-        }
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/new`, meetData
       );
+
 
       const meetId = response.data.appointmentId;
       const meetUrl = `/meet/${meetId}`;
@@ -501,6 +509,7 @@ export default function CreateMeeting({
               >
                 <Input
                   label={dict.page.createMeeting.input.meeting__name.label}
+                  name="meeting__name"
                   type="text"
                   id="meeting__name"
                   register={register}
@@ -521,6 +530,7 @@ export default function CreateMeeting({
                 />
                 <Input
                   label={dict.page.createMeeting.input.meeting__place.label}
+                  name="meeting__place"
                   type="text"
                   id="meeting__place"
                   register={register}
@@ -540,6 +550,7 @@ export default function CreateMeeting({
                 />
                 <Input
                   label={dict.page.createMeeting.input.meeting__link.label}
+                  name="meeting__link"
                   type="text"
                   id="meeting__link"
                   register={register}

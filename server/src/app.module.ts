@@ -4,6 +4,8 @@ import { APP_GUARD } from '@nestjs/core';
 import { MongooseModule } from '@nestjs/mongoose';
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import { MeetModule } from './meet/meet.module';
+import { AuthModule } from './auth/auth.module';
+import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
@@ -22,6 +24,8 @@ import { MeetModule } from './meet/meet.module';
         limit: 100,
       },
     ]),
+    AuthModule,
+    UserModule,
   ],
   controllers: [],
   providers: [

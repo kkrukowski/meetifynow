@@ -3,6 +3,7 @@ import { DayTimes } from './dayTimes.interface';
 
 export interface Meet {
   readonly appointmentId: string;
+  readonly authorId: string;
   readonly meetName: string;
   readonly place: string;
   readonly link: string;

@@ -1,6 +1,7 @@
 import { getDictionary } from "@/lib/dictionary";
 import CreateMeeting from "@/routes/CreateMeeting";
 import { Locale } from "@root/i18n.config";
+import {auth} from "@src/auth.ts";
 
 export async function generateMetadata({
   params: { lang },
@@ -21,7 +22,10 @@ export default async function Page({
 }: {
   params: { lang: Locale };
 }) {
+  // Auth session
+  const session = await auth();
+
   const dict = await getDictionary(lang);
 
-  return <CreateMeeting lang={lang} dict={dict} />;
+  return <CreateMeeting lang={lang} dict={dict} auth={session} />;
 }

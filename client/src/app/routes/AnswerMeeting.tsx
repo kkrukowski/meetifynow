@@ -18,7 +18,7 @@ import Button from "@/components/Button";
 import CopyLinkButton from "@/components/CopyLinkButton";
 import Heading from "@/components/Heading";
 import Input from "@/components/Input";
-import LinkButton from "@/components/LinkButton";
+import { LinkButton } from "@/components/LinkButton";
 import Title from "@/components/Title";
 
 // Utils
@@ -26,15 +26,17 @@ import { getAvailabilityInfo } from "@/utils/meeting/answer/getAvailabilityInfo"
 // import { getUnavailableUsersInfo } from "@/utils/meeting/answer/getUnavailableUsersInfo";
 import useMouseDown from "@/utils/useIsMouseDown";
 import { Locale } from "@root/i18n.config";
-
+import {getUnavailableUsersInfo} from "@/utils/meeting/answer/getUnavailableUsersInfo.ts";
 export default function AnswerMeeting({
   lang,
   dict,
   meetingData,
+    session,
 }: {
   lang: Locale;
   dict: any;
   meetingData: any;
+  session: any;
 }) {
   moment.locale(lang);
   const pathname = usePathname();
@@ -49,11 +51,14 @@ export default function AnswerMeeting({
       this.isOnline = isOnline;
     }
   }
+
+  // Auth
+  const isUserLoggedIn = !!session?.user;
   const [selectionMode, setSelectionMode] = useState(false);
   const [lookedUpDatetime, setLookedUpDatetime] = useState<number>();
   const [lookedUpDate, setLookedUpDate] = useState<string>();
   const [lookedUpTime, setLookedUpTime] = useState<string>();
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(isUserLoggedIn ? session.user.name : "");
   const [availableCount, setAvailableCount] = useState(0);
   const [answers, setAnswers] = useState<any>(meetingData.answers);
   const [meetName, setMeetName] = useState(meetingData.meetName);
@@ -61,7 +66,6 @@ export default function AnswerMeeting({
   const meetLink = meetingData.meetLink;
   const answersCount = answers.length;
   const datesInfo = meetingData.dates;
-  // const [unavailableUsersInfo, setUnavailableUsersInfo] = useState<any>([]);
   const [highestAvailableCount, setHighestAvailableCount] = useState(0);
   const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
   const currentUrl = pathname;
@@ -73,11 +77,6 @@ export default function AnswerMeeting({
 
   // Handling mouse down
   const isMouseDown = useMouseDown();
-
-  // Availability info
-  // useEffect(() => {
-  //   setUnavailableUsersInfo(getUnavailableUsersInfo(answers));
-  // }, [answers]);
 
   const availabilityInfo = getAvailabilityInfo(answers);
 
@@ -451,18 +450,22 @@ export default function AnswerMeeting({
           )
         );
 
-        // const listOfUnavailableUsers = unavailableUsersInfo?.map(
-        //   (userData: any) => (
-        //     <li key={userData.userData.userId} className="text-gray">
-        //       <s>{userData.userData.username}</s>
-        //     </li>
-        //   )
-        // );
+        const unavailableUsers = getUnavailableUsersInfo(answers, availableUsers);
+
+        const listOfUnavailableUsers = unavailableUsers?.map(
+          (userData: any) => (
+              <li key={userData._id} className="text-gray flex items-center">
+                <span className="block h-3 w-3 rounded-full bg-gray mr-2"></span>
+                <s>{userData.username}</s>
+              </li>
+          )
+        );
 
         const listOfAvailability = (
-          <ul>
+            <ul>
             {listOfOnlineAvailableUsers}
             {listOfOfflineAvailableUsers}
+            {listOfUnavailableUsers}
           </ul>
         );
 
@@ -513,6 +516,35 @@ export default function AnswerMeeting({
     }
   };
 
+  const sendAnswerLoggedIn = async () => {
+    try {
+      if (isSendingReq || !username) return;
+
+      setIsSendingReq(true);
+
+      const answerResponse = await axios.patch(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`,
+          { username, dates: selectedTimecells }
+      );
+
+      if (answerResponse.status !== 200) return;
+
+      const updatedMeetResponse = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`
+      );
+
+      if (updatedMeetResponse.status === 200) {
+        setAnswers(updatedMeetResponse.data.answers);
+        setMeetName(updatedMeetResponse.data.meetName);
+        setSelectedTimecells([]);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSendingReq(false);
+    }
+  }
+
   useEffect(() => {
     if (lookedUpDatetime && availabilityInfo[lookedUpDatetime]) {
       setAvailableCount(availabilityInfo[lookedUpDatetime].usersInfo.length);
@@ -524,14 +556,15 @@ export default function AnswerMeeting({
   // Forms
   const formSchema = yup.object().shape({
     name: yup
-      .string()
-      .required(dict.page.answerMeeting.validate.name.required)
-      .max(20, dict.page.answerMeeting.validate.name.max),
+        .string()
+        .required(dict.page.answerMeeting.validate.name.required)
+        .max(20, dict.page.answerMeeting.validate.name.max),
   });
 
   type Inputs = {
     name: string;
-  };
+  }
+
 
   const {
     register,
@@ -542,7 +575,7 @@ export default function AnswerMeeting({
   });
 
   return (
-    <main className="flex md:flex-1 flex-col lg:justify-center px-5 pb-10 pt-20 md:pt-28 w-[356px] md:w-auto lg:w-[900px]">
+    <main className="flex md:flex-1 flex-col px-5 py-10 pt-24 lg:p-20 lg:pt-28 h-smd:pt-30 lg:m-0 w-[356px] md:w-auto lg:w-[900px]">
       <Title text={meetName} />
       {/* Meeting details */}
       {(meetPlace || meetLink) && (
@@ -578,17 +611,17 @@ export default function AnswerMeeting({
 
         <section className="flex flex-col time__selection lg:w-1/2">
           {isMobile && (
-            <div className="flex items-center justify-center">
+            <div className="flex items-center justify-center mb-5">
               <Button text={toggleButtonName} onClick={toggleAnsweringMode} />
             </div>
           )}
 
           <form
             className="flex flex-1 flex-col place-content-start items-center"
-            onSubmit={handleSubmit(sendAnswer)}
+            onSubmit={isUserLoggedIn ? sendAnswerLoggedIn : handleSubmit(sendAnswer)}
           >
             <div className="flex flex-col-reverse lg:flex-col items-center lg:items-start">
-              {(mobileAnsweringMode && isMobile) || !isMobile ? (
+              {((mobileAnsweringMode && isMobile) || !isMobile) && !isUserLoggedIn && (
                 <div>
                   <Input
                     label={dict.page.answerMeeting.input.name.label}
@@ -600,11 +633,11 @@ export default function AnswerMeeting({
                     onChange={(e) => setUsername(e.target.value)}
                     value={username}
                     placeholder={dict.page.answerMeeting.input.name.placeholder}
-                  />
+                    name="name"/>
                 </div>
-              ) : null}
+              )}
               <div
-                className={`self-center overflow-auto max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[300px] w-auto max-w-[365px] md:max-w-[700px] lg:max-w-[350px] pr-3 mt-5 ${
+                className={`self-center overflow-auto max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[300px] w-auto max-w-[365px] md:max-w-[700px] lg:max-w-[350px] pr-3 ${!isUserLoggedIn && 'mt-5'} ${
                   isMobile && "mb-10"
                 }`}
               >

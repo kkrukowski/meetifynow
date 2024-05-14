@@ -4,6 +4,7 @@ type Props = {
   label: string;
   type: string;
   id: string;
+  name: string;
   register: any;
   placeholder: string;
   options?: any;
@@ -12,12 +13,14 @@ type Props = {
   value?: string;
   required?: boolean | undefined;
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
 };
 
 const Input = ({
   label,
   type,
   id,
+  name,
   register,
   placeholder,
   options,
@@ -26,6 +29,7 @@ const Input = ({
   onChange,
   value,
   required = false,
+  disabled = false,
 }: Props) => {
   return (
     <div className="flex flex-col w-[300px] gap-2">
@@ -37,6 +41,7 @@ const Input = ({
       </div>
       <input
         id={id}
+        name={name}
         {...register(id, { ...options })}
         type={type}
         className={
@@ -48,6 +53,7 @@ const Input = ({
         value={value}
         autoComplete="off"
         required={required}
+        disabled={disabled}
       />
       <p className="text-sm relative -top-1 text-red font-medium">
         {errorText}

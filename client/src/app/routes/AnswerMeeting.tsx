@@ -30,10 +30,12 @@ export default function AnswerMeeting({
   lang,
   dict,
   meetingData,
+    session,
 }: {
   lang: Locale;
   dict: any;
   meetingData: any;
+  session: any;
 }) {
   moment.locale(lang);
   const pathname = usePathname();
@@ -48,11 +50,14 @@ export default function AnswerMeeting({
       this.isOnline = isOnline;
     }
   }
+
+  // Auth
+  const isUserLoggedIn = !!session.user;
   const [selectionMode, setSelectionMode] = useState(false);
   const [lookedUpDatetime, setLookedUpDatetime] = useState<number>();
   const [lookedUpDate, setLookedUpDate] = useState<string>();
   const [lookedUpTime, setLookedUpTime] = useState<string>();
-  const [username, setUsername] = useState("");
+  const [username, setUsername] = useState(isUserLoggedIn ? session.user.name : "");
   const [availableCount, setAvailableCount] = useState(0);
   const [answers, setAnswers] = useState<any>(meetingData.answers);
   const [meetName, setMeetName] = useState(meetingData.meetName);
@@ -512,6 +517,35 @@ export default function AnswerMeeting({
     }
   };
 
+  const sendAnswerLoggedIn = async () => {
+    try {
+      if (isSendingReq || !username) return;
+
+      setIsSendingReq(true);
+
+      const answerResponse = await axios.patch(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`,
+          { username, dates: selectedTimecells }
+      );
+
+      if (answerResponse.status !== 200) return;
+
+      const updatedMeetResponse = await axios.get(
+          `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`
+      );
+
+      if (updatedMeetResponse.status === 200) {
+        setAnswers(updatedMeetResponse.data.answers);
+        setMeetName(updatedMeetResponse.data.meetName);
+        setSelectedTimecells([]);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSendingReq(false);
+    }
+  }
+
   useEffect(() => {
     if (lookedUpDatetime && availabilityInfo[lookedUpDatetime]) {
       setAvailableCount(availabilityInfo[lookedUpDatetime].usersInfo.length);
@@ -523,14 +557,15 @@ export default function AnswerMeeting({
   // Forms
   const formSchema = yup.object().shape({
     name: yup
-      .string()
-      .required(dict.page.answerMeeting.validate.name.required)
-      .max(20, dict.page.answerMeeting.validate.name.max),
+        .string()
+        .required(dict.page.answerMeeting.validate.name.required)
+        .max(20, dict.page.answerMeeting.validate.name.max),
   });
 
   type Inputs = {
     name: string;
-  };
+  }
+
 
   const {
     register,
@@ -584,10 +619,10 @@ export default function AnswerMeeting({
 
           <form
             className="flex flex-1 flex-col place-content-start items-center"
-            onSubmit={handleSubmit(sendAnswer)}
+            onSubmit={isUserLoggedIn ? sendAnswerLoggedIn : handleSubmit(sendAnswer)}
           >
             <div className="flex flex-col-reverse lg:flex-col items-center lg:items-start">
-              {(mobileAnsweringMode && isMobile) || !isMobile ? (
+              {((mobileAnsweringMode && isMobile) || !isMobile) && !isUserLoggedIn && (
                 <div>
                   <Input
                     label={dict.page.answerMeeting.input.name.label}
@@ -601,9 +636,9 @@ export default function AnswerMeeting({
                     placeholder={dict.page.answerMeeting.input.name.placeholder}
                     name="name"/>
                 </div>
-              ) : null}
+              )}
               <div
-                className={`self-center overflow-auto max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[300px] w-auto max-w-[365px] md:max-w-[700px] lg:max-w-[350px] pr-3 mt-5 ${
+                className={`self-center overflow-auto max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[300px] w-auto max-w-[365px] md:max-w-[700px] lg:max-w-[350px] pr-3 ${!isUserLoggedIn && 'mt-5'} ${
                   isMobile && "mb-10"
                 }`}
               >

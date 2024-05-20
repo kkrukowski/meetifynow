@@ -5,7 +5,7 @@ type Props = {
   type: string;
   id: string;
   name: string;
-  register: any;
+  register?: any;
   placeholder: string;
   options?: any;
   errorText?: string | undefined | null;

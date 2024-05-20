@@ -37,6 +37,12 @@ export async function middleware(req: NextRequest) {
 
   // Redirect if there is no locale
   siteLocale = getLocale(req);
+
+  // Do not redirect if this is api request
+  if (siteLocale === "" || pathname.startsWith("/api")) {
+      return response;
+  }
+
   req.nextUrl.pathname = `/${siteLocale}${pathname}`;
   return new NextResponse(null, {
     status: 302,

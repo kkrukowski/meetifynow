@@ -9,6 +9,8 @@ export default async function UserProfile({ dict, meetHistory }: { lang: Locale,
     const session = await auth()
     if(!session?.user) return null
 
+    console.log("meetHistory", meetHistory[0])
+
   return (
       <main className="flex flex-1 flex-col justify-center items-center h-full px-5 pb-10 pt-20 md:pt-28">
           <Title text={dict.page.profile.title}/>

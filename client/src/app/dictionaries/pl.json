@@ -113,6 +113,7 @@
         }
       },
       "error": {
+        "login": "Niepoprawny email lub hasło.",
         "email": {
           "required": "Email jest wymagany.",
           "email": "Niepoprawny format emaila."
@@ -125,8 +126,7 @@
         "name": {
           "required": "Nazwa jest wymagana.",
           "min": "Nazwa musi mieć co najmniej 2 znaki."
-        },
-        "userExists": "Uzytkownik już istnieje!"
+        }
       },
       "success": {
         "register": "Utworzono konto!",

@@ -113,6 +113,7 @@
         }
       },
       "error": {
+        "login": "Incorrect email or password.",
         "email": {
           "required": "Email is required.",
           "email": "Email is incorrect."
@@ -125,8 +126,7 @@
         "name": {
           "required": "Name is required.",
           "min": "Name must be at least 2 characters long."
-        },
-        "userExists": "User already exists!"
+        }
       },
       "success": {
         "register": "User registered successfully!",

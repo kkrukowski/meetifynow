@@ -21,13 +21,8 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
             const res = await axios.post(process.env.NEXT_PUBLIC_SERVER_URL + "/auth/login", { email, password })
 
-            if (res.status == 401) {
-                console.log(res.statusText)
-
-                return null
-            }
-
             const user = await res.data
+            console.log(user)
 
             return user
         }

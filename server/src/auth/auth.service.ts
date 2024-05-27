@@ -58,6 +58,8 @@ export class AuthService {
       };
 
       return {
+        message: 'User logged in!',
+        statusCode: 200,
         user: userReturnData,
         tokens: {
           access_token: this.jwtService.sign(payload, {
@@ -72,7 +74,7 @@ export class AuthService {
       };
     }
 
-    return { error: 'Some error!', statusCode: 400 };
+    return { message: 'Some error!', statusCode: 400 };
   }
 
   async validateUser(loginUserDto: LoginUserDto) {

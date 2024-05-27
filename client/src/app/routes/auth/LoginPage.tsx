@@ -39,11 +39,15 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
     } = useForm({ resolver: yupResolver(formSchema) });
 
     const loginHandler: SubmitHandler<LoginInputs> = async () => {
+        setError("")
+        setSuccess("")
         startTransition(async () => {
             const res = await login(loginData, lang)
 
-            setError(res.error)
-            setSuccess(res.success)
+            if (res.statusCode === 404 && res.message === "User not found!") {
+                setLoginData({ email: loginData.email, password: "" })
+                return setError(dict.page.auth.error.login)
+            }
         })
     };
 

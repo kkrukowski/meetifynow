@@ -633,7 +633,9 @@ export default function AnswerMeeting({
                     onChange={(e) => setUsername(e.target.value)}
                     value={username}
                     placeholder={dict.page.answerMeeting.input.name.placeholder}
-                    name="name"/>
+                    name="name"
+                    autocomplete="name"
+                  />
                 </div>
               )}
               <div

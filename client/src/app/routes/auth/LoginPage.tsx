@@ -54,14 +54,14 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
     return <main className="flex md:flex-1 h-full flex-col px-5 py-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 lg:m-0 justify-center items-center">
         <Title text={dict.page.login.title}/>
 
-            {/*Credentials login*/}
+        {/*Credentials login*/}
         <motion.div
             initial={{x: "50%", opacity: 0}}
             animate={{x: 0, opacity: 1}}
             transition={{duration: 0.3, ease: "easeInOut"}}
             className="flex flex-col w-full justify-center items-center"
         >
-            <form>
+            <form onSubmit={handleSubmit(loginHandler)} noValidate>
                 <Input
                     label={dict.page.auth.input.email.label}
                     type="email"
@@ -104,11 +104,11 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
                 />
                 {error && <FormError text={error} error={true}/>}
                 {success && <FormError text={success} error={false}/>}
-            </form>
 
-            <div className="self-center w-full">
-                <LoginButton onClick={handleSubmit(loginHandler)} text={dict.page.login.button.login} />
-            </div>
+                <div className="self-center w-full">
+                    <LoginButton text={dict.page.login.button.login}/>
+                </div>
+            </form>
 
             {/*<div className="flex flex-row w-full justify-center items-center py-5">*/}
             {/*    <div className="w-full h-0.5 rounded-full bg-gray"></div>*/}
@@ -130,6 +130,5 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
                 <LinkButton href="/register" target="_self" text={dict.page.login.createAccount.link}/>
             </div>
         </motion.div>
-
     </main>
 }

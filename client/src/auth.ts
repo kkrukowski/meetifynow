@@ -19,12 +19,11 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
             if (!credentials?.email || !credentials?.password) return null
             const { email, password } = credentials
 
-            const res = await axios.post(process.env.NEXT_PUBLIC_SERVER_URL + "/auth/login", { email, password })
+            const { data } = await axios.post(process.env.NEXT_PUBLIC_SERVER_URL + "/auth/login", { email, password })
 
-            const user = await res.data
-            console.log(user)
+            // console.log(data)
 
-            return user
+            return data
         }
     })],
     callbacks: {

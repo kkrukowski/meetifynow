@@ -1,4 +1,8 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
 import { UserService } from '../user/user.service';
@@ -42,42 +46,46 @@ export class AuthService {
 
   async login(loginUserDto: LoginUserDto) {
     if (!loginUserDto) {
-      throw new Error('No data provided!');
+      console.error('No data provided!');
+      throw new BadRequestException('No data provided!');
     }
 
-    const res = await this.validateUser(loginUserDto);
-    const user = res.user;
+    const { user, statusCode } = await this.validateUser(loginUserDto);
 
-    if (res.statusCode === 200) {
-      const payload = { email: user.email, sub: user._id };
-
-      const userReturnData = {
-        _id: user._id,
-        email: user.email,
-        name: user.name,
-      };
-
+    if (statusCode !== 200) {
       return {
-        message: 'User logged in!',
-        statusCode: 200,
-        user: userReturnData,
-        tokens: {
-          access_token: this.jwtService.sign(payload, {
-            expiresIn: '20s',
-            secret: process.env.JWT_SECRET,
-          }),
-          refresh_token: this.jwtService.sign(payload, {
-            expiresIn: '7d',
-            secret: process.env.JWT_REFRESH_TOKEN,
-          }),
-        },
+        message: 'Invalid credentials!',
+        statusCode: 401,
       };
     }
 
-    return { message: 'Some error!', statusCode: 400 };
+    const payload = { email: user.email, sub: user._id };
+    const access_token = this.jwtService.sign(payload, {
+      expiresIn: '20s',
+      secret: process.env.JWT_SECRET,
+    });
+    const refresh_token = this.jwtService.sign(payload, {
+      expiresIn: '7d',
+      secret: process.env.JWT_REFRESH_TOKEN,
+    });
+
+    const userReturnData = {
+      _id: user._id,
+      email: user.email,
+      name: user.name,
+    };
+
+    return {
+      message: 'User logged in!',
+      statusCode: 200,
+      user: userReturnData,
+      tokens: { access_token, refresh_token },
+    };
   }
 
   async validateUser(loginUserDto: LoginUserDto) {
+    console.log(loginUserDto)
+
     const res = await this.userService.findByEmail(loginUserDto.email);
 
     if (res.statusCode === 404) {
@@ -98,11 +106,11 @@ export class AuthService {
       return {
         message: 'Password is correct!',
         statusCode: 200,
-        user: user,
+        user,
       };
     }
 
-    throw new UnauthorizedException('Invalid credentials!');
+    return { message: 'Invalid credentials!', statusCode: 401 };
   }
 
   async refreshToken(user: any) {

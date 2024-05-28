@@ -378,6 +378,7 @@ export default function CreateMeeting({
   // Create meeting
   const [isRequestInProgress, setIsRequestInProgress] = useState(false);
   const createMeeting: SubmitHandler<Inputs> = async () => {
+
     if (isRequestInProgress) {
       return <AnswerMeetingLoader />;
     }
@@ -389,13 +390,11 @@ export default function CreateMeeting({
 
       const meetData = {
         meetName: meetDetails?.name,
-        authorId: auth?.user._id,
+        authorId: auth ? auth.user.id : null,
         meetPlace: meetDetails?.place,
         meetLink: meetDetails?.link,
         dates: dailyTimeRanges,
       }
-
-      console.log(meetData)
 
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/new`, meetData
@@ -473,7 +472,7 @@ export default function CreateMeeting({
       }
 
       if (currStep === 2) {
-        handleSubmit(createMeeting)();
+        await handleSubmit(createMeeting)();
       }
     }
   };

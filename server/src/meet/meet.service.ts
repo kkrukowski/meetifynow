@@ -28,6 +28,7 @@ export class MeetService {
   ) {}
 
   async create(@Body() createMeetDto: CreateMeetDto): Promise<Appointment> {
+
     const meetData = {
       ...createMeetDto,
       appointmentId: nanoid(),

@@ -21,8 +21,6 @@ export const { auth, handlers, signIn, signOut } = NextAuth({
 
             const { data } = await axios.post(process.env.NEXT_PUBLIC_SERVER_URL + "/auth/login", { email, password })
 
-            // console.log(data)
-
             return data
         }
     })],

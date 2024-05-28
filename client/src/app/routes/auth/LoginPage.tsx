@@ -34,6 +34,7 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
 
     const {
         register,
+        setValue,
         handleSubmit,
         formState: { errors },
     } = useForm({ resolver: yupResolver(formSchema) });
@@ -69,11 +70,13 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
                     name="email"
                     onChange={(e: {
                         target: { value: React.SetStateAction<string> };
-                    }) =>
+                    }) => {
+                        setValue("email", e.target.value.toString());
                         setLoginData({
                             ...loginData,
                             email: e.target.value.toString(),
                         })
+                    }
                     }
                     required={true}
                     placeholder={dict.page.auth.input.email.placeholder}
@@ -81,6 +84,7 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
                     error={!!errors.email}
                     errorText={errors.email?.message?.toString()}
                     disabled={isPending}
+                    value={loginData.email}
                 />
                 <Input
                     label={dict.page.auth.input.password.label}
@@ -89,11 +93,13 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
                     name="password"
                     onChange={(e: {
                         target: { value: React.SetStateAction<string> };
-                    }) =>
+                    }) => {
+                        setValue("password", e.target.value.toString());
                         setLoginData({
                             ...loginData,
                             password: e.target.value.toString(),
                         })
+                    }
                     }
                     required={true}
                     placeholder={dict.page.auth.input.password.placeholder}
@@ -101,6 +107,7 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
                     error={!!errors.password}
                     errorText={errors.password?.message?.toString()}
                     disabled={isPending}
+                    value={loginData.password}
                 />
                 {error && <FormError text={error} error={true}/>}
                 {success && <FormError text={success} error={false}/>}

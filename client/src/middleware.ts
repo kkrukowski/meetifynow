@@ -35,6 +35,12 @@ export async function middleware(req: NextRequest) {
     return response;
   }
 
+  // Skip middleware for public assets
+  const isPublicAsset = pathname.startsWith('/imgs') || pathname === '/imgs/og-image.webp';
+  if (isPublicAsset) {
+    return NextResponse.next();
+  }
+
   // Redirect if there is no locale
   siteLocale = getLocale(req);
   req.nextUrl.pathname = `/${siteLocale}${pathname}`;
@@ -49,6 +55,6 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next|favicon.ico|manifest.webmanifest|robots.txt|sitemap.xml).*)",
+    "/((?!_next|favicon.ico|manifest.webmanifest|robots.txt|sitemap.xml|imgs).*)",
   ],
 };

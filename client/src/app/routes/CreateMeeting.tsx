@@ -503,7 +503,7 @@ export default function CreateMeeting({
             {/* Meeting details */}
             {currStep === 0 && (
               <motion.div
-                initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+                initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0}}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
               >
@@ -574,7 +574,7 @@ export default function CreateMeeting({
             {/* Choose date */}
             {currStep === 1 && (
               <motion.div
-                initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+                initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0}}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
               >
@@ -628,7 +628,7 @@ export default function CreateMeeting({
             {/* Choose time */}
             {currStep === 2 && (
               <motion.div
-                initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+                initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0}}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
               >

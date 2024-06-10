@@ -50,12 +50,12 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
     return <main className="flex md:flex-1 h-full flex-col px-5 py-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 lg:m-0 justify-center items-center">
         <Title text={dict.page.login.title}/>
 
-            {/*Credentials login*/}
+        {/*Credentials login*/}
         <motion.div
             initial={{x: "50%", opacity: 0}}
             animate={{x: 0, opacity: 1}}
             transition={{duration: 0.3, ease: "easeInOut"}}
-            className="flex flex-col w-full justify-center items-center"
+            className="relative flex flex-col w-full justify-center items-center"
         >
             <form>
                 <Input
@@ -126,6 +126,5 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
                 <LinkButton href="/register" target="_self" text={dict.page.login.createAccount.link}/>
             </div>
         </motion.div>
-
     </main>
 }

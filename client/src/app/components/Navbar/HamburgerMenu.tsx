@@ -2,9 +2,6 @@
 
 import {useState} from "react";
 import Link from "next/link";
-import {FaUser} from "react-icons/fa6";
-import {Locale} from "@root/i18n.config.ts";
-import {getDictionary} from "@/lib/dictionary.ts";
 import {FaUserCircle} from "react-icons/fa";
 import {LogoutButton} from "@/components/Auth/LogoutButton.tsx";
 import {LoginButton} from "@/components/Auth/LoginButton.tsx";

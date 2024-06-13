@@ -2,17 +2,13 @@ import { Locale } from "@root/i18n.config.ts";
 import Image from "next/image";
 import Link from "next/link";
 import meetifyNowLogo from "../../assets/imgs/meetifynow-logo.webp";
-import { LoginButton } from "@/components/Auth/LoginButton.tsx";
 import {getDictionary} from "@/lib/dictionary.ts";
 import {auth} from "@src/auth.ts";
-import UserDropdownMenu from "@/components/Auth/UserDropdownMenu.tsx";
 import HamburgerMenu from "@/components/Navbar/HamburgerMenu.tsx";
 
 export default async function Navbar({ lang }: { lang: Locale }) {
     const dict = await getDictionary(lang);
-
     const session = await auth()
-    let isLogged = !!session?.user
 
   return (
           <nav
@@ -29,7 +25,6 @@ export default async function Navbar({ lang }: { lang: Locale }) {
                   />
               </Link>
               <HamburgerMenu sessionUser={session?.user} dict={dict} />
-              {/*{isLogged ? (<UserDropdownMenu sessionUser={session.user} lang={lang} />) : (<LoginButton text={dict.page.login.button.login} mode="redirect" />)}*/}
           </nav>
   );
 }

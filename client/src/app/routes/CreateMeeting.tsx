@@ -492,7 +492,7 @@ export default function CreateMeeting({
     return <AnswerMeetingLoader />;
   } else {
     return (
-      <main className="flex md:flex-1 h-full flex-col px-5 py-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 lg:m-0 justify-center">
+      <main className="flex md:flex-1 h-full flex-col px-5 py-10 pt-24 lg:p-24 lg:pt-28 h-smd:pt-24 lg:m-0 justify-center">
         <Title text={dict.page.createMeeting.title} />
         <StepsIndicator steps={4} stepsData={stepsInfo} currIndex={currStep} />
         <form

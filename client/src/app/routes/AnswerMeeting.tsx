@@ -575,7 +575,7 @@ export default function AnswerMeeting({
   });
 
   return (
-    <main className="flex md:flex-1 flex-col px-5 py-10 pt-24 lg:p-20 lg:pt-28 h-smd:pt-30 lg:m-0 w-[356px] md:w-auto lg:w-[900px]">
+    <main className="flex md:flex-1 flex-col px-5 py-10 pt-24 lg:p-24 lg:pt-28 h-smd:pt-30 lg:m-0 w-[356px] md:w-auto lg:w-[900px]">
       <Title text={meetName} />
       {/* Meeting details */}
       {(meetPlace || meetLink) && (

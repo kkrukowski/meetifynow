@@ -16,7 +16,7 @@ export default async function Navbar({ lang }: { lang: Locale }) {
 
   return (
           <nav
-              className="fixed z-50 top-0 w-full max-w-[1250px] bg-light border-b-[1px] border-light-active p-5 md:p-8 flex align-center justify-between items-center">
+              className="fixed z-50 top-0 w-full max-w-[1250px] bg-light border-b-[1px] border-light-active p-5 md:p-6 flex align-center justify-between items-center">
               <Link href={`/${lang}`}>
                   <Image
                       src={meetifyNowLogo}

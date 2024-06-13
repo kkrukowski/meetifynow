@@ -47,7 +47,7 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
         })
     };
 
-    return <main className="flex md:flex-1 h-full flex-col px-5 py-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 lg:m-0 justify-center items-center">
+    return <main className="flex md:flex-1 h-full flex-col px-5 py-10 pt-24 lg:p-24 lg:pt-28 h-smd:pt-24 lg:m-0 justify-center items-center">
         <Title text={dict.page.login.title}/>
 
         {/*Credentials login*/}

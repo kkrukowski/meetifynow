@@ -12,7 +12,7 @@ export default async function UserProfile({ dict, meetHistory }: { lang: Locale,
     console.log("meetHistory", meetHistory[0])
 
   return (
-      <main className="flex flex-1 flex-col justify-center items-center h-full px-5 pb-10 pt-20 md:pt-28">
+      <main className="flex flex-1 flex-col justify-center items-center h-full px-5 pb-10 pt-24 md:pt-28">
           <Title text={dict.page.profile.title}/>
           <section className="flex-col lg:flex-row flex h-full">
               {/* User Info */}

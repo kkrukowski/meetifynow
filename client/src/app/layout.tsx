@@ -1,5 +1,5 @@
 import Footer from "@/components/Footer";
-import Navbar from "@/components/Navbar";
+import Navbar from "@/components/Navbar/Navbar.tsx";
 import "@/global.css";
 import { Locale, i18n } from "@root/i18n.config";
 import { Analytics } from "@vercel/analytics/react";

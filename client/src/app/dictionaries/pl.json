@@ -93,10 +93,11 @@
       }
     },
     "auth": {
-      "userDropdownMenu": {
+      "hamburgerMenu": {
         "profile": "Profil",
         "createMeeting": "Utwórz spotkanie",
-        "logout": "Wyloguj się"
+        "logout": "Wyloguj się",
+        "login": "Zaloguj się"
       },
       "input": {
         "name": {

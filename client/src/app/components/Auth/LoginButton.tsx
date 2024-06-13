@@ -19,6 +19,6 @@ export const LoginButton = ({mode = "modal", text, onClick}: LoginButtonProps) =
     }
 
     return (
-        <Button onClick={mode == "redirect" ? redirectToLoginPage : onClick} text={text} className={mode == "modal" ? "w-full mt-5" : ""} />
+        <Button onClick={mode == "redirect" ? redirectToLoginPage : onClick} text={text} className={`text-lg ${mode == "modal" ? "w-full mt-5" : ""}`} />
     );
 }

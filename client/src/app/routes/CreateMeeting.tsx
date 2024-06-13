@@ -491,7 +491,7 @@ export default function CreateMeeting({
     return <AnswerMeetingLoader />;
   } else {
     return (
-      <main className="flex md:flex-1 h-full flex-col px-5 py-10 pt-20 lg:p-20 lg:pt-28 h-smd:pt-20 lg:m-0 justify-center">
+      <main className="flex md:flex-1 h-full flex-col px-5 py-10 pt-24 lg:p-24 lg:pt-28 h-smd:pt-24 lg:m-0 justify-center">
         <Title text={dict.page.createMeeting.title} />
         <StepsIndicator steps={4} stepsData={stepsInfo} currIndex={currStep} />
         <form
@@ -502,7 +502,7 @@ export default function CreateMeeting({
             {/* Meeting details */}
             {currStep === 0 && (
               <motion.div
-                initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+                initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0}}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
               >
@@ -573,7 +573,7 @@ export default function CreateMeeting({
             {/* Choose date */}
             {currStep === 1 && (
               <motion.div
-                initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+                initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0}}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
               >
@@ -627,7 +627,7 @@ export default function CreateMeeting({
             {/* Choose time */}
             {currStep === 2 && (
               <motion.div
-                initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
+                initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0}}
                 animate={{ x: 0, opacity: 1 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
               >

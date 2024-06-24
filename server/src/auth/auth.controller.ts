@@ -26,6 +26,11 @@ export class AuthController {
     return await this.authService.login(loginUserDto);
   }
 
+  @Post('/validate')
+  async validate(@Body() loginUserDto: LoginUserDto) {
+      return await this.authService.validateUser(loginUserDto);
+  }
+
   @UseGuards(RefreshJwtGuard)
   @Post('/refresh')
   async refreshToken(@Request() req) {

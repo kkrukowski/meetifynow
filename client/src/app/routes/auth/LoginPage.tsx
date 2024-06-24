@@ -34,16 +34,21 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
 
     const {
         register,
+        setValue,
         handleSubmit,
         formState: { errors },
     } = useForm({ resolver: yupResolver(formSchema) });
 
     const loginHandler: SubmitHandler<LoginInputs> = async () => {
+        setError("")
+        setSuccess("")
         startTransition(async () => {
             const res = await login(loginData, lang)
 
-            setError(res.error)
-            setSuccess(res.success)
+            if (res.statusCode === 404 && res.message === "User not found!") {
+                setLoginData({ email: loginData.email, password: "" })
+                return setError(dict.page.auth.error.login)
+            }
         })
     };
 
@@ -57,7 +62,7 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
             transition={{duration: 0.3, ease: "easeInOut"}}
             className="relative flex flex-col w-full justify-center items-center"
         >
-            <form>
+            <form onSubmit={handleSubmit(loginHandler)} noValidate>
                 <Input
                     label={dict.page.auth.input.email.label}
                     type="email"
@@ -65,11 +70,13 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
                     name="email"
                     onChange={(e: {
                         target: { value: React.SetStateAction<string> };
-                    }) =>
+                    }) => {
+                        setValue("email", e.target.value.toString());
                         setLoginData({
                             ...loginData,
                             email: e.target.value.toString(),
                         })
+                    }
                     }
                     required={true}
                     placeholder={dict.page.auth.input.email.placeholder}
@@ -77,6 +84,7 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
                     error={!!errors.email}
                     errorText={errors.email?.message?.toString()}
                     disabled={isPending}
+                    value={loginData.email}
                 />
                 <Input
                     label={dict.page.auth.input.password.label}
@@ -85,11 +93,13 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
                     name="password"
                     onChange={(e: {
                         target: { value: React.SetStateAction<string> };
-                    }) =>
+                    }) => {
+                        setValue("password", e.target.value.toString());
                         setLoginData({
                             ...loginData,
                             password: e.target.value.toString(),
                         })
+                    }
                     }
                     required={true}
                     placeholder={dict.page.auth.input.password.placeholder}
@@ -97,14 +107,15 @@ export default function LoginPage({ dict, lang }: { dict: any, lang: Locale }) {
                     error={!!errors.password}
                     errorText={errors.password?.message?.toString()}
                     disabled={isPending}
+                    value={loginData.password}
                 />
                 {error && <FormError text={error} error={true}/>}
                 {success && <FormError text={success} error={false}/>}
-            </form>
 
-            <div className="self-center w-full">
-                <LoginButton onClick={handleSubmit(loginHandler)} text={dict.page.login.button.login} />
-            </div>
+                <div className="self-center w-full">
+                    <LoginButton text={dict.page.login.button.login}/>
+                </div>
+            </form>
 
             {/*<div className="flex flex-row w-full justify-center items-center py-5">*/}
             {/*    <div className="w-full h-0.5 rounded-full bg-gray"></div>*/}

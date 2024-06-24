@@ -33,6 +33,7 @@ export default function RegisterPage({ dict }: { dict: any }) {
 
     const {
         register,
+        setValue,
         handleSubmit,
         formState: { errors },
     } = useForm({ resolver: yupResolver(formSchema) });
@@ -59,7 +60,7 @@ export default function RegisterPage({ dict }: { dict: any }) {
         <Title text={dict.page.register.title}/>
 
         {/*Credentials login*/}
-        <form>
+        <form onSubmit={handleSubmit(registerHandler)} noValidate>
             <motion.div
                 initial={{x: "50%", opacity: 0}}
                 animate={{x: 0, opacity: 1}}
@@ -73,11 +74,13 @@ export default function RegisterPage({ dict }: { dict: any }) {
                     name="name"
                     onChange={(e: {
                         target: { value: React.SetStateAction<string> };
-                    }) =>
+                    }) => {
+                        setValue("name", e.target.value.toString());
                         setRegisterData({
                             ...registerData,
                             name: e.target.value.toString(),
                         })
+                    }
                     }
                     required={true}
                     placeholder={dict.page.auth.input.name.placeholder}
@@ -94,11 +97,13 @@ export default function RegisterPage({ dict }: { dict: any }) {
                     name="email"
                     onChange={(e: {
                         target: { value: React.SetStateAction<string> };
-                    }) =>
+                    }) => {
+                        setValue("email", e.target.value.toString());
                         setRegisterData({
                             ...registerData,
                             email: e.target.value.toString(),
                         })
+                    }
                     }
                     required={true}
                     placeholder={dict.page.auth.input.email.placeholder}
@@ -115,11 +120,13 @@ export default function RegisterPage({ dict }: { dict: any }) {
                     name="password"
                     onChange={(e: {
                         target: { value: React.SetStateAction<string> };
-                    }) =>
+                    }) => {
+                        setValue("password", e.target.value.toString());
                         setRegisterData({
                             ...registerData,
                             password: e.target.value.toString(),
                         })
+                    }
                     }
                     required={true}
                     placeholder={dict.page.auth.input.password.placeholder}
@@ -133,7 +140,7 @@ export default function RegisterPage({ dict }: { dict: any }) {
                 {success && <FormError text={success} error={false}/>}
 
                 <div className="self-center w-full">
-                    <Button text={dict.page.register.button.register} onClick={handleSubmit(registerHandler)}
+                    <Button text={dict.page.register.button.register}
                             className="w-full mt-5"/>
                 </div>
 

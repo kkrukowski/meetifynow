@@ -7,14 +7,23 @@ import { Appointment } from '../schemas/appointment.schema';
 import { CreateMeetDto } from './dto/create-meet.dto';
 import { NewAnswerDto } from './dto/new-answer.dto';
 import { MeetService } from './meet.service';
+import {UserService} from "../user/user.service";
+import {User} from "../schemas/user.schema";
 
 describe('MeetService', () => {
+  // Meet service and model
   let meetService: MeetService;
-  let model: Model<Appointment>;
+  let meetModel: Model<Appointment>;
+
+  // User service and model
+  let userService: UserService;
+  let userModel: Model<User>;
+
 
   // Mock meet object
   const mockMeet = {
     _id: '65ddc1a883b51eea009aba04',
+    authorId: null,
     appointmentId: 'ieihrA7',
     meetName: 'Test Meet',
     place: 'Test Place',
@@ -36,6 +45,20 @@ describe('MeetService', () => {
     findOneAndUpdate: jest.fn(),
   };
 
+  const mockUser = {
+    _id: '65ddc1a883b51eea009aba04',
+    username: 'Test User',
+    email: 'test@user.com',
+  }
+
+  const mockUserModel = {
+    create: jest.fn(),
+    find: jest.fn(),
+    findOne: jest.fn(),
+    findOneAndUpdate: jest.fn(),
+    addAppointment: jest.fn(),
+  }
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -44,17 +67,25 @@ describe('MeetService', () => {
           provide: getModelToken(Appointment.name),
           useValue: mockAppointmentModel,
         },
+        UserService,
+        {
+          provide: getModelToken(User.name),
+          useValue: mockUserModel,
+        },
       ],
     }).compile();
 
     meetService = module.get<MeetService>(MeetService);
-    model = module.get<Model<Appointment>>(getModelToken(Appointment.name));
+    meetModel = module.get<Model<Appointment>>(getModelToken(Appointment.name));
+    userService = module.get<UserService>(UserService);
+    userModel = module.get<Model<User>>(getModelToken(User.name));
   });
 
   describe('create', () => {
     it('should create a new meet', async () => {
       const newMeetDto: CreateMeetDto = {
         meetName: 'Test Meet',
+        authorId: null,
         place: 'Test Place',
         link: 'Test Link',
         dates: [
@@ -70,7 +101,7 @@ describe('MeetService', () => {
         answers: [],
       };
       jest
-        .spyOn(model, 'create')
+        .spyOn(meetModel, 'create')
         .mockImplementationOnce(() => Promise.resolve(mockMeet as any));
       const result = await meetService.create(newMeetDto);
       expect(result).toEqual(mockMeet);
@@ -80,7 +111,7 @@ describe('MeetService', () => {
   describe('findAll', () => {
     it('should return an array of meets', async () => {
       // Mock the return value of the find method
-      jest.spyOn(model, 'find').mockResolvedValueOnce([mockMeet]);
+      jest.spyOn(meetModel, 'find').mockResolvedValueOnce([mockMeet]);
 
       const result = await meetService.findAll();
 
@@ -88,7 +119,7 @@ describe('MeetService', () => {
     });
 
     it('should throw an error if no meets are found', async () => {
-      jest.spyOn(model, 'find').mockResolvedValue([]);
+      jest.spyOn(meetModel, 'find').mockResolvedValue([]);
 
       await expect(meetService.findAll()).rejects.toThrow(NotFoundException);
     });
@@ -96,7 +127,7 @@ describe('MeetService', () => {
 
   describe('findOne', () => {
     it("should return a meet's details", async () => {
-      jest.spyOn(model, 'findOne').mockResolvedValueOnce(mockMeet);
+      jest.spyOn(meetModel, 'findOne').mockResolvedValueOnce(mockMeet);
 
       const result = await meetService.findOne(mockMeet.appointmentId);
 
@@ -104,7 +135,7 @@ describe('MeetService', () => {
     });
 
     it('should throw an error if the meet is not found', async () => {
-      jest.spyOn(model, 'findOne').mockResolvedValueOnce(null);
+      jest.spyOn(meetModel, 'findOne').mockResolvedValueOnce(null);
 
       await expect(meetService.findOne(mockMeet.appointmentId)).rejects.toThrow(
         NotFoundException,
@@ -132,7 +163,7 @@ describe('MeetService', () => {
     mockMeet.answers.push(newAnswerDto);
 
     it('should add a new answer to the meet', async () => {
-      jest.spyOn(model, 'findOneAndUpdate').mockResolvedValueOnce(updatedMeet);
+      jest.spyOn(meetModel, 'findOneAndUpdate').mockResolvedValueOnce(updatedMeet);
 
       const result = await meetService.addAnswer(
         mockMeet.appointmentId,

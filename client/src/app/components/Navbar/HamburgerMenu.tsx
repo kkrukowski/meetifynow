@@ -55,12 +55,10 @@ export default function HamburgerMenu(props: HamburgerMenuProps) {
                             <FaUserCircle className={`text-dark text-5xl mr-5`}/>
                         </Link>)}
                         <div>
-                            <p className={`text-dark text-base font-medium`}>
-                                {props.sessionUser ? <div>
-                                    <p>{props.sessionUser.name}</p>
-                                    <p>{props.sessionUser.email}</p>
-                                </div> : <LoginButton text={props.dict.page.login.button.login} mode="redirect" />}
-                            </p>
+                            {props.sessionUser ? <div className={`text-dark text-base font-medium`}>
+                                <p>{props.sessionUser.name}</p>
+                                <p>{props.sessionUser.email}</p>
+                            </div> : <LoginButton text={props.dict.page.login.button.login} mode="redirect" />}
                         </div>
                     </div>
                     <div className={`w-[300px] rounded-lg h-[1px] bg-light-active`}></div>

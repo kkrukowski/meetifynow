@@ -28,10 +28,21 @@ export class MeetService {
   ) {}
 
   async create(@Body() createMeetDto: CreateMeetDto): Promise<Appointment> {
+    let unique = false;
+    let appointmentId: string;
+
+    // Generate a unique appointmentId
+    while (!unique) {
+      appointmentId = nanoid();
+      const existingAppointment = await this.meetModel.findOne({ appointmentId }).exec();
+      if (!existingAppointment) {
+        unique = true;
+      }
+    }
 
     const meetData = {
       ...createMeetDto,
-      appointmentId: nanoid(),
+      appointmentId,
       createdAt: new Date(),
     };
 

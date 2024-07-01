@@ -12,8 +12,6 @@ import { CreateMeetDto } from './dto/create-meet.dto';
 import { NewAnswerDto } from './dto/new-answer.dto';
 import { UserService } from '../user/user.service';
 import { AddAppointmentDto } from '../user/dto/add-appointment.dto';
-import { SearchManyIdDto } from './dto/search-many-id.dto';
-const { ObjectId } = require('mongodb');
 
 const nanoid = customAlphabet(
   '1234567890abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ',
@@ -34,7 +32,9 @@ export class MeetService {
     // Generate a unique appointmentId
     while (!unique) {
       appointmentId = nanoid();
-      const existingAppointment = await this.meetModel.findOne({ appointmentId }).exec();
+      const existingAppointment = await this.meetModel
+        .findOne({ appointmentId })
+        .exec();
       if (!existingAppointment) {
         unique = true;
       }
@@ -104,6 +104,7 @@ export class MeetService {
 
       // Convert dates to DateData[]
       let dates: DateData[];
+      // eslint-disable-next-line prefer-const
       dates = newAnswerData.dates.map((date) => {
         if (date.meetDate == null || !date.isOnline == null) {
           throw new BadRequestException('Invalid date data.');

@@ -4,10 +4,15 @@ import { Model, ObjectId } from 'mongoose';
 import { User } from '../schemas/user.schema';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { AddAppointmentDto } from './dto/add-appointment.dto';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectModel(User.name) private userModel: Model<User>) {}
+  constructor(
+    @InjectModel(User.name) private userModel: Model<User>,
+    private readonly mailService: MailService,
+  ) {}
+
   async create(createUserDto: CreateUserDto) {
     const userData = {
       ...createUserDto,
@@ -23,6 +28,13 @@ export class UserService {
         statusCode: 400,
       };
     }
+
+    await this.mailService.sendMail({
+      to: 'hadekshd@gmail.com',
+      from: 'contact@meetifynow.com',
+      subject: 'Welcome to MeetifyNow!',
+      text: `Welcome to MeetifyNow, ${createdUser.name}!`,
+    });
 
     return {
       message: 'User created',

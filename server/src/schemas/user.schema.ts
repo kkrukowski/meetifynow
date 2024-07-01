@@ -19,6 +19,9 @@ export class User {
   })
   appointments: mongoose.Schema.Types.ObjectId[];
 
+  @Prop({ type: Boolean, default: false })
+  isVerified: boolean;
+
   @Prop({ type: Date })
   createdAt: Date;
 }

@@ -83,8 +83,27 @@ export class AuthService {
     };
   }
 
+  async verifyEmail(token: string) {
+    const user = await this.userService.findByEmailToken(token);
+
+    console.log(user);
+
+    if (!user) {
+      throw new UnauthorizedException('Invalid token!');
+    }
+
+    const userId = user._id.toString();
+
+    await this.userService.update(userId, { isVerified: true, emailToken: null });
+
+    return {
+      message: 'Email verified!',
+      statusCode: 200,
+    };
+  }
+
   async validateUser(loginUserDto: LoginUserDto) {
-    console.log(loginUserDto)
+    console.log(loginUserDto);
 
     const res = await this.userService.findByEmail(loginUserDto.email);
 

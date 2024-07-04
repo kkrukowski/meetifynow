@@ -5,6 +5,8 @@ import { User } from '../schemas/user.schema';
 import { CreateUserDto } from '../auth/dto/create-user.dto';
 import { AddAppointmentDto } from './dto/add-appointment.dto';
 import { MailService } from '../mail/mail.service';
+import { randomBytes } from 'crypto';
+import {Appointment} from "../schemas/appointment.schema";
 
 @Injectable()
 export class UserService {
@@ -14,8 +16,13 @@ export class UserService {
   ) {}
 
   async create(createUserDto: CreateUserDto) {
+    console.log('create user');
+
+    const emailToken = randomBytes(32).toString('hex');
+
     const userData = {
       ...createUserDto,
+      emailToken,
       createdAt: new Date(),
     };
 
@@ -30,10 +37,11 @@ export class UserService {
     }
 
     await this.mailService.sendMail({
-      to: 'hadekshd@gmail.com',
+      to: createdUser.email,
       from: 'contact@meetifynow.com',
       subject: 'Welcome to MeetifyNow!',
-      text: `Welcome to MeetifyNow, ${createdUser.name}!`,
+      text: `Verify your email by clicking on the link: https://meetifynow.com/verify-email?token=${emailToken}`,
+      html: `<p>Verify your email by clicking on the link: <a href="https://meetifynow.com/verify-email?token=${emailToken}">Verify Email</a></p>`,
     });
 
     return {
@@ -101,5 +109,14 @@ export class UserService {
       statusCode: 200,
       user: user,
     };
+  }
+
+  async findByEmailToken(token: string) {
+    return this.userModel.findOne({ emailToken: token });
+  }
+
+  async update(id: string, data: any) {
+    console.log('update user');
+    return this.userModel.updateOne({ _id: id }, data);
   }
 }

@@ -22,6 +22,9 @@ export class User {
   @Prop({ type: Boolean, default: false })
   isVerified: boolean;
 
+  @Prop({ type: String })
+  emailToken: string;
+
   @Prop({ type: Date })
   createdAt: Date;
 }

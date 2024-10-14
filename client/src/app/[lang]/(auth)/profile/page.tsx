@@ -12,6 +12,8 @@ export default async function Page({params: { lang }}: { params: { lang: Locale 
 
     const accessToken = session.tokens.access_token
 
+    console.log(session.user)
+
     const userMeetHistory = await getUserMeetHistory(session.user._id, accessToken);
 
     const userMeetData = await getMeetData(userMeetHistory, accessToken)

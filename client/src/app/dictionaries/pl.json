@@ -132,6 +132,9 @@
       "success": {
         "register": "Utworzono konto!",
         "login": "Poprawnie zalogowano!"
+      },
+      "verifyEmail": {
+        "text": "Sprawdź swoją skrzynkę mailową i kliknij w link, aby zweryfikować swoje konto."
       }
     },
     "createMeeting": {

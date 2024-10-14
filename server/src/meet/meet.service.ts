@@ -70,6 +70,8 @@ export class MeetService {
   async findOne(id: string): Promise<Appointment> {
     const meet = await this.meetModel.findOne({ appointmentId: id });
 
+    console.log(meet);
+
     if (!meet) throw new NotFoundException('Meet not found.');
 
     return meet;

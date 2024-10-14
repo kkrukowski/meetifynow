@@ -14,12 +14,17 @@ export async function generateMetadata({
   params: { id: string };
 }): Promise<Metadata> {
   const url = process.env.NEXT_PUBLIC_SERVER_URL + `/meet/${id}`;
+  console.log(url)
   meetingData = await axios
     .get(url)
     .then((res) => res)
     .catch((err) => err.response);
 
   let title = "Answer Not Found - MeetifyNow";
+
+  console.log(meetingData)
+
+  if (!meetingData) return notFound()
 
   if (meetingData.status === 200) {
     title = meetingData.data.meetName + ` - MeetifyNow`;
@@ -42,10 +47,16 @@ export default async function Page({
 
   // Check if the meeting exists
   const url = process.env.NEXT_PUBLIC_SERVER_URL + `/meet/${id}`;
+  console.log(url)
+
   const res = await axios
     .get(url)
     .then((res) => res)
     .catch((err) => err.response);
+
+  console.log(res)
+
+  if (!res) return notFound();
 
   if (res.status === 200) {
     return <AnswerMeeting lang={lang} dict={dict} meetingData={res.data} session={session} />;

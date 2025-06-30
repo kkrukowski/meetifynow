@@ -487,6 +487,38 @@ export default function CreateMeeting({
     }
   };
 
+  // Add state for daily pickers (per day)
+  const [dailyHours, setDailyHours] = useState<{ [date: number]: { from: number; to: number } }>({});
+
+  // Helper to get from/to for a day
+  const getDayHours = (date: number, defaultFrom: number, defaultTo: number) => {
+    if (dailyHours[date]) return dailyHours[date];
+    return { from: defaultFrom, to: defaultTo };
+  };
+
+  // Handler for daily pickers
+  const handleDailyHourChange = (date: number, type: 'from' | 'to', value: number) => {
+    setDailyHours(prev => {
+      const prevFrom = prev[date]?.from ?? moment(getStartTime(date)).hour();
+      const prevTo = prev[date]?.to ?? moment(getEndTime(date)).hour();
+      let from = prevFrom;
+      let to = prevTo;
+      if (type === 'from') {
+        from = value;
+        if (from >= to) to = Math.min(from + 1, 23);
+      } else {
+        to = value;
+        if (to <= from) from = Math.max(to - 1, 0);
+      }
+      return { ...prev, [date]: { from, to } };
+    });
+    // Optionally update dailyTimeRanges here if needed
+  };
+
+  // Add state for main time selection
+  const [mainFromTime, setMainFromTime] = useState(8);
+  const [mainToTime, setMainToTime] = useState(9);
+
   if (isRequestInProgress) {
     return <AnswerMeetingLoader />;
   } else {
@@ -665,28 +697,26 @@ export default function CreateMeeting({
                         <>
                           <Timepicker
                             from={true}
-                            fromTime={moment(
-                              getStartTime(dailyTimeRanges[0].date)
-                            ).hour()}
-                            toTime={moment(
-                              getEndTime(dailyTimeRanges[0].date)
-                            ).hour()}
-                            onChange={(e) =>
-                              handleDailyTimeRangeChange(e, -1, true)
-                            }
+                            value={mainFromTime}
+                            onChange={(e) => {
+                              const newFrom = +e.target.value;
+                              setMainFromTime(newFrom);
+                              if (newFrom >= mainToTime) {
+                                setMainToTime(Math.min(newFrom + 1, 24));
+                              }
+                            }}
                           />
                           <span className="m-4"> - </span>
                           <Timepicker
                             from={false}
-                            fromTime={moment(
-                              getStartTime(dailyTimeRanges[0].date)
-                            ).hour()}
-                            toTime={moment(
-                              getEndTime(dailyTimeRanges[0].date)
-                            ).hour()}
-                            onChange={(e) =>
-                              handleDailyTimeRangeChange(e, -1, false)
-                            }
+                            value={mainToTime}
+                            onChange={(e) => {
+                              const newTo = +e.target.value;
+                              setMainToTime(newTo);
+                              if (newTo <= mainFromTime) {
+                                setMainFromTime(Math.max(newTo - 1, 0));
+                              }
+                            }}
                           />
                         </>
                       )}
@@ -694,57 +724,49 @@ export default function CreateMeeting({
                       {/* Daily main time picking */}
                       {timepickerIndex === 1 && (
                         <>
-                          {dailyTimeRanges.map(
-                            (dayTimeRange: { date: number }) => {
-                              const dateObj = moment(dayTimeRange.date);
-
-                              const fromTime = moment(
-                                getStartTime(dayTimeRange.date)
-                              ).hour();
-                              const toTime = moment(
-                                getEndTime(dayTimeRange.date)
-                              ).hour();
-                              return (
-                                <div className="flex justify-between w-[310px] md:w-[400px] items-center mb-4 px-2">
-                                  <div className="flex flex-col h-14 w-14 bg-primary rounded-lg justify-center">
-                                    <p className="text-3xl text-center text-light leading-none">
-                                      {dateObj.date()}
-                                    </p>
-                                    <p className="text-center text-light leading-none">
-                                      {shortDaysNames[dateObj.day() - 1]}
-                                    </p>
-                                  </div>
-                                  <div>
-                                    <Timepicker
-                                      from={true}
-                                      fromTime={fromTime}
-                                      toTime={toTime}
-                                      onChange={(e) => {
-                                        handleDailyTimeRangeChange(
-                                          e,
-                                          dateObj.valueOf(),
-                                          true
-                                        );
-                                      }}
-                                    />
-                                    <span className="m-2 md:m-4"> - </span>
-                                    <Timepicker
-                                      from={false}
-                                      fromTime={fromTime}
-                                      toTime={toTime}
-                                      onChange={(e) => {
-                                        handleDailyTimeRangeChange(
-                                          e,
-                                          dateObj.valueOf(),
-                                          false
-                                        );
-                                      }}
-                                    />
-                                  </div>
+                          {dailyTimeRanges.map((dayTimeRange: DailyTimeRange) => {
+                            const dateObj = moment(dayTimeRange.date);
+                            const defaultFrom = moment(getStartTime(dayTimeRange.date)).hour();
+                            const defaultTo = moment(getEndTime(dayTimeRange.date)).hour();
+                            const { from, to } = getDayHours(dayTimeRange.date, defaultFrom, defaultTo);
+                            return (
+                              <div className="flex justify-between w-[310px] md:w-[400px] items-center mb-4 px-2">
+                                <div className="flex flex-col h-14 w-14 bg-primary rounded-lg justify-center">
+                                  <p className="text-3xl text-center text-light leading-none">
+                                    {dateObj.date()}
+                                  </p>
+                                  <p className="text-center text-light leading-none">
+                                    {shortDaysNames[dateObj.day() - 1]}
+                                  </p>
                                 </div>
-                              );
-                            }
-                          )}
+                                <div>
+                                  <Timepicker
+                                    from={true}
+                                    value={from}
+                                    onChange={e => {
+                                      const newFrom = +e.target.value;
+                                      handleDailyHourChange(dayTimeRange.date, 'from', newFrom);
+                                      if (newFrom >= to) {
+                                        handleDailyHourChange(dayTimeRange.date, 'to', Math.min(newFrom + 1, 24));
+                                      }
+                                    }}
+                                  />
+                                  <span className="m-2 md:m-4"> - </span>
+                                  <Timepicker
+                                    from={false}
+                                    value={to}
+                                    onChange={e => {
+                                      const newTo = +e.target.value;
+                                      handleDailyHourChange(dayTimeRange.date, 'to', newTo);
+                                      if (newTo <= from) {
+                                        handleDailyHourChange(dayTimeRange.date, 'from', Math.max(newTo - 1, 0));
+                                      }
+                                    }}
+                                  />
+                                </div>
+                              </div>
+                            );
+                          })}
                         </>
                       )}
 

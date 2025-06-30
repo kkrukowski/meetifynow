@@ -1,23 +1,16 @@
 const Timepicker = (props: {
   from: boolean;
-  fromTime: number;
-  toTime: number;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
+  value: number;
 }) => {
-  const defaultTime = () => {
-    if (props.from) {
-      return props.fromTime;
-    }
-    if (!props.from) {
-      return props.toTime + 1;
-    }
-  };
+  const fromTime = 1;
+  const toTime = 23;
 
   const renderOptions = () => {
     const optionsElements = [];
     // For start timepicker
     if (props.from) {
-      for (let i = 1; i <= props.toTime; i++) {
+      for (let i = 0; i <= toTime; i++) {
         const optionElement = (
           <option key={i} value={i}>{`${i < 10 ? `0${i}` : i}:00`}</option>
         );
@@ -26,7 +19,7 @@ const Timepicker = (props: {
     }
     // For end timepicker
     if (!props.from) {
-      for (let i = props.fromTime + 1; i <= 24; i++) {
+      for (let i = fromTime; i <= 24; i++) {
         const optionElement = (
           <option key={i} value={i}>{`${i < 10 ? `0${i}` : i}:00`}</option>
         );
@@ -41,7 +34,7 @@ const Timepicker = (props: {
     <select
       id={props.from ? "timepicker__from" : "timepicker__to"}
       className="p-2 text-lg text-dark border border-gray rounded-lg focus:outline-none focus:ring focus:border-primary transition-all"
-      defaultValue={defaultTime()}
+      value={props.value}
       onChange={props.onChange}
     >
       {renderOptions()}

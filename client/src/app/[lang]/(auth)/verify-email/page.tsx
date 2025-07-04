@@ -1,17 +1,10 @@
-import { getDictionary } from "@/lib/dictionary.ts";
 import VerifyEmail from "@/routes/auth/VerifyEmail.tsx";
-import { Locale } from "@root/i18n.config.ts";
 import { auth } from "@src/auth.ts";
 import { redirect } from "next/navigation";
 
-export default async function Page({
-  params: { lang },
-}: {
-  params: { lang: Locale };
-}) {
+export default async function Page() {
   const session = await auth();
   if (session?.user) return redirect("/profile");
-  const dict = await getDictionary(lang);
 
-  return <VerifyEmail dict={dict} />;
+  return <VerifyEmail />;
 }

@@ -23,15 +23,14 @@ import Title from "@/components/Title";
 
 // Utils
 import { getAvailabilityInfo } from "@/utils/meeting/answer/getAvailabilityInfo";
-// import { getUnavailableUsersInfo } from "@/utils/meeting/answer/getUnavailableUsersInfo";
+import { getUnavailableUsersInfo } from "@/utils/meeting/answer/getUnavailableUsersInfo";
 import useMouseDown from "@/utils/useIsMouseDown";
 import { Locale } from "@root/i18n.config";
-import {getUnavailableUsersInfo} from "@/utils/meeting/answer/getUnavailableUsersInfo.ts";
 export default function AnswerMeeting({
   lang,
   dict,
   meetingData,
-    session,
+  session,
 }: {
   lang: Locale;
   dict: any;
@@ -58,7 +57,9 @@ export default function AnswerMeeting({
   const [lookedUpDatetime, setLookedUpDatetime] = useState<number>();
   const [lookedUpDate, setLookedUpDate] = useState<string>();
   const [lookedUpTime, setLookedUpTime] = useState<string>();
-  const [username, setUsername] = useState(isUserLoggedIn ? session.user.name : "");
+  const [username, setUsername] = useState(
+    isUserLoggedIn ? session.user.name : ""
+  );
   const [availableCount, setAvailableCount] = useState(0);
   const [answers, setAnswers] = useState<any>(meetingData.answers);
   const [meetName, setMeetName] = useState(meetingData.meetName);
@@ -121,7 +122,6 @@ export default function AnswerMeeting({
     if (!isMobile) {
       setUnselectMode(true);
     }
-    updateTimecell(dateTime, false);
     setSelectedTimecells(
       selectedTimecells.filter(
         (meetDateInfo) => meetDateInfo.meetDate !== dateTime
@@ -204,7 +204,7 @@ export default function AnswerMeeting({
   const isMinimumTimeHalfHour = (): boolean =>
     getMinimumTimeInDates().minute() === 30;
   const isMaximumTimeHalfHour = (): boolean =>
-    getMaximumTimeInDates().minute() === 0;
+    getMaximumTimeInDates().minute() === 30;
 
   const renderTimeCells = () => {
     const disabledTimecell = () => (
@@ -222,9 +222,9 @@ export default function AnswerMeeting({
       for (let h = 0; h < 2; h++) {
         // Handle half hours
         const isHalfHour = h === 1;
-        if (i == maximumTimeHour && isHalfHour && isMaximumTimeHalfHour())
+        if (i == maximumTimeHour && isHalfHour && !isMaximumTimeHalfHour())
           break;
-        if (i == minimumTimeHour && isHalfHour && isMinimumTimeHalfHour())
+        if (i == minimumTimeHour && !isHalfHour && isMinimumTimeHalfHour())
           continue;
 
         let timeRow: JSX.Element[] = [];
@@ -254,14 +254,21 @@ export default function AnswerMeeting({
             key={`${i}${isHalfHour ? "30" : "00"}`}
             className="cursor-pointer"
           >
-            {h === 0 && (
+            {((h === 0 &&
+              !(i === minimumTimeHour && isMinimumTimeHalfHour())) ||
+              (h === 1 && i === minimumTimeHour && isMinimumTimeHalfHour()) ||
+              (h === 1 &&
+                i === maximumTimeHour &&
+                !isMaximumTimeHalfHour())) && (
               <th
-                rowSpan={
-                  i == maximumTimeHour && isMaximumTimeHalfHour() ? 1 : 2
-                }
+                rowSpan={isHalfHour ? 1 : 2}
                 className="text-right text-dark align-top bg-light sticky left-0 pr-2"
               >
-                {`${i.toString().padStart(2, "0")}:${isHalfHour ? "30" : "00"}`}
+                {i === minimumTimeHour && isMinimumTimeHalfHour()
+                  ? `${i.toString().padStart(2, "0")}:30`
+                  : isHalfHour
+                  ? `${i.toString().padStart(2, "0")}:30`
+                  : `${i.toString().padStart(2, "0")}:00`}
               </th>
             )}
             {timeRow}
@@ -270,20 +277,19 @@ export default function AnswerMeeting({
       }
     }
 
-    // Add end hour row
-    const endHour = isMaximumTimeHalfHour()
-      ? maximumTimeHour
-      : maximumTimeHour + 1;
-    const key = `${endHour}${isMaximumTimeHalfHour() ? "30" : "00"}`;
-    timeCells.push(
-      <tr key={key} className="cursor-pointer">
-        <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2">
-          {`${endHour.toString().padStart(2, "0")}:${
-            isMaximumTimeHalfHour() ? "30" : "00"
-          }`}
-        </th>
-      </tr>
-    );
+    // Add end hour row only if maximum time is half hour
+    if (isMaximumTimeHalfHour()) {
+      const endHour = maximumTimeHour + 1;
+      const endMinute = "00";
+      const key = `${endHour}${endMinute}`;
+      timeCells.push(
+        <tr key={key} className="cursor-pointer">
+          <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2">
+            {`${endHour.toString().padStart(2, "0")}:${endMinute}`}
+          </th>
+        </tr>
+      );
+    }
 
     return timeCells;
   };
@@ -299,7 +305,7 @@ export default function AnswerMeeting({
     const handleMouseDown = () => {
       if ((isMobileAnsweringMode || isDesktop) && !unselectMode) {
         toggleTimecell(dateTime);
-      } else if (isMobileAnsweringMode && !unselectMode) {
+      } else if (!isMobileAnsweringMode && !isDesktop && !unselectMode) {
         setLookedUpDatetime(dateTime);
         convertDatetimeToDate(dateTime);
       }
@@ -393,7 +399,10 @@ export default function AnswerMeeting({
       const classNames = dayOfWeek === 0 ? "pr-4" : "";
 
       return (
-        <th key={date} className={`bg-light sticky top-0 z-10 ${classNames}`}>
+        <th
+          key={day.date}
+          className={`bg-light sticky top-0 z-10 ${classNames}`}
+        >
           <p className="text-sm text-dark font-medium">
             {`${date.toString().padStart(2, "0")}.${month
               .toString()
@@ -450,19 +459,22 @@ export default function AnswerMeeting({
           )
         );
 
-        const unavailableUsers = getUnavailableUsersInfo(answers, availableUsers);
+        const unavailableUsers = getUnavailableUsersInfo(
+          answers,
+          availableUsers
+        );
 
         const listOfUnavailableUsers = unavailableUsers?.map(
           (userData: any) => (
-              <li key={userData._id} className="text-gray flex items-center">
-                <span className="block h-3 w-3 rounded-full bg-gray mr-2"></span>
-                <s>{userData.username}</s>
-              </li>
+            <li key={userData._id} className="text-gray flex items-center">
+              <span className="block h-3 w-3 rounded-full bg-gray mr-2"></span>
+              <s>{userData.username}</s>
+            </li>
           )
         );
 
         const listOfAvailability = (
-            <ul>
+          <ul>
             {listOfOnlineAvailableUsers}
             {listOfOfflineAvailableUsers}
             {listOfUnavailableUsers}
@@ -518,19 +530,19 @@ export default function AnswerMeeting({
 
   const sendAnswerLoggedIn = async () => {
     try {
-      if (isSendingReq || !username) return;
+      if (isSendingReq) return;
 
       setIsSendingReq(true);
 
       const answerResponse = await axios.patch(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`,
-          { username, dates: selectedTimecells }
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`,
+        { username, dates: selectedTimecells }
       );
 
       if (answerResponse.status !== 200) return;
 
       const updatedMeetResponse = await axios.get(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`
       );
 
       if (updatedMeetResponse.status === 200) {
@@ -543,7 +555,7 @@ export default function AnswerMeeting({
     } finally {
       setIsSendingReq(false);
     }
-  }
+  };
 
   useEffect(() => {
     if (lookedUpDatetime && availabilityInfo[lookedUpDatetime]) {
@@ -556,15 +568,14 @@ export default function AnswerMeeting({
   // Forms
   const formSchema = yup.object().shape({
     name: yup
-        .string()
-        .required(dict.page.answerMeeting.validate.name.required)
-        .max(20, dict.page.answerMeeting.validate.name.max),
+      .string()
+      .required(dict.page.answerMeeting.validate.name.required)
+      .max(20, dict.page.answerMeeting.validate.name.max),
   });
 
   type Inputs = {
     name: string;
-  }
-
+  };
 
   const {
     register,
@@ -618,30 +629,35 @@ export default function AnswerMeeting({
 
           <form
             className="flex flex-1 flex-col place-content-start items-center"
-            onSubmit={isUserLoggedIn ? sendAnswerLoggedIn : handleSubmit(sendAnswer)}
+            onSubmit={
+              isUserLoggedIn ? sendAnswerLoggedIn : handleSubmit(sendAnswer)
+            }
           >
             <div className="flex flex-col-reverse lg:flex-col items-center lg:items-start">
-              {((mobileAnsweringMode && isMobile) || !isMobile) && !isUserLoggedIn && (
-                <div>
-                  <Input
-                    label={dict.page.answerMeeting.input.name.label}
-                    type="text"
-                    id="name"
-                    register={register}
-                    error={errors.name ? true : false}
-                    errorText={errors.name?.message?.toString()}
-                    onChange={(e) => setUsername(e.target.value)}
-                    value={username}
-                    placeholder={dict.page.answerMeeting.input.name.placeholder}
-                    name="name"
-                    autocomplete="name"
-                  />
-                </div>
-              )}
+              {((mobileAnsweringMode && isMobile) || !isMobile) &&
+                !isUserLoggedIn && (
+                  <div>
+                    <Input
+                      label={dict.page.answerMeeting.input.name.label}
+                      type="text"
+                      id="name"
+                      register={register}
+                      error={errors.name ? true : false}
+                      errorText={errors.name?.message?.toString()}
+                      onChange={(e) => setUsername(e.target.value)}
+                      value={username}
+                      placeholder={
+                        dict.page.answerMeeting.input.name.placeholder
+                      }
+                      name="name"
+                      autocomplete="name"
+                    />
+                  </div>
+                )}
               <div
-                className={`self-center overflow-auto max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[300px] w-auto max-w-[365px] md:max-w-[700px] lg:max-w-[350px] pr-3 ${!isUserLoggedIn && 'mt-5'} ${
-                  isMobile && "mb-10"
-                }`}
+                className={`self-center overflow-auto max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[300px] w-auto max-w-[365px] md:max-w-[700px] lg:max-w-[350px] pr-3 ${
+                  !isUserLoggedIn && "mt-5"
+                } ${isMobile && "mb-10"}`}
               >
                 <table className="time__seclection--table w-fit lg:mt-5 self-center select-none">
                   <thead>

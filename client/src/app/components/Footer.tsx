@@ -20,7 +20,9 @@ export default function Footer() {
             </span>
           </Link>
         </p>
-        <p className="text-center text-dark text-sm">2024 © meetifynow.com</p>
+        <p className="text-center text-dark text-sm">
+          {new Date().getFullYear()} © meetifynow.com
+        </p>
       </div>
     </footer>
   );

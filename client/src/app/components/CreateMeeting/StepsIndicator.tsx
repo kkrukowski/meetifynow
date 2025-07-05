@@ -11,10 +11,12 @@ export default function StepsIndicator(props: {
     for (let i = 0; i < props.steps; i++) {
       stepsItems.push(
         <StepIndicator
+          key={i}
           isCurrent={i === props.currIndex}
           isCompleted={i < props.currIndex}
           isLast={i === props.steps - 1}
           index={i}
+          shouldAnimateLine={i + 1 === props.currIndex}
         />
       );
     }

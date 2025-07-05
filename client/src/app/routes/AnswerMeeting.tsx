@@ -131,6 +131,8 @@ export default function AnswerMeeting({
 
   const [onlineSelectionMode, setOnlineSelectionMode] = useState(false);
   const [unselectMode, setUnselectMode] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [userPreviousAnswer, setUserPreviousAnswer] = useState<any>(null);
 
   const toggleTimecell = (dateTime: number) => {
     const isSelected = isDateSelected(dateTime);
@@ -498,6 +500,52 @@ export default function AnswerMeeting({
     setSelectedTimecells([]);
   }
 
+  const enterEditMode = () => {
+    if (userPreviousAnswer) {
+      // Wczytaj wcześniejsze odpowiedzi użytkownika
+      const previousDates = userPreviousAnswer.dates.map(
+        (date: any) => new MeetingDate(date.meetDate, date.isOnline)
+      );
+      setSelectedTimecells(previousDates);
+      setIsEditMode(true);
+    }
+  };
+
+  const exitEditMode = () => {
+    setIsEditMode(false);
+    setSelectedTimecells([]);
+  };
+
+  const saveEditedAnswer = async () => {
+    try {
+      if (isSendingReq) return;
+
+      setIsSendingReq(true);
+
+      const answerResponse = await axios.patch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`,
+        { username, dates: selectedTimecells }
+      );
+
+      if (answerResponse.status !== 200) return;
+
+      const updatedMeetResponse = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`
+      );
+
+      if (updatedMeetResponse.status === 200) {
+        setAnswers(updatedMeetResponse.data.answers);
+        setMeetName(updatedMeetResponse.data.meetName);
+        setIsEditMode(false);
+        setSelectedTimecells([]);
+      }
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsSendingReq(false);
+    }
+  };
+
   const [isSendingReq, setIsSendingReq] = useState(false);
   const sendAnswer: SubmitHandler<Inputs> = async () => {
     try {
@@ -565,6 +613,16 @@ export default function AnswerMeeting({
     }
   }, [lookedUpDatetime, availabilityInfo]);
 
+  // Znajdź wcześniejszą odpowiedź zalogowanego użytkownika
+  useEffect(() => {
+    if (isUserLoggedIn && session?.user?.name) {
+      const existingAnswer = answers.find(
+        (answer: any) => answer.username === session.user.name
+      );
+      setUserPreviousAnswer(existingAnswer);
+    }
+  }, [answers, isUserLoggedIn, session]);
+
   // Forms
   const formSchema = yup.object().shape({
     name: yup
@@ -630,7 +688,14 @@ export default function AnswerMeeting({
           <form
             className="flex flex-1 flex-col place-content-start items-center"
             onSubmit={
-              isUserLoggedIn ? sendAnswerLoggedIn : handleSubmit(sendAnswer)
+              isEditMode
+                ? (e) => e.preventDefault()
+                : isUserLoggedIn && !userPreviousAnswer
+                ? (e) => {
+                    e.preventDefault();
+                    sendAnswerLoggedIn();
+                  }
+                : handleSubmit(sendAnswer)
             }
           >
             <div className="flex flex-col-reverse lg:flex-col items-center lg:items-start">
@@ -654,10 +719,19 @@ export default function AnswerMeeting({
                     />
                   </div>
                 )}
+              {isEditMode && (
+                <div className="mb-4 p-3 bg-primary/10 border border-primary rounded-lg">
+                  <p className="text-primary font-medium text-center">
+                    Tryb edycji - modyfikuj swoją odpowiedź
+                  </p>
+                </div>
+              )}
               <div
                 className={`self-center overflow-auto max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[300px] w-auto max-w-[365px] md:max-w-[700px] lg:max-w-[350px] pr-3 ${
                   !isUserLoggedIn && "mt-5"
-                } ${isMobile && "mb-10"}`}
+                } ${isMobile && "mb-10"} ${
+                  isEditMode && "ring-2 ring-primary ring-opacity-50 rounded-lg"
+                }`}
               >
                 <table className="time__seclection--table w-fit lg:mt-5 self-center select-none">
                   <thead>
@@ -730,7 +804,37 @@ export default function AnswerMeeting({
                   </Popup>
                 </div>
 
-                <Button text={dict.page.answerMeeting.button.submit} />
+                {isEditMode ? (
+                  <div className="flex gap-2">
+                    <Button
+                      text="Zapisz zmiany"
+                      onClick={saveEditedAnswer}
+                      disabled={isSendingReq}
+                    />
+                    <Button
+                      text="Anuluj"
+                      onClick={exitEditMode}
+                      disabled={isSendingReq}
+                    />
+                  </div>
+                ) : (
+                  <div className="flex gap-2">
+                    {!isUserLoggedIn && (
+                      <Button text={dict.page.answerMeeting.button.submit} />
+                    )}
+                    {isUserLoggedIn && !userPreviousAnswer && (
+                      <Button
+                        text={dict.page.answerMeeting.button.submit}
+                        onClick={sendAnswerLoggedIn}
+                        disabled={isSendingReq}
+                      />
+                    )}
+                    {isUserLoggedIn && userPreviousAnswer && (
+                      <Button text="Edytuj odpowiedź" onClick={enterEditMode} />
+                    )}
+                  </div>
+                )}
+
                 <CopyLinkButton
                   link={currentUrl}
                   dict={dict}

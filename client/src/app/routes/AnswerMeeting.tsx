@@ -500,52 +500,6 @@ export default function AnswerMeeting({
     setSelectedTimecells([]);
   }
 
-  const enterEditMode = () => {
-    if (userPreviousAnswer) {
-      // Wczytaj wcześniejsze odpowiedzi użytkownika
-      const previousDates = userPreviousAnswer.dates.map(
-        (date: any) => new MeetingDate(date.meetDate, date.isOnline)
-      );
-      setSelectedTimecells(previousDates);
-      setIsEditMode(true);
-    }
-  };
-
-  const exitEditMode = () => {
-    setIsEditMode(false);
-    setSelectedTimecells([]);
-  };
-
-  const saveEditedAnswer = async () => {
-    try {
-      if (isSendingReq) return;
-
-      setIsSendingReq(true);
-
-      const answerResponse = await axios.patch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`,
-        { username, dates: selectedTimecells }
-      );
-
-      if (answerResponse.status !== 200) return;
-
-      const updatedMeetResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`
-      );
-
-      if (updatedMeetResponse.status === 200) {
-        setAnswers(updatedMeetResponse.data.answers);
-        setMeetName(updatedMeetResponse.data.meetName);
-        setIsEditMode(false);
-        setSelectedTimecells([]);
-      }
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsSendingReq(false);
-    }
-  };
-
   const [isSendingReq, setIsSendingReq] = useState(false);
   const sendAnswer: SubmitHandler<Inputs> = async () => {
     try {
@@ -615,10 +569,18 @@ export default function AnswerMeeting({
 
   // Znajdź wcześniejszą odpowiedź zalogowanego użytkownika
   useEffect(() => {
+    console.log("🔍 Sprawdzanie wcześniejszej odpowiedzi użytkownika:", {
+      isUserLoggedIn,
+      username: session?.user?.name,
+      answersCount: answers.length,
+      answers: answers,
+    });
+
     if (isUserLoggedIn && session?.user?.name) {
       const existingAnswer = answers.find(
         (answer: any) => answer.username === session.user.name
       );
+      console.log("📝 Znaleziona wcześniejsza odpowiedź:", existingAnswer);
       setUserPreviousAnswer(existingAnswer);
     }
   }, [answers, isUserLoggedIn, session]);
@@ -642,6 +604,98 @@ export default function AnswerMeeting({
   } = useForm<Inputs>({
     resolver: yupResolver(formSchema),
   });
+
+  const enterEditMode = () => {
+    console.log("🔄 Wchodzenie w tryb edycji:", {
+      userPreviousAnswer,
+      currentSelectedTimecells: selectedTimecells,
+    });
+
+    if (userPreviousAnswer) {
+      // Wczytaj wcześniejsze odpowiedzi użytkownika
+      const previousDates = userPreviousAnswer.dates.map(
+        (date: any) => new MeetingDate(date.meetDate, date.isOnline)
+      );
+
+      console.log("📅 Wczytywanie wcześniejszych dat:", {
+        originalDates: userPreviousAnswer.dates,
+        convertedDates: previousDates,
+      });
+
+      setSelectedTimecells(previousDates);
+      setIsEditMode(true);
+
+      console.log("✅ Tryb edycji aktywowany");
+    } else {
+      console.warn("⚠️ Brak wcześniejszej odpowiedzi do edycji");
+    }
+  };
+
+  const exitEditMode = () => {
+    console.log("❌ Wychodzenie z trybu edycji");
+    setIsEditMode(false);
+    setSelectedTimecells([]);
+    console.log("🧹 Wybory wyczyszczone");
+  };
+
+  const saveEditedAnswer = async () => {
+    console.log("💾 Zapisywanie edytowanej odpowiedzi:", {
+      username,
+      selectedTimecells,
+      isSendingReq,
+    });
+
+    try {
+      if (isSendingReq) {
+        console.log("⏳ Żądanie już w toku, przerywanie");
+        return;
+      }
+
+      setIsSendingReq(true);
+
+      const requestData = { username, dates: selectedTimecells };
+      console.log("📤 Wysyłanie żądania PATCH:", requestData);
+
+      const answerResponse = await axios.patch(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`,
+        requestData
+      );
+
+      console.log("📥 Odpowiedź serwera (PATCH):", answerResponse);
+
+      if (answerResponse.status !== 200) {
+        console.error("❌ Błąd przy zapisywaniu:", answerResponse.status);
+        return;
+      }
+
+      console.log("🔄 Pobieranie zaktualizowanych danych spotkania...");
+      const updatedMeetResponse = await axios.get(
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`
+      );
+
+      console.log(
+        "📥 Zaktualizowane dane spotkania:",
+        updatedMeetResponse.data
+      );
+
+      if (updatedMeetResponse.status === 200) {
+        setAnswers(updatedMeetResponse.data.answers);
+        setMeetName(updatedMeetResponse.data.meetName);
+        setIsEditMode(false);
+        setSelectedTimecells([]);
+
+        console.log("✅ Edycja zapisana pomyślnie!", {
+          newAnswersCount: updatedMeetResponse.data.answers.length,
+          exitingEditMode: true,
+        });
+      }
+    } catch (error) {
+      console.error("💥 Błąd podczas zapisywania edycji:", error);
+    } finally {
+      setIsSendingReq(false);
+      console.log("🔓 isSendingReq ustawione na false");
+    }
+  };
 
   return (
     <main className="flex md:flex-1 flex-col px-5 py-10 pt-24 lg:p-24 lg:pt-28 h-smd:pt-30 lg:m-0 w-[356px] md:w-auto lg:w-[900px]">
@@ -688,14 +742,7 @@ export default function AnswerMeeting({
           <form
             className="flex flex-1 flex-col place-content-start items-center"
             onSubmit={
-              isEditMode
-                ? (e) => e.preventDefault()
-                : isUserLoggedIn && !userPreviousAnswer
-                ? (e) => {
-                    e.preventDefault();
-                    sendAnswerLoggedIn();
-                  }
-                : handleSubmit(sendAnswer)
+              isUserLoggedIn ? sendAnswerLoggedIn : handleSubmit(sendAnswer)
             }
           >
             <div className="flex flex-col-reverse lg:flex-col items-center lg:items-start">
@@ -719,19 +766,10 @@ export default function AnswerMeeting({
                     />
                   </div>
                 )}
-              {isEditMode && (
-                <div className="mb-4 p-3 bg-primary/10 border border-primary rounded-lg">
-                  <p className="text-primary font-medium text-center">
-                    Tryb edycji - modyfikuj swoją odpowiedź
-                  </p>
-                </div>
-              )}
               <div
                 className={`self-center overflow-auto max-h-[300px] h-md:max-h-[350px] h-mdl:max-h-[400px] h-hd:max-h-[400px] md:h-lg:max-h-[600px] lg:max-h-[300px] w-auto max-w-[365px] md:max-w-[700px] lg:max-w-[350px] pr-3 ${
                   !isUserLoggedIn && "mt-5"
-                } ${isMobile && "mb-10"} ${
-                  isEditMode && "ring-2 ring-primary ring-opacity-50 rounded-lg"
-                }`}
+                } ${isMobile && "mb-10"}`}
               >
                 <table className="time__seclection--table w-fit lg:mt-5 self-center select-none">
                   <thead>
@@ -804,37 +842,7 @@ export default function AnswerMeeting({
                   </Popup>
                 </div>
 
-                {isEditMode ? (
-                  <div className="flex gap-2">
-                    <Button
-                      text="Zapisz zmiany"
-                      onClick={saveEditedAnswer}
-                      disabled={isSendingReq}
-                    />
-                    <Button
-                      text="Anuluj"
-                      onClick={exitEditMode}
-                      disabled={isSendingReq}
-                    />
-                  </div>
-                ) : (
-                  <div className="flex gap-2">
-                    {!isUserLoggedIn && (
-                      <Button text={dict.page.answerMeeting.button.submit} />
-                    )}
-                    {isUserLoggedIn && !userPreviousAnswer && (
-                      <Button
-                        text={dict.page.answerMeeting.button.submit}
-                        onClick={sendAnswerLoggedIn}
-                        disabled={isSendingReq}
-                      />
-                    )}
-                    {isUserLoggedIn && userPreviousAnswer && (
-                      <Button text="Edytuj odpowiedź" onClick={enterEditMode} />
-                    )}
-                  </div>
-                )}
-
+                <Button text={dict.page.answerMeeting.button.submit} />
                 <CopyLinkButton
                   link={currentUrl}
                   dict={dict}

@@ -71,19 +71,29 @@ export default function CreateMeeting({
   const [dailyTimeRanges, setDailyTimeRanges] = useState<DailyTimeRange[]>([]);
 
   const getStartTime = (datetime: number) => {
+    // Check if there are custom daily hours for this date
+    if (dailyHours[datetime]) {
+      return dailyHours[datetime].from;
+    }
+
     const timeRange = dailyTimeRanges.find((range) => range.date === datetime);
     if (timeRange) {
       return timeRange.times[0];
     }
-    return 8;
+    return mainFromTime;
   };
 
   const getEndTime = (datetime: number) => {
+    // Check if there are custom daily hours for this date
+    if (dailyHours[datetime]) {
+      return dailyHours[datetime].to;
+    }
+
     const timeRange = dailyTimeRanges.find((range) => range.date === datetime);
     if (timeRange) {
       return timeRange?.times[timeRange?.times.length - 1];
     }
-    return 9;
+    return mainToTime;
   };
 
   const convertDatetimeToTime = (datetime: number) => {
@@ -124,9 +134,14 @@ export default function CreateMeeting({
   const fillDailyTimeRanges = () => {
     const timeRanges: DailyTimeRange[] = [];
     selectedDates.forEach((date) => {
+      // Use daily hours if set, otherwise use main time
+      const dayHours = dailyHours[date];
+      const fromHour = dayHours ? dayHours.from : mainFromTime;
+      const toHour = dayHours ? dayHours.to : mainToTime;
+
       timeRanges.push({
         date: date,
-        times: getTimeRangeDatetimes(date, 8, 9),
+        times: getTimeRangeDatetimes(date, fromHour, toHour),
       });
     });
     setDailyTimeRanges(timeRanges);
@@ -519,9 +534,25 @@ export default function CreateMeeting({
         to = value;
         if (to <= from) from = Math.max(to - 1, 0);
       }
+
+      // Update dailyTimeRanges immediately after state update
+      setTimeout(() => {
+        setDailyTimeRanges((prevTimeRanges) => {
+          const index = getDailyTimeRangeIndex(date);
+          if (index !== -1) {
+            const updatedTimeRanges = [...prevTimeRanges];
+            updatedTimeRanges[index] = {
+              date: date,
+              times: getTimeRangeDatetimes(date, from, to),
+            };
+            return updatedTimeRanges;
+          }
+          return prevTimeRanges;
+        });
+      }, 0);
+
       return { ...prev, [date]: { from, to } };
     });
-    // Optionally update dailyTimeRanges here if needed
   };
 
   // Add state for main time selection
@@ -713,6 +744,26 @@ export default function CreateMeeting({
                               if (newFrom >= mainToTime) {
                                 setMainToTime(Math.min(newFrom + 1, 24));
                               }
+                              // Update dailyTimeRanges for all dates that don't have custom hours
+                              setDailyTimeRanges((prevTimeRanges) => {
+                                return prevTimeRanges.map((range) => {
+                                  if (!dailyHours[range.date]) {
+                                    const toTime =
+                                      newFrom >= mainToTime
+                                        ? Math.min(newFrom + 1, 24)
+                                        : mainToTime;
+                                    return {
+                                      ...range,
+                                      times: getTimeRangeDatetimes(
+                                        range.date,
+                                        newFrom,
+                                        toTime
+                                      ),
+                                    };
+                                  }
+                                  return range;
+                                });
+                              });
                             }}
                           />
                           <span className="m-4"> - </span>
@@ -725,6 +776,26 @@ export default function CreateMeeting({
                               if (newTo <= mainFromTime) {
                                 setMainFromTime(Math.max(newTo - 1, 0));
                               }
+                              // Update dailyTimeRanges for all dates that don't have custom hours
+                              setDailyTimeRanges((prevTimeRanges) => {
+                                return prevTimeRanges.map((range) => {
+                                  if (!dailyHours[range.date]) {
+                                    const fromTime =
+                                      newTo <= mainFromTime
+                                        ? Math.max(newTo - 1, 0)
+                                        : mainFromTime;
+                                    return {
+                                      ...range,
+                                      times: getTimeRangeDatetimes(
+                                        range.date,
+                                        fromTime,
+                                        newTo
+                                      ),
+                                    };
+                                  }
+                                  return range;
+                                });
+                              });
                             }}
                           />
                         </>

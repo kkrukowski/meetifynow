@@ -131,8 +131,6 @@ export default function AnswerMeeting({
 
   const [onlineSelectionMode, setOnlineSelectionMode] = useState(false);
   const [unselectMode, setUnselectMode] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [userPreviousAnswer, setUserPreviousAnswer] = useState<any>(null);
 
   const toggleTimecell = (dateTime: number) => {
     const isSelected = isDateSelected(dateTime);
@@ -567,24 +565,6 @@ export default function AnswerMeeting({
     }
   }, [lookedUpDatetime, availabilityInfo]);
 
-  // Znajdź wcześniejszą odpowiedź zalogowanego użytkownika
-  useEffect(() => {
-    console.log("🔍 Sprawdzanie wcześniejszej odpowiedzi użytkownika:", {
-      isUserLoggedIn,
-      username: session?.user?.name,
-      answersCount: answers.length,
-      answers: answers,
-    });
-
-    if (isUserLoggedIn && session?.user?.name) {
-      const existingAnswer = answers.find(
-        (answer: any) => answer.username === session.user.name
-      );
-      console.log("📝 Znaleziona wcześniejsza odpowiedź:", existingAnswer);
-      setUserPreviousAnswer(existingAnswer);
-    }
-  }, [answers, isUserLoggedIn, session]);
-
   // Forms
   const formSchema = yup.object().shape({
     name: yup
@@ -604,98 +584,6 @@ export default function AnswerMeeting({
   } = useForm<Inputs>({
     resolver: yupResolver(formSchema),
   });
-
-  const enterEditMode = () => {
-    console.log("🔄 Wchodzenie w tryb edycji:", {
-      userPreviousAnswer,
-      currentSelectedTimecells: selectedTimecells,
-    });
-
-    if (userPreviousAnswer) {
-      // Wczytaj wcześniejsze odpowiedzi użytkownika
-      const previousDates = userPreviousAnswer.dates.map(
-        (date: any) => new MeetingDate(date.meetDate, date.isOnline)
-      );
-
-      console.log("📅 Wczytywanie wcześniejszych dat:", {
-        originalDates: userPreviousAnswer.dates,
-        convertedDates: previousDates,
-      });
-
-      setSelectedTimecells(previousDates);
-      setIsEditMode(true);
-
-      console.log("✅ Tryb edycji aktywowany");
-    } else {
-      console.warn("⚠️ Brak wcześniejszej odpowiedzi do edycji");
-    }
-  };
-
-  const exitEditMode = () => {
-    console.log("❌ Wychodzenie z trybu edycji");
-    setIsEditMode(false);
-    setSelectedTimecells([]);
-    console.log("🧹 Wybory wyczyszczone");
-  };
-
-  const saveEditedAnswer = async () => {
-    console.log("💾 Zapisywanie edytowanej odpowiedzi:", {
-      username,
-      selectedTimecells,
-      isSendingReq,
-    });
-
-    try {
-      if (isSendingReq) {
-        console.log("⏳ Żądanie już w toku, przerywanie");
-        return;
-      }
-
-      setIsSendingReq(true);
-
-      const requestData = { username, dates: selectedTimecells };
-      console.log("📤 Wysyłanie żądania PATCH:", requestData);
-
-      const answerResponse = await axios.patch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`,
-        requestData
-      );
-
-      console.log("📥 Odpowiedź serwera (PATCH):", answerResponse);
-
-      if (answerResponse.status !== 200) {
-        console.error("❌ Błąd przy zapisywaniu:", answerResponse.status);
-        return;
-      }
-
-      console.log("🔄 Pobieranie zaktualizowanych danych spotkania...");
-      const updatedMeetResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`
-      );
-
-      console.log(
-        "📥 Zaktualizowane dane spotkania:",
-        updatedMeetResponse.data
-      );
-
-      if (updatedMeetResponse.status === 200) {
-        setAnswers(updatedMeetResponse.data.answers);
-        setMeetName(updatedMeetResponse.data.meetName);
-        setIsEditMode(false);
-        setSelectedTimecells([]);
-
-        console.log("✅ Edycja zapisana pomyślnie!", {
-          newAnswersCount: updatedMeetResponse.data.answers.length,
-          exitingEditMode: true,
-        });
-      }
-    } catch (error) {
-      console.error("💥 Błąd podczas zapisywania edycji:", error);
-    } finally {
-      setIsSendingReq(false);
-      console.log("🔓 isSendingReq ustawione na false");
-    }
-  };
 
   return (
     <main className="flex md:flex-1 flex-col px-5 py-10 pt-24 lg:p-24 lg:pt-28 h-smd:pt-30 lg:m-0 w-[356px] md:w-auto lg:w-[900px]">

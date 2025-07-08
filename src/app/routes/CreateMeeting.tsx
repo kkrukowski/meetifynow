@@ -30,17 +30,24 @@ import {
 
 import { Locale } from "@root/i18n.config";
 import axios from "axios";
+import { useSession } from "next-auth/react";
 import AnswerMeetingLoader from "./AnswerMeetingLoader";
 
 export default function CreateMeeting({
   lang,
   dict,
-  auth,
 }: {
   lang: Locale;
   dict: any;
-  auth: any;
 }) {
+  // Auth session
+  const { data: session, status } = useSession({
+    required: true,
+    onUnauthenticated() {
+      router.push(`/${lang}/login`);
+    },
+  });
+
   // Moment locale
   moment.locale(lang);
 
@@ -394,17 +401,18 @@ export default function CreateMeeting({
   const [isRequestInProgress, setIsRequestInProgress] = useState(false);
   const createMeeting: SubmitHandler<Inputs> = async () => {
     if (isRequestInProgress) {
-      return <AnswerMeetingLoader />;
+      return;
     }
     try {
       setIsRequestInProgress(true);
       if (!validateDate()) {
+        setIsRequestInProgress(false);
         return;
       }
 
       const meetData = {
         meetName: meetDetails?.name,
-        authorId: auth ? auth.user.id : null,
+        authorId: session?.user?.id,
         meetPlace: meetDetails?.place,
         meetLink: meetDetails?.link,
         dates: dailyTimeRanges,
@@ -420,6 +428,7 @@ export default function CreateMeeting({
       router.push(meetUrl);
     } catch (error) {
       console.error(error);
+      setIsRequestInProgress(false);
     }
   };
 
@@ -559,7 +568,7 @@ export default function CreateMeeting({
   const [mainFromTime, setMainFromTime] = useState(8);
   const [mainToTime, setMainToTime] = useState(9);
 
-  if (isRequestInProgress) {
+  if (isRequestInProgress || status === "loading") {
     return <AnswerMeetingLoader />;
   } else {
     return (

@@ -5,29 +5,27 @@ import { Locale, i18n } from "@root/i18n.config";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Metadata } from "next";
-import { headers } from "next/headers";
 import Script from "next/script";
-import { cache } from "react";
 import { getDictionary } from "./lib/dictionary";
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale: Locale) => ({ lang: locale }));
 }
 
-const getLocale = cache((): Locale => {
-  const preference = headers().get("X-Language-Preference");
-  return (preference ?? "en") as Locale;
-});
+export async function generateMetadata({
+  params,
+}: {
+  params: { lang: Locale };
+}): Promise<Metadata> {
+  const dict = await getDictionary(params.lang);
+  const baseUrl = "https://meetifynow.com";
 
-export async function generateMetadata() {
-  const dict = await getDictionary(getLocale() as Locale);
-
-  const metadata: Metadata = {
+  return {
     title: dict.website.title,
     description: dict.website.description,
     openGraph: {
-      images: "https://meetifynow.com/imgs/og-image.webp",
-      url: dict.website.url,
+      images: `${baseUrl}/imgs/og-image.webp`,
+      url: `${baseUrl}/${params.lang}`,
       description: dict.website.description,
       siteName: "MeetifyNow",
       type: "website",
@@ -37,22 +35,26 @@ export async function generateMetadata() {
       card: "summary_large_image",
       title: "MeetifyNow",
       description: dict.website.description,
-      images: "https://meetifynow.com/imgs/og-image.webp",
+      images: `${baseUrl}/imgs/og-image.webp`,
     },
     alternates: {
-      canonical: "https://meetifynow.com/en",
+      canonical: `${baseUrl}/${params.lang}`,
       languages: {
-        en: "https://meetifynow.com/en",
-        pl: "https://meetifynow.com/pl",
+        en: `${baseUrl}/en`,
+        pl: `${baseUrl}/pl`,
       },
     },
   };
-
-  return metadata;
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  const locale = getLocale();
+export default function Layout({
+  children,
+  params,
+}: {
+  children: React.ReactNode;
+  params: { lang: Locale };
+}) {
+  const { lang: locale } = params;
 
   return (
     <html lang={locale}>

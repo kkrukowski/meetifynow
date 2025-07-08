@@ -7,7 +7,7 @@ import moment from "moment";
 import "moment/locale/pl";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { SubmitHandler, useForm } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import { useMediaQuery } from "react-responsive";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
@@ -499,7 +499,7 @@ export default function AnswerMeeting({
   }
 
   const [isSendingReq, setIsSendingReq] = useState(false);
-  const sendAnswer: SubmitHandler<Inputs> = async () => {
+  const sendAnswer = async () => {
     try {
       if (isSendingReq || !username) return;
 

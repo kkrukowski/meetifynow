@@ -2,17 +2,20 @@
 
 import { LoginButton } from "@/components/Auth/LoginButton.tsx";
 import { LogoutButton } from "@/components/Auth/LogoutButton.tsx";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FaUserCircle } from "react-icons/fa";
 
 type HamburgerMenuProps = {
-  sessionUser: any;
   dict: any;
 };
 
-export default function HamburgerMenu(props: HamburgerMenuProps) {
+export default function HamburgerMenu({ dict }: HamburgerMenuProps) {
+  const { data: session } = useSession();
+  const sessionUser = session?.user;
+
   const [isOpen, setIsOpen] = useState(false);
   const pathname = usePathname();
 
@@ -69,7 +72,7 @@ export default function HamburgerMenu(props: HamburgerMenuProps) {
         <div className={`mt-[100px] flex flex-col items-center`}>
           {/* User info */}
           <div className={`flex items-center justify-center mb-5`}>
-            {props.sessionUser && (
+            {sessionUser && (
               <Link
                 href={`/profile`}
                 onClick={closeMenu}
@@ -79,14 +82,14 @@ export default function HamburgerMenu(props: HamburgerMenuProps) {
               </Link>
             )}
             <div>
-              {props.sessionUser ? (
+              {sessionUser ? (
                 <div className={`text-dark text-base font-medium`}>
-                  <p>{props.sessionUser.name}</p>
-                  <p>{props.sessionUser.email}</p>
+                  <p>{sessionUser.name}</p>
+                  <p>{sessionUser.email}</p>
                 </div>
               ) : (
                 <LoginButton
-                  text={props.dict.page.login.button.login}
+                  text={dict.page.login.button.login}
                   mode="redirect"
                 />
               )}
@@ -111,16 +114,16 @@ export default function HamburgerMenu(props: HamburgerMenuProps) {
             </Link>
           </div>
           {/* Auth items */}
-          {props.sessionUser && (
+          {sessionUser && (
             <div className={`flex flex-col items-center`}>
               <Link
                 href={"/profile"}
                 onClick={closeMenu}
                 className={`text-primary text-xl hover:text-primary-hover active:text-primary-active font-medium p-3`}
               >
-                <span>{props.dict.page.auth.hamburgerMenu.profile}</span>
+                <span>{dict.page.auth.hamburgerMenu.profile}</span>
               </Link>
-              <LogoutButton text={props.dict.page.auth.hamburgerMenu.logout} />
+              <LogoutButton text={dict.page.auth.hamburgerMenu.logout} />
             </div>
           )}
         </div>

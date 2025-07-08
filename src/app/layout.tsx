@@ -1,5 +1,6 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar/Navbar.tsx";
+import Providers from "@/components/Providers";
 import "@/global.css";
 import { Locale, i18n } from "@root/i18n.config";
 import { Analytics } from "@vercel/analytics/react";
@@ -72,11 +73,13 @@ export default function Layout({
         </Script>
       </head>
       <body>
-        <Navbar lang={locale} />
-        {children}
-        <Footer />
-        <Analytics />
-        <SpeedInsights />
+        <Providers>
+          <Navbar lang={locale} />
+          {children}
+          <Footer />
+          <Analytics />
+          <SpeedInsights />
+        </Providers>
       </body>
     </html>
   );

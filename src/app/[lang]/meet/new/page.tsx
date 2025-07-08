@@ -8,9 +8,7 @@ export async function generateMetadata({
   params: { lang: Locale };
 }) {
   const dict = await getDictionary(lang);
-
   const title = dict.page.createMeeting.title + ` - MeetifyNow`;
-
   return {
     title,
   };
@@ -22,6 +20,5 @@ export default async function Page({
   params: { lang: Locale };
 }) {
   const dict = await getDictionary(lang);
-
   return <CreateMeeting lang={lang} dict={dict} />;
 }

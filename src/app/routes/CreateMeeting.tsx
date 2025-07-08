@@ -40,19 +40,14 @@ export default function CreateMeeting({
   lang: Locale;
   dict: any;
 }) {
+  // Router
+  const router = useRouter();
+
   // Auth session
-  const { data: session, status } = useSession({
-    required: true,
-    onUnauthenticated() {
-      router.push(`/${lang}/login`);
-    },
-  });
+  const { data: session, status } = useSession();
 
   // Moment locale
   moment.locale(lang);
-
-  // Router
-  const router = useRouter();
 
   // Steps
   const [prevStep, setPrevStep] = useState(0);

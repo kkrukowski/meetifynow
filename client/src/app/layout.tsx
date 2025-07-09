@@ -26,7 +26,7 @@ export async function generateMetadata() {
     title: dict.website.title,
     description: dict.website.description,
     openGraph: {
-      images: "https://meetifynow.com/imgs/og-image.webp",
+      images: "https://krukodudl.online/imgs/og-image.webp",
       url: dict.website.url,
       description: dict.website.description,
       siteName: "MeetifyNow",
@@ -37,13 +37,13 @@ export async function generateMetadata() {
       card: "summary_large_image",
       title: "MeetifyNow",
       description: dict.website.description,
-      images: "https://meetifynow.com/imgs/og-image.webp",
+      images: "https://krukodudl.online/imgs/og-image.webp",
     },
     alternates: {
-      canonical: "https://meetifynow.com/en",
+      canonical: "https://krukodudl.online/en",
       languages: {
-        en: "https://meetifynow.com/en",
-        pl: "https://meetifynow.com/pl",
+        en: "https://krukodudl.online/en",
+        pl: "https://krukodudl.online/pl",
       },
     },
   };
@@ -64,7 +64,7 @@ export default function Layout({ children }: { children: React.ReactNode }) {
                 "@type" : "WebSite",
                 "name" : "MeetifyNow",
                 "alternateName" : "MN",
-                "url" : "https://meetifynow.com/"
+                "url" : "https://krukodudl.online/"
             }
         `}
         </Script>

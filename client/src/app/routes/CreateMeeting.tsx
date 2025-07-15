@@ -96,6 +96,37 @@ export default function CreateMeeting({
     return mainToTime;
   };
 
+  // Add function to get global time range considering all daily hours
+  const getGlobalTimeRange = () => {
+    const allFromTimes: number[] = [];
+    const allToTimes: number[] = [];
+
+    // Get times from dailyHours
+    Object.values(dailyHours).forEach(({ from, to }) => {
+      allFromTimes.push(from);
+      allToTimes.push(to);
+    });
+
+    // Get times from dailyTimeRanges for dates without custom daily hours
+    dailyTimeRanges.forEach((range) => {
+      if (!dailyHours[range.date]) {
+        allFromTimes.push(mainFromTime);
+        allToTimes.push(mainToTime);
+      }
+    });
+
+    // If no custom times are set, use main times
+    if (allFromTimes.length === 0) {
+      allFromTimes.push(mainFromTime);
+      allToTimes.push(mainToTime);
+    }
+
+    return {
+      globalFrom: Math.min(...allFromTimes),
+      globalTo: Math.max(...allToTimes),
+    };
+  };
+
   const convertDatetimeToTime = (datetime: number) => {
     return moment(datetime);
   };
@@ -133,11 +164,13 @@ export default function CreateMeeting({
 
   const fillDailyTimeRanges = () => {
     const timeRanges: DailyTimeRange[] = [];
+    const { globalFrom, globalTo } = getGlobalTimeRange();
+
     selectedDates.forEach((date) => {
-      // Use daily hours if set, otherwise use main time
+      // Use daily hours if set, otherwise use global time range
       const dayHours = dailyHours[date];
-      const fromHour = dayHours ? dayHours.from : mainFromTime;
-      const toHour = dayHours ? dayHours.to : mainToTime;
+      const fromHour = dayHours ? dayHours.from : globalFrom;
+      const toHour = dayHours ? dayHours.to : globalTo;
 
       timeRanges.push({
         date: date,
@@ -535,23 +568,46 @@ export default function CreateMeeting({
         if (to <= from) from = Math.max(to - 1, 0);
       }
 
+      const newDailyHours = { ...prev, [date]: { from, to } };
+
+      // Calculate new global range with updated daily hours
+      const allFromTimes: number[] = [];
+      const allToTimes: number[] = [];
+
+      Object.values(newDailyHours).forEach(({ from: f, to: t }) => {
+        allFromTimes.push(f);
+        allToTimes.push(t);
+      });
+
+      selectedDates.forEach((selectedDate) => {
+        if (!newDailyHours[selectedDate]) {
+          allFromTimes.push(mainFromTime);
+          allToTimes.push(mainToTime);
+        }
+      });
+
+      const globalFrom =
+        allFromTimes.length > 0 ? Math.min(...allFromTimes) : mainFromTime;
+      const globalTo =
+        allToTimes.length > 0 ? Math.max(...allToTimes) : mainToTime;
+
       // Update dailyTimeRanges immediately after state update
       setTimeout(() => {
         setDailyTimeRanges((prevTimeRanges) => {
-          const index = getDailyTimeRangeIndex(date);
-          if (index !== -1) {
-            const updatedTimeRanges = [...prevTimeRanges];
-            updatedTimeRanges[index] = {
-              date: date,
-              times: getTimeRangeDatetimes(date, from, to),
+          return prevTimeRanges.map((range) => {
+            const dayHours = newDailyHours[range.date];
+            const rangeFrom = dayHours ? dayHours.from : globalFrom;
+            const rangeTo = dayHours ? dayHours.to : globalTo;
+
+            return {
+              date: range.date,
+              times: getTimeRangeDatetimes(range.date, rangeFrom, rangeTo),
             };
-            return updatedTimeRanges;
-          }
-          return prevTimeRanges;
+          });
         });
       }, 0);
 
-      return { ...prev, [date]: { from, to } };
+      return newDailyHours;
     });
   };
 

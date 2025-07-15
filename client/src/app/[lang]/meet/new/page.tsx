@@ -1,7 +1,7 @@
+import CreateMeeting from "@/components/CreateMeeting/CreateMeeting";
 import { getDictionary } from "@/lib/dictionary";
-import CreateMeeting from "@/routes/CreateMeeting";
 import { Locale } from "@root/i18n.config";
-import {auth} from "@src/auth.ts";
+import { auth } from "@src/auth.ts";
 
 export async function generateMetadata({
   params: { lang },

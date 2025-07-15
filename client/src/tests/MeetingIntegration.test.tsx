@@ -2,8 +2,8 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import axios from "axios";
 import moment from "moment";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import CreateMeeting from "../app/components/CreateMeeting/CreateMeeting";
 import AnswerMeeting from "../app/routes/AnswerMeeting";
-import CreateMeeting from "../app/routes/CreateMeeting";
 
 // Mock axios
 vi.mock("axios");

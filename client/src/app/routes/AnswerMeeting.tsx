@@ -39,6 +39,31 @@ export default function AnswerMeeting({
 }) {
   moment.locale(lang);
   const pathname = usePathname();
+
+  React.useEffect(() => {
+    console.log("🚀 DEBUG AnswerMeeting: Inicjalizacja komponentu", {
+      meetingData: {
+        meetName: meetingData.meetName,
+        appointmentId: meetingData.appointmentId,
+        meetPlace: meetingData.meetPlace,
+        meetLink: meetingData.meetLink,
+        datesCount: meetingData.dates?.length || 0,
+        answersCount: meetingData.answers?.length || 0,
+        answers: meetingData.answers || 0,
+        dates: meetingData.dates || 0,
+      },
+      session: session
+        ? {
+            isLoggedIn: true,
+            username: session.user?.name,
+          }
+        : { isLoggedIn: false },
+      lang,
+      pathname,
+      timestamp: new Date().toISOString(),
+    });
+  }, []);
+
   const [selectedTimecells, setSelectedTimecells] = useState<MeetingDate[]>([]);
 
   class MeetingDate {
@@ -192,19 +217,111 @@ export default function AnswerMeeting({
     const convertedTime = date.format("HH:mm");
     setLookedUpDate(`${convertedDate} ${convertedDayName}`);
     setLookedUpTime(convertedTime);
+
+    console.log("👀 DEBUG AnswerMeeting: Podgląd daty/czasu", {
+      datetime,
+      convertedDate,
+      convertedDayName,
+      convertedTime,
+      formattedDateTime: `${convertedDate} ${convertedDayName} ${convertedTime}`,
+      timestamp: new Date().toISOString(),
+    });
   };
 
   const flatTimes: number[] = datesInfo.flatMap((date: any) => date.times);
 
-  const getMinimumTimeInDates = (): moment.Moment =>
-    moment(Math.min(...flatTimes));
-  const getMaximumTimeInDates = (): moment.Moment =>
-    moment(Math.max(...flatTimes));
+  // DEBUG: Logowanie analizy wszystkich czasów
+  React.useEffect(() => {
+    console.log("🕐 DEBUG AnswerMeeting: Analiza wszystkich czasów", {
+      totalTimesCount: flatTimes.length,
+      datesInfoCount: datesInfo.length,
+      datesBreakdown: datesInfo.map((date: any, index: number) => ({
+        dayIndex: index,
+        date: new Date(date.date).toLocaleDateString(),
+        timesCount: date.times?.length || 0,
+        firstTime: date.times?.[0]
+          ? new Date(date.times[0]).toLocaleString()
+          : null,
+        lastTime: date.times?.[date.times.length - 1]
+          ? new Date(date.times[date.times.length - 1]).toLocaleString()
+          : null,
+        hourRange:
+          date.times?.length > 0
+            ? {
+                firstHour: moment(Math.min(...date.times)).hour(),
+                firstMinute: moment(Math.min(...date.times)).minute(),
+                lastHour: moment(Math.max(...date.times)).hour(),
+                lastMinute: moment(Math.max(...date.times)).minute(),
+              }
+            : null,
+      })),
+      globalTimeRange: {
+        earliest:
+          flatTimes.length > 0
+            ? new Date(Math.min(...flatTimes)).toLocaleString()
+            : null,
+        latest:
+          flatTimes.length > 0
+            ? new Date(Math.max(...flatTimes)).toLocaleString()
+            : null,
+        earliestHour:
+          flatTimes.length > 0 ? moment(Math.min(...flatTimes)).hour() : null,
+        latestHour:
+          flatTimes.length > 0 ? moment(Math.max(...flatTimes)).hour() : null,
+      },
+      timestamp: new Date().toISOString(),
+    });
+  }, [flatTimes, datesInfo]);
 
-  const isMinimumTimeHalfHour = (): boolean =>
-    getMinimumTimeInDates().minute() === 30;
-  const isMaximumTimeHalfHour = (): boolean =>
-    getMaximumTimeInDates().minute() === 30;
+  const getMinimumTimeInDates = (): moment.Moment => {
+    const minTime = Math.min(...flatTimes);
+    console.log("⏰ DEBUG AnswerMeeting: Najwcześniejszy czas", {
+      minTimeRaw: minTime,
+      minTimeFormatted: new Date(minTime).toLocaleString(),
+      hour: moment(minTime).hour(),
+      minute: moment(minTime).minute(),
+      timestamp: new Date().toISOString(),
+    });
+    return moment(minTime);
+  };
+
+  const getMaximumTimeInDates = (): moment.Moment => {
+    const maxTime = Math.max(...flatTimes);
+    console.log("⏰ DEBUG AnswerMeeting: Najpóźniejszy czas", {
+      maxTimeRaw: maxTime,
+      maxTimeFormatted: new Date(maxTime).toLocaleString(),
+      hour: moment(maxTime).hour(),
+      minute: moment(maxTime).minute(),
+      timestamp: new Date().toISOString(),
+    });
+    return moment(maxTime);
+  };
+
+  const isMinimumTimeHalfHour = (): boolean => {
+    const result = getMinimumTimeInDates().minute() === 30;
+    console.log(
+      "🕐 DEBUG AnswerMeeting: Czy najwcześniejszy czas to półgodzina?",
+      {
+        result,
+        minute: getMinimumTimeInDates().minute(),
+        timestamp: new Date().toISOString(),
+      }
+    );
+    return result;
+  };
+
+  const isMaximumTimeHalfHour = (): boolean => {
+    const result = getMaximumTimeInDates().minute() === 30;
+    console.log(
+      "🕐 DEBUG AnswerMeeting: Czy najpóźniejszy czas to półgodzina?",
+      {
+        result,
+        minute: getMaximumTimeInDates().minute(),
+        timestamp: new Date().toISOString(),
+      }
+    );
+    return result;
+  };
 
   const renderTimeCells = () => {
     const disabledTimecell = () => (
@@ -213,8 +330,20 @@ export default function AnswerMeeting({
       </td>
     );
 
+    // POPRAWKA: Używamy globalnego minimum i maximum zamiast pierwszego dnia
     const minimumTimeHour = getMinimumTimeInDates().hour();
     const maximumTimeHour = getMaximumTimeInDates().hour();
+
+    console.log("📊 DEBUG AnswerMeeting: Renderowanie komórek czasowych", {
+      minimumTimeHour,
+      maximumTimeHour,
+      isMinimumHalfHour: isMinimumTimeHalfHour(),
+      isMaximumHalfHour: isMaximumTimeHalfHour(),
+      hourRange: `${minimumTimeHour}:00 - ${maximumTimeHour}:00`,
+      totalHoursSpan: maximumTimeHour - minimumTimeHour + 1,
+      datesCount: dates.length,
+      timestamp: new Date().toISOString(),
+    });
 
     var timeCells: JSX.Element[] = [];
 
@@ -222,12 +351,29 @@ export default function AnswerMeeting({
       for (let h = 0; h < 2; h++) {
         // Handle half hours
         const isHalfHour = h === 1;
-        if (i == maximumTimeHour && isHalfHour && !isMaximumTimeHalfHour())
+
+        // POPRAWKA: Sprawdzamy warunki na podstawie globalnych minimum i maximum
+        if (i == maximumTimeHour && isHalfHour && !isMaximumTimeHalfHour()) {
+          console.log("⏭️ DEBUG: Pomijanie ostatniej półgodziny", {
+            hour: i,
+            isHalfHour,
+            reason: "Maksymalny czas nie jest półgodziną",
+          });
           break;
-        if (i == minimumTimeHour && !isHalfHour && isMinimumTimeHalfHour())
+        }
+
+        if (i == minimumTimeHour && !isHalfHour && isMinimumTimeHalfHour()) {
+          console.log("⏭️ DEBUG: Pomijanie pierwszej pełnej godziny", {
+            hour: i,
+            isHalfHour,
+            reason: "Minimalny czas zaczyna się od półgodziny",
+          });
           continue;
+        }
 
         let timeRow: JSX.Element[] = [];
+        let validTimesInRow = 0;
+
         for (const date of dates) {
           const dateTime = moment(date.date)
             .hour(i)
@@ -235,8 +381,13 @@ export default function AnswerMeeting({
             .valueOf();
 
           const isEndOfWeek = moment(dateTime).day() == 0;
+          const isTimeAvailable = flatTimes.includes(dateTime);
 
-          const cellComponent = flatTimes.includes(dateTime)
+          if (isTimeAvailable) {
+            validTimesInRow++;
+          }
+
+          const cellComponent = isTimeAvailable
             ? availableTimecell(dateTime, isEndOfWeek)
             : disabledTimecell();
           timeRow.push(cellComponent);
@@ -249,6 +400,18 @@ export default function AnswerMeeting({
             );
           }
         }
+
+        console.log("📋 DEBUG AnswerMeeting: Wygenerowany rząd czasu", {
+          hour: i,
+          minute: isHalfHour ? 30 : 0,
+          timeDisplay: `${i.toString().padStart(2, "0")}:${
+            isHalfHour ? "30" : "00"
+          }`,
+          validTimesInRow,
+          totalCellsInRow: timeRow.length,
+          timestamp: new Date().toISOString(),
+        });
+
         timeCells.push(
           <tr
             key={`${i}${isHalfHour ? "30" : "00"}`}
@@ -282,6 +445,15 @@ export default function AnswerMeeting({
       const endHour = maximumTimeHour + 1;
       const endMinute = "00";
       const key = `${endHour}${endMinute}`;
+
+      console.log("🔚 DEBUG AnswerMeeting: Dodawanie końcowego rzędu godziny", {
+        endHour,
+        endMinute,
+        key,
+        reason: "Maksymalny czas jest półgodziną",
+        timestamp: new Date().toISOString(),
+      });
+
       timeCells.push(
         <tr key={key} className="cursor-pointer">
           <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2">
@@ -290,6 +462,14 @@ export default function AnswerMeeting({
         </tr>
       );
     }
+
+    console.log("✅ DEBUG AnswerMeeting: Zakończono renderowanie tabeli", {
+      totalRows: timeCells.length,
+      hourRange: `${minimumTimeHour}:${
+        isMinimumTimeHalfHour() ? "30" : "00"
+      } - ${maximumTimeHour}:${isMaximumTimeHalfHour() ? "30" : "00"}`,
+      timestamp: new Date().toISOString(),
+    });
 
     return timeCells;
   };

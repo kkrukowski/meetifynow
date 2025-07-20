@@ -6,7 +6,7 @@ import _ from "lodash";
 import moment from "moment";
 import "moment/locale/pl";
 import { usePathname } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { useMediaQuery } from "react-responsive";
 import Popup from "reactjs-popup";
@@ -26,6 +26,7 @@ import { getAvailabilityInfo } from "@/utils/meeting/answer/getAvailabilityInfo"
 import { getUnavailableUsersInfo } from "@/utils/meeting/answer/getUnavailableUsersInfo";
 import useMouseDown from "@/utils/useIsMouseDown";
 import { Locale } from "@root/i18n.config";
+
 export default function AnswerMeeting({
   lang,
   dict,
@@ -40,17 +41,468 @@ export default function AnswerMeeting({
   moment.locale(lang);
   const pathname = usePathname();
 
+  // OPTYMALIZACJA: Memoizacja stałych danych
+  const staticMeetingData = useMemo(
+    () => ({
+      meetName: meetingData.meetName,
+      appointmentId: meetingData.appointmentId,
+      meetPlace: meetingData.meetPlace,
+      meetLink: meetingData.meetLink,
+      dates: meetingData.dates?.sort() || [],
+    }),
+    [meetingData]
+  );
+
+  // OPTYMALIZACJA: Memoizacja flatTimes z szczegółową analizą danych spotkania
+  const flatTimes = useMemo(() => {
+    console.log("🔧 OPTYMALIZACJA: Rozpoczęcie analizy danych spotkania", {
+      rawMeetingData: meetingData,
+      staticMeetingDataDates: staticMeetingData.dates,
+      timestamp: new Date().toISOString(),
+    });
+
+    // DEBUG: Szczegółowa analiza każdego dnia z bazy danych
+    const detailedDayAnalysis = staticMeetingData.dates.map(
+      (dateObj: any, index: number) => {
+        console.log(`📅 DEBUG: Analiza dnia ${index + 1} - surowe dane`, {
+          dayIndex: index,
+          rawDateObject: dateObj,
+          hasDate: !!dateObj.date,
+          hasTimes: !!dateObj.times,
+          timesIsArray: Array.isArray(dateObj.times),
+          timesLength: dateObj.times?.length || 0,
+          timestamp: new Date().toISOString(),
+        });
+
+        const dayDate = new Date(dateObj.date);
+        const dayTimes = dateObj.times || [];
+
+        // Konwersja każdego timestampu na czytelny format
+        const timesWithDetails = dayTimes.map(
+          (timestamp: number, timeIndex: number) => {
+            const timeMoment = moment(timestamp);
+            return {
+              timeIndex,
+              timestamp,
+              formatted: timeMoment.format("YYYY-MM-DD HH:mm:ss"),
+              dateOnly: timeMoment.format("YYYY-MM-DD"),
+              timeOnly: timeMoment.format("HH:mm"),
+              hour: timeMoment.hour(),
+              minute: timeMoment.minute(),
+              dayOfWeek: timeMoment.format("dddd"),
+              isWeekend: timeMoment.day() === 0 || timeMoment.day() === 6,
+              isValid: timeMoment.isValid(),
+            };
+          }
+        );
+
+        const dayAnalysis = {
+          dayIndex: index,
+          originalDate: dateObj.date,
+          dateFormatted: dayDate.toLocaleDateString("pl-PL"),
+          dayName: dayDate.toLocaleDateString("pl-PL", { weekday: "long" }),
+          dayOfWeek: dayDate.getDay(),
+          isWeekend: dayDate.getDay() === 0 || dayDate.getDay() === 6,
+          timesCount: dayTimes.length,
+          timesRaw: dayTimes,
+          timesDetailed: timesWithDetails,
+          timeSlots: timesWithDetails.map((t) => t.timeOnly).sort(),
+          uniqueHours: [...new Set(timesWithDetails.map((t) => t.hour))].sort(),
+          uniqueMinutes: [
+            ...new Set(timesWithDetails.map((t) => t.minute)),
+          ].sort(),
+          hourRange:
+            dayTimes.length > 0
+              ? {
+                  earliest: Math.min(...dayTimes),
+                  latest: Math.max(...dayTimes),
+                  earliestFormatted: moment(Math.min(...dayTimes)).format(
+                    "HH:mm"
+                  ),
+                  latestFormatted: moment(Math.max(...dayTimes)).format(
+                    "HH:mm"
+                  ),
+                  span: `${moment(Math.min(...dayTimes)).format(
+                    "HH:mm"
+                  )} - ${moment(Math.max(...dayTimes)).format("HH:mm")}`,
+                  totalHours:
+                    moment(Math.max(...dayTimes)).hour() -
+                    moment(Math.min(...dayTimes)).hour() +
+                    1,
+                }
+              : null,
+        };
+
+        console.log(
+          `📊 DEBUG: Kompletna analiza dnia ${index + 1} (${
+            dayAnalysis.dateFormatted
+          })`,
+          {
+            ...dayAnalysis,
+            sampleTimes: timesWithDetails.slice(0, 5), // pierwsze 5 czasów jako przykład
+            timestamp: new Date().toISOString(),
+          }
+        );
+
+        return dayAnalysis;
+      }
+    );
+
+    console.log("📋 DEBUG: Zestawienie wszystkich dni spotkania", {
+      totalDays: detailedDayAnalysis.length,
+      daysOverview: detailedDayAnalysis.map((day) => ({
+        date: day.dateFormatted,
+        dayName: day.dayName,
+        timesCount: day.timesCount,
+        hourSpan: day.hourRange?.span || "Brak czasów",
+        firstTime: day.timesDetailed[0]?.timeOnly || "Brak",
+        lastTime:
+          day.timesDetailed[day.timesDetailed.length - 1]?.timeOnly || "Brak",
+      })),
+      timestamp: new Date().toISOString(),
+    });
+
+    // Flatten wszystkich czasów z wszystkich dni
+    const times = staticMeetingData.dates.flatMap((date: any) => date.times);
+
+    // DEBUG: Analiza wszystkich płaskich czasów
+    const allTimesAnalysis = times.map((timestamp: number, index: number) => {
+      const timeMoment = moment(timestamp);
+      return {
+        globalIndex: index,
+        timestamp,
+        formatted: timeMoment.format("YYYY-MM-DD HH:mm:ss"),
+        dateOnly: timeMoment.format("YYYY-MM-DD"),
+        timeOnly: timeMoment.format("HH:mm"),
+        hour: timeMoment.hour(),
+        minute: timeMoment.minute(),
+        dayOfWeek: timeMoment.format("dddd"),
+        whichDay:
+          detailedDayAnalysis.findIndex(
+            (day) =>
+              timeMoment.format("YYYY-MM-DD") ===
+              moment(day.originalDate).format("YYYY-MM-DD")
+          ) + 1,
+      };
+    });
+
+    console.log("🌍 DEBUG: Analiza wszystkich flatTimes z bazy danych", {
+      totalTimes: times.length,
+      totalDays: staticMeetingData.dates.length,
+      averageTimesPerDay: (
+        times.length / staticMeetingData.dates.length
+      ).toFixed(2),
+      allTimesBreakdown: allTimesAnalysis.slice(0, 15), // pierwsze 15 jako przykład
+      timesByDay: detailedDayAnalysis.reduce((acc, day) => {
+        acc[`Dzień ${day.dayIndex + 1} (${day.dateFormatted})`] =
+          day.timesCount;
+        return acc;
+      }, {} as Record<string, number>),
+      timestamp: new Date().toISOString(),
+    });
+
+    // DEBUG: Globalne statystyki czasowe
+    const globalTimeStats = {
+      allUniqueHours: [...new Set(allTimesAnalysis.map((t) => t.hour))].sort(),
+      allUniqueMinutes: [
+        ...new Set(allTimesAnalysis.map((t) => t.minute)),
+      ].sort(),
+      allUniqueDates: [
+        ...new Set(allTimesAnalysis.map((t) => t.dateOnly)),
+      ].sort(),
+      allUniqueTimeSlots: [
+        ...new Set(allTimesAnalysis.map((t) => t.timeOnly)),
+      ].sort(),
+      earliestGlobalTime: times.length > 0 ? Math.min(...times) : null,
+      latestGlobalTime: times.length > 0 ? Math.max(...times) : null,
+    };
+
+    if (
+      globalTimeStats.earliestGlobalTime &&
+      globalTimeStats.latestGlobalTime
+    ) {
+      globalTimeStats.earliestFormatted = moment(
+        globalTimeStats.earliestGlobalTime
+      ).format("YYYY-MM-DD HH:mm");
+      globalTimeStats.latestFormatted = moment(
+        globalTimeStats.latestGlobalTime
+      ).format("YYYY-MM-DD HH:mm");
+      globalTimeStats.globalSpan = `${moment(
+        globalTimeStats.earliestGlobalTime
+      ).format("HH:mm")} - ${moment(globalTimeStats.latestGlobalTime).format(
+        "HH:mm"
+      )}`;
+    }
+
+    console.log("📈 DEBUG: Globalne statystyki czasowe spotkania", {
+      ...globalTimeStats,
+      hourRange:
+        globalTimeStats.allUniqueHours.length > 0
+          ? `${globalTimeStats.allUniqueHours[0]}:00 - ${
+              globalTimeStats.allUniqueHours[
+                globalTimeStats.allUniqueHours.length - 1
+              ]
+            }:59`
+          : "Brak",
+      minuteDistribution: globalTimeStats.allUniqueMinutes.reduce(
+        (acc, minute) => {
+          acc[`${minute.toString().padStart(2, "0")}min`] =
+            allTimesAnalysis.filter((t) => t.minute === minute).length;
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
+      dateDistribution: globalTimeStats.allUniqueDates.reduce((acc, date) => {
+        acc[date] = allTimesAnalysis.filter((t) => t.dateOnly === date).length;
+        return acc;
+      }, {} as Record<string, number>),
+      timestamp: new Date().toISOString(),
+    });
+
+    // DEBUG: Wykrywanie wzorców i anomalii
+    const patterns = {
+      hasOnlyFullHours: globalTimeStats.allUniqueMinutes.every((m) => m === 0),
+      hasOnlyHalfHours: globalTimeStats.allUniqueMinutes.every(
+        (m) => m === 0 || m === 30
+      ),
+      hasQuarterHours: globalTimeStats.allUniqueMinutes.every(
+        (m) => m % 15 === 0
+      ),
+      hasFiveMinuteIntervals: globalTimeStats.allUniqueMinutes.every(
+        (m) => m % 5 === 0
+      ),
+      daysWithMostTimes: detailedDayAnalysis
+        .sort((a, b) => b.timesCount - a.timesCount)
+        .slice(0, 3)
+        .map((day) => ({ date: day.dateFormatted, count: day.timesCount })),
+      daysWithLeastTimes: detailedDayAnalysis
+        .sort((a, b) => a.timesCount - b.timesCount)
+        .slice(0, 3)
+        .map((day) => ({ date: day.dateFormatted, count: day.timesCount })),
+      timeGaps: detailedDayAnalysis.map((day) => ({
+        date: day.dateFormatted,
+        hasGaps: day.hourRange
+          ? day.hourRange.totalHours * 2 !== day.timesCount
+          : false,
+        expectedSlots: day.hourRange ? day.hourRange.totalHours * 2 : 0,
+        actualSlots: day.timesCount,
+      })),
+    };
+
+    console.log("🔍 DEBUG: Wzorce i anomalie w danych spotkania", {
+      patterns,
+      recommendations: {
+        tableStructure: patterns.hasOnlyHalfHours
+          ? "Tabela 30-minutowa"
+          : patterns.hasQuarterHours
+          ? "Tabela 15-minutowa"
+          : "Tabela dynamiczna",
+        potentialIssues: patterns.timeGaps
+          .filter((gap) => gap.hasGaps)
+          .map(
+            (gap) =>
+              `${gap.date}: brakuje ${
+                gap.expectedSlots - gap.actualSlots
+              } slotów czasowych`
+          ),
+      },
+      timestamp: new Date().toISOString(),
+    });
+
+    console.log("🔧 OPTYMALIZACJA: Finalne obliczanie flatTimes", {
+      totalTimes: times.length,
+      firstTimestamp: times[0],
+      lastTimestamp: times[times.length - 1],
+      firstTimeFormatted:
+        times.length > 0 ? moment(times[0]).format("YYYY-MM-DD HH:mm") : "Brak",
+      lastTimeFormatted:
+        times.length > 0
+          ? moment(times[times.length - 1]).format("YYYY-MM-DD HH:mm")
+          : "Brak",
+      timesSample: times
+        .slice(0, 10)
+        .map((t) => moment(t).format("YYYY-MM-DD HH:mm")),
+      timestamp: new Date().toISOString(),
+    });
+
+    return times;
+  }, [staticMeetingData.dates, meetingData]);
+
+  // OPTYMALIZACJA: Memoizacja czasu minimum i maximum z dodatkowymi szczegółami
+  const timeRange = useMemo(() => {
+    if (flatTimes.length === 0) return null;
+
+    console.log("🔧 OPTYMALIZACJA: Rozpoczęcie obliczania timeRange", {
+      flatTimesCount: flatTimes.length,
+      datesCount: staticMeetingData.dates.length,
+      timestamp: new Date().toISOString(),
+    });
+
+    // DEBUG: Analiza minimum i maximum dla każdego dnia osobno
+    const dailyMinMax = staticMeetingData.dates
+      .map((dateObj: any, index: number) => {
+        if (!dateObj.times || dateObj.times.length === 0) return null;
+
+        const dayMinTime = Math.min(...dateObj.times);
+        const dayMaxTime = Math.max(...dateObj.times);
+
+        const analysis = {
+          dayIndex: index,
+          date: new Date(dateObj.date).toLocaleDateString("pl-PL"),
+          dayName: new Date(dateObj.date).toLocaleDateString("pl-PL", {
+            weekday: "long",
+          }),
+          dayMinTime,
+          dayMaxTime,
+          minFormatted: moment(dayMinTime).format("YYYY-MM-DD HH:mm"),
+          maxFormatted: moment(dayMaxTime).format("YYYY-MM-DD HH:mm"),
+          minHour: moment(dayMinTime).hour(),
+          minMinute: moment(dayMinTime).minute(),
+          maxHour: moment(dayMaxTime).hour(),
+          maxMinute: moment(dayMaxTime).minute(),
+          timesCount: dateObj.times.length,
+          timeSpan: `${moment(dayMinTime).format("HH:mm")} - ${moment(
+            dayMaxTime
+          ).format("HH:mm")}`,
+          allTimesForDay: dateObj.times
+            .map((t: number) => ({
+              timestamp: t,
+              formatted: moment(t).format("HH:mm"),
+            }))
+            .sort((a: any, b: any) => a.timestamp - b.timestamp),
+        };
+
+        console.log(`📅 DEBUG: Min/Max analiza dla dnia ${index + 1}`, {
+          ...analysis,
+          timeSlots: analysis.allTimesForDay.map((t) => t.formatted),
+          timestamp: new Date().toISOString(),
+        });
+
+        return analysis;
+      })
+      .filter(Boolean);
+
+    // Znajdź globalne minimum i maximum
+    const allMinTimes = dailyMinMax.map((day) => day.dayMinTime);
+    const allMaxTimes = dailyMinMax.map((day) => day.dayMaxTime);
+
+    const globalMinTime = Math.min(...allMinTimes);
+    const globalMaxTime = Math.max(...allMaxTimes);
+
+    // Znajdź które dni mają globalne extrema
+    const dayWithGlobalMin = dailyMinMax.find(
+      (day) => day.dayMinTime === globalMinTime
+    );
+    const dayWithGlobalMax = dailyMinMax.find(
+      (day) => day.dayMaxTime === globalMaxTime
+    );
+
+    console.log("⚖️ DEBUG: Porównanie metod obliczania globalnego zakresu", {
+      methodComparison: {
+        flatTimesMethod: {
+          minTime: Math.min(...flatTimes),
+          maxTime: Math.max(...flatTimes),
+          minFormatted: moment(Math.min(...flatTimes)).format(
+            "YYYY-MM-DD HH:mm"
+          ),
+          maxFormatted: moment(Math.max(...flatTimes)).format(
+            "YYYY-MM-DD HH:mm"
+          ),
+        },
+        dailyAnalysisMethod: {
+          minTime: globalMinTime,
+          maxTime: globalMaxTime,
+          minFormatted: moment(globalMinTime).format("YYYY-MM-DD HH:mm"),
+          maxFormatted: moment(globalMaxTime).format("YYYY-MM-DD HH:mm"),
+        },
+      },
+      extremaSources: {
+        globalMinFrom: dayWithGlobalMin
+          ? {
+              day: dayWithGlobalMin.date,
+              dayName: dayWithGlobalMin.dayName,
+              time: dayWithGlobalMin.minFormatted,
+            }
+          : null,
+        globalMaxFrom: dayWithGlobalMax
+          ? {
+              day: dayWithGlobalMax.date,
+              dayName: dayWithGlobalMax.dayName,
+              time: dayWithGlobalMax.maxFormatted,
+            }
+          : null,
+      },
+      dailyRanges: dailyMinMax.map((day) => ({
+        date: day.date,
+        range: day.timeSpan,
+        timesCount: day.timesCount,
+      })),
+      timestamp: new Date().toISOString(),
+    });
+
+    const result = {
+      minTime: globalMinTime,
+      maxTime: globalMaxTime,
+      minimumTimeHour: moment(globalMinTime).hour(),
+      maximumTimeHour: moment(globalMaxTime).hour(),
+      isMinimumTimeHalfHour: moment(globalMinTime).minute() === 30,
+      isMaximumTimeHalfHour: moment(globalMaxTime).minute() === 30,
+    };
+
+    console.log("🔧 OPTYMALIZACJA: Finalne obliczanie zakresu czasu", {
+      result,
+      detailedBreakdown: {
+        globalMinTime: {
+          timestamp: globalMinTime,
+          formatted: moment(globalMinTime).format("YYYY-MM-DD HH:mm:ss"),
+          hour: result.minimumTimeHour,
+          minute: moment(globalMinTime).minute(),
+          isHalfHour: result.isMinimumTimeHalfHour,
+          sourceDay: dayWithGlobalMin?.date,
+        },
+        globalMaxTime: {
+          timestamp: globalMaxTime,
+          formatted: moment(globalMaxTime).format("YYYY-MM-DD HH:mm:ss"),
+          hour: result.maximumTimeHour,
+          minute: moment(globalMaxTime).minute(),
+          isHalfHour: result.isMaximumTimeHalfHour,
+          sourceDay: dayWithGlobalMax?.date,
+        },
+        hourSpan: {
+          from: `${result.minimumTimeHour}:${
+            result.isMinimumTimeHalfHour ? "30" : "00"
+          }`,
+          to: `${result.maximumTimeHour}:${
+            result.isMaximumTimeHalfHour ? "30" : "00"
+          }`,
+          totalHours: result.maximumTimeHour - result.minimumTimeHour + 1,
+          expectedTableRows:
+            (result.maximumTimeHour - result.minimumTimeHour + 1) * 2,
+        },
+      },
+      qualityCheck: {
+        hasValidRange: result.maximumTimeHour >= result.minimumTimeHour,
+        hourSpanReasonable:
+          result.maximumTimeHour - result.minimumTimeHour <= 24,
+        coversAllDays: dailyMinMax.every(
+          (day) =>
+            day.minHour >= result.minimumTimeHour &&
+            day.maxHour <= result.maximumTimeHour
+        ),
+      },
+      timestamp: new Date().toISOString(),
+    });
+
+    return result;
+  }, [flatTimes, staticMeetingData.dates]);
+
   React.useEffect(() => {
     console.log("🚀 DEBUG AnswerMeeting: Inicjalizacja komponentu", {
       meetingData: {
-        meetName: meetingData.meetName,
-        appointmentId: meetingData.appointmentId,
-        meetPlace: meetingData.meetPlace,
-        meetLink: meetingData.meetLink,
-        datesCount: meetingData.dates?.length || 0,
+        meetName: staticMeetingData.meetName,
+        appointmentId: staticMeetingData.appointmentId,
+        datesCount: staticMeetingData.dates?.length || 0,
         answersCount: meetingData.answers?.length || 0,
-        answers: meetingData.answers || 0,
-        dates: meetingData.dates || 0,
       },
       session: session
         ? {
@@ -62,9 +514,20 @@ export default function AnswerMeeting({
       pathname,
       timestamp: new Date().toISOString(),
     });
-  }, []);
+  }, []); // OPTYMALIZACJA: Uruchamiany tylko raz
 
   const [selectedTimecells, setSelectedTimecells] = useState<MeetingDate[]>([]);
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [lookedUpDatetime, setLookedUpDatetime] = useState<number>();
+  const [lookedUpDate, setLookedUpDate] = useState<string>();
+  const [lookedUpTime, setLookedUpTime] = useState<string>();
+  const [answers, setAnswers] = useState<any>(meetingData.answers);
+  const [meetName, setMeetName] = useState(staticMeetingData.meetName);
+  const [highestAvailableCount, setHighestAvailableCount] = useState(0);
+  const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
+  const [onlineSelectionMode, setOnlineSelectionMode] = useState(false);
+  const [unselectMode, setUnselectMode] = useState(false);
+  const [isSendingReq, setIsSendingReq] = useState(false);
 
   class MeetingDate {
     meetDate: number;
@@ -76,63 +539,67 @@ export default function AnswerMeeting({
     }
   }
 
-  // Auth
   const isUserLoggedIn = !!session?.user;
-  const [selectionMode, setSelectionMode] = useState(false);
-  const [lookedUpDatetime, setLookedUpDatetime] = useState<number>();
-  const [lookedUpDate, setLookedUpDate] = useState<string>();
-  const [lookedUpTime, setLookedUpTime] = useState<string>();
   const [username, setUsername] = useState(
     isUserLoggedIn ? session.user.name : ""
   );
   const [availableCount, setAvailableCount] = useState(0);
-  const [answers, setAnswers] = useState<any>(meetingData.answers);
-  const [meetName, setMeetName] = useState(meetingData.meetName);
-  const meetPlace = meetingData.meetPlace;
-  const meetLink = meetingData.meetLink;
-  const answersCount = answers.length;
-  const datesInfo = meetingData.dates;
-  const [highestAvailableCount, setHighestAvailableCount] = useState(0);
-  const [mobileAnsweringMode, setMobileAnsweringMode] = useState(true);
-  const currentUrl = pathname;
 
-  // Checking mobile mode
+  // OPTYMALIZACJA: Memoizacja sprawdzania mobile
   const isMobile = useMediaQuery({
     query: "(max-width: 1023px)",
   });
 
-  // Handling mouse down
   const isMouseDown = useMouseDown();
 
-  const availabilityInfo = getAvailabilityInfo(answers);
+  // OPTYMALIZACJA: Memoizacja availabilityInfo
+  const availabilityInfo = useMemo(() => {
+    const info = getAvailabilityInfo(answers);
+    console.log("🔧 OPTYMALIZACJA: Obliczanie availabilityInfo", {
+      answersCount: answers.length,
+      availabilityKeysCount: Object.keys(info).length,
+      timestamp: new Date().toISOString(),
+    });
+    return info;
+  }, [answers]);
 
   const [toggleButtonName, setToggleButtonName] = useState(
     dict.page.answerMeeting.toggleButton.showAvailability
   );
-  const toggleAnsweringMode = () => {
+
+  // OPTYMALIZACJA: useCallback dla często używanych funkcji
+  const toggleAnsweringMode = useCallback(() => {
+    console.log("🔄 DEBUG AnswerMeeting: Przełączanie trybu odpowiadania");
     setMobileAnsweringMode((prevMode) => !prevMode);
-    if (mobileAnsweringMode)
-      setToggleButtonName(dict.page.answerMeeting.toggleButton.answerMeeting);
-    else
-      setToggleButtonName(
-        dict.page.answerMeeting.toggleButton.showAvailability
-      );
-  };
-
-  // Answering functionallity
-  const dates = meetingData.dates.sort();
-
-  const isDateSelected = (dateTime: number) =>
-    selectedTimecells.some(
-      (meetDateInfo) => meetDateInfo.meetDate === dateTime
+    setToggleButtonName((prevMode) =>
+      prevMode === mobileAnsweringMode
+        ? dict.page.answerMeeting.toggleButton.answerMeeting
+        : dict.page.answerMeeting.toggleButton.showAvailability
     );
+  }, [dict, mobileAnsweringMode]);
 
-  const getSelectedTimecell = (dateTime: number) =>
-    selectedTimecells.find(
-      (meetDateInfo) => meetDateInfo.meetDate === dateTime
-    );
+  const isDateSelected = useCallback(
+    (dateTime: number) =>
+      selectedTimecells.some(
+        (meetDateInfo) => meetDateInfo.meetDate === dateTime
+      ),
+    [selectedTimecells]
+  );
 
-  const updateTimecell = (dateTime: number, isOnline: boolean) => {
+  const getSelectedTimecell = useCallback(
+    (dateTime: number) =>
+      selectedTimecells.find(
+        (meetDateInfo) => meetDateInfo.meetDate === dateTime
+      ),
+    [selectedTimecells]
+  );
+
+  const updateTimecell = useCallback((dateTime: number, isOnline: boolean) => {
+    console.log("🔄 DEBUG AnswerMeeting: Aktualizacja komórki czasowej", {
+      datetime: new Date(dateTime).toLocaleString(),
+      isOnline,
+    });
+
     setSelectedTimecells((prevTimecells) => {
       const updatedTimecells = prevTimecells.map((meetDateInfo) =>
         meetDateInfo.meetDate === dateTime
@@ -141,76 +608,87 @@ export default function AnswerMeeting({
       );
       return updatedTimecells;
     });
-  };
+  }, []);
 
-  const unselectTimecell = (dateTime: number) => {
-    if (!isMobile) {
-      setUnselectMode(true);
-    }
-    setSelectedTimecells(
-      selectedTimecells.filter(
-        (meetDateInfo) => meetDateInfo.meetDate !== dateTime
-      )
-    );
-  };
+  const unselectTimecell = useCallback(
+    (dateTime: number) => {
+      console.log("❌ DEBUG AnswerMeeting: Odznaczanie komórki czasowej", {
+        datetime: new Date(dateTime).toLocaleString(),
+        isMobile,
+      });
 
-  const [onlineSelectionMode, setOnlineSelectionMode] = useState(false);
-  const [unselectMode, setUnselectMode] = useState(false);
+      if (!isMobile) {
+        setUnselectMode(true);
+      }
+      setSelectedTimecells(
+        selectedTimecells.filter(
+          (meetDateInfo) => meetDateInfo.meetDate !== dateTime
+        )
+      );
+    },
+    [selectedTimecells, isMobile]
+  );
 
-  const toggleTimecell = (dateTime: number) => {
-    const isSelected = isDateSelected(dateTime);
-    const selectedTimecell = getSelectedTimecell(dateTime);
+  const toggleTimecell = useCallback(
+    (dateTime: number) => {
+      const isSelected = isDateSelected(dateTime);
+      const selectedTimecell = getSelectedTimecell(dateTime);
 
-    console.log("toggleTimecell", {
-      isSelected,
-      selectedTimecell,
+      console.log("🔀 DEBUG AnswerMeeting: toggleTimecell", {
+        datetime: new Date(dateTime).toLocaleString(),
+        isSelected,
+        selectionMode,
+        onlineSelectionMode,
+        unselectMode,
+      });
+
+      if (isSelected) {
+        if (!selectionMode) {
+          if (selectedTimecell?.isOnline) {
+            unselectTimecell(dateTime);
+            setOnlineSelectionMode(false);
+          } else if (!selectedTimecell?.isOnline) {
+            setOnlineSelectionMode(true);
+            updateTimecell(dateTime, true);
+          }
+        } else {
+          if (!unselectMode) {
+            if (onlineSelectionMode && !selectedTimecell?.isOnline) {
+              updateTimecell(dateTime, true);
+            } else if (!onlineSelectionMode && selectedTimecell?.isOnline) {
+              updateTimecell(dateTime, false);
+            }
+          } else {
+            unselectTimecell(dateTime);
+          }
+        }
+      } else if (!unselectMode) {
+        const meetDateInfo = new MeetingDate(dateTime, onlineSelectionMode);
+        setSelectedTimecells([...selectedTimecells, meetDateInfo]);
+      }
+    },
+    [
+      isDateSelected,
+      getSelectedTimecell,
       selectionMode,
       onlineSelectionMode,
       unselectMode,
-    });
+      selectedTimecells,
+      unselectTimecell,
+      updateTimecell,
+    ]
+  );
 
-    if (isSelected) {
-      if (!selectionMode) {
-        if (selectedTimecell?.isOnline) {
-          // Selecting timecell online -> unselected (click)
-          unselectTimecell(dateTime);
-          setOnlineSelectionMode(false);
-        } else if (!selectedTimecell?.isOnline) {
-          // Selecting timecell offline -> online (click)
-          setOnlineSelectionMode(true);
-          updateTimecell(dateTime, true);
-        }
-      } else {
-        if (!unselectMode) {
-          if (onlineSelectionMode && !selectedTimecell?.isOnline) {
-            // Updating timecell offline -> online (drag)
-            updateTimecell(dateTime, true);
-          } else if (!onlineSelectionMode && selectedTimecell?.isOnline) {
-            // Updating timecell online -> offline (drag)
-            updateTimecell(dateTime, false);
-          }
-        } else {
-          // Updating timecell online -> unselected (drag)
-          unselectTimecell(dateTime);
-        }
-      }
-    } else if (!unselectMode) {
-      // Selecting timecell unselected -> offline (click)
-      const meetDateInfo = new MeetingDate(dateTime, onlineSelectionMode);
-      setSelectedTimecells([...selectedTimecells, meetDateInfo]);
-    }
-  };
-
-  const disableSelection = () => {
+  const disableSelection = useCallback(() => {
     if (!isMouseDown) {
+      console.log("🔒 DEBUG AnswerMeeting: Wyłączanie trybu selekcji");
       setSelectionMode(false);
       setUnselectMode(false);
       setOnlineSelectionMode(false);
     }
-  };
+  }, [isMouseDown]);
 
-  // Table rendering
-  const convertDatetimeToDate = (datetime: number) => {
+  const convertDatetimeToDate = useCallback((datetime: number) => {
     const date = moment(datetime);
     const convertedDate = date.format("DD.MM");
     const convertedDayName = _.capitalize(date.format("dddd"));
@@ -220,161 +698,201 @@ export default function AnswerMeeting({
 
     console.log("👀 DEBUG AnswerMeeting: Podgląd daty/czasu", {
       datetime,
-      convertedDate,
-      convertedDayName,
-      convertedTime,
       formattedDateTime: `${convertedDate} ${convertedDayName} ${convertedTime}`,
+    });
+  }, []);
+
+  const isAnswered = useCallback(
+    (datetime: number) =>
+      answers.some((answer: any) =>
+        answer.dates.some((date: any) => date.meetDate === datetime)
+      ),
+    [answers]
+  );
+
+  // OPTYMALIZACJA: Memoizacja nagłówków dni
+  const daysHeadings = useMemo(() => {
+    console.log("🔧 OPTYMALIZACJA: Renderowanie nagłówków dni");
+
+    return staticMeetingData.dates.map((day: any) => {
+      const dateMoment = moment(day.date);
+      const date = dateMoment.date();
+      const month = dateMoment.month() + 1;
+      const dayOfWeek = dateMoment.day();
+      const classNames = dayOfWeek === 0 ? "pr-4" : "";
+
+      return (
+        <th
+          key={day.date}
+          className={`bg-light sticky top-0 z-10 ${classNames}`}
+        >
+          <p className="text-sm text-dark font-medium">
+            {`${date.toString().padStart(2, "0")}.${month
+              .toString()
+              .padStart(2, "0")}`}
+          </p>
+          <p className="text-dark">{_.capitalize(dateMoment.format("ddd"))}</p>
+        </th>
+      );
+    });
+  }, [staticMeetingData.dates]);
+
+  // OPTYMALIZACJA: Memoizacja komórki dostępnej
+  const availableTimecell = useCallback(
+    (dateTime: number, isEndOfWeek: boolean) => {
+      const isMobileAnsweringMode = isMobile && mobileAnsweringMode;
+      const isDesktop = !isMobile;
+      const selectedTimecell = getSelectedTimecell(dateTime);
+      const dateVotes = availabilityInfo[dateTime]?.usersInfo.length || 0;
+      const isSelected = isDateSelected(dateTime);
+      const isAnsweredDate = isAnswered(dateTime);
+
+      const handleMouseDown = () => {
+        if ((isMobileAnsweringMode || isDesktop) && !unselectMode) {
+          toggleTimecell(dateTime);
+        } else if (!isMobileAnsweringMode && !isDesktop && !unselectMode) {
+          setLookedUpDatetime(dateTime);
+          convertDatetimeToDate(dateTime);
+        }
+        if (isDesktop) {
+          setSelectionMode(true);
+        }
+      };
+
+      const handleMouseUp = () => {
+        if (isDesktop) {
+          setSelectionMode(false);
+          setUnselectMode(false);
+        }
+      };
+
+      const handleMouseOver = () => {
+        if (selectionMode) {
+          toggleTimecell(dateTime);
+        }
+        setLookedUpDatetime(dateTime);
+        convertDatetimeToDate(dateTime);
+        disableSelection();
+      };
+
+      return (
+        <td key={dateTime}>
+          <div
+            data-date={dateTime}
+            date-votes={dateVotes}
+            onMouseDown={handleMouseDown}
+            onMouseUp={handleMouseUp}
+            onMouseOver={handleMouseOver}
+            className={`rounded-lg h-12 w-24 lg:h-6 lg:w-12 transition-colors ${
+              isEndOfWeek && "mr-4"
+            } ${
+              isAnsweredDate
+                ? `border-none ${
+                    isSelected
+                      ? `${
+                          selectedTimecell?.isOnline
+                            ? `bg-gold ${!isMobile && "hover:bg-gold/50"}`
+                            : `bg-primary ${!isMobile && "hover:bg-primary/50"}`
+                        } selected`
+                      : `answered  ${
+                          !isMobile && "active:animate-cell-select"
+                        } ${
+                          availabilityInfo[dateTime].onlineCount >=
+                            highestAvailableCount * 0.5 &&
+                          availabilityInfo[dateTime].usersInfo.length ==
+                            highestAvailableCount
+                            ? `bg-gold-dark ${
+                                !isMobile && "hover:bg-gold-dark/50"
+                              }`
+                            : availabilityInfo[dateTime].usersInfo.length ==
+                              highestAvailableCount
+                            ? `bg-green ${!isMobile && "hover:bg-green/50"}`
+                            : `bg-light-green ${
+                                !isMobile && "hover:bg-light-green/50"
+                              }`
+                        }`
+                  }`
+                : `border border-gray ${!isMobile && "hover:border-gray/50"} ${
+                    isSelected
+                      ? `border-none ${
+                          selectedTimecell?.isOnline
+                            ? `bg-gold ${!isMobile && "hover:bg-gold/50"}`
+                            : `bg-primary ${!isMobile && "hover:bg-primary/50"}`
+                        }`
+                      : `${
+                          (isMobileAnsweringMode || isDesktop) &&
+                          !isMobile &&
+                          !unselectMode &&
+                          "hover:border-none active:animate-cell-select hover:bg-primary"
+                        }`
+                  }`
+            }`}
+          ></div>
+        </td>
+      );
+    },
+    [
+      isMobile,
+      mobileAnsweringMode,
+      getSelectedTimecell,
+      availabilityInfo,
+      isDateSelected,
+      isAnswered,
+      unselectMode,
+      selectionMode,
+      toggleTimecell,
+      convertDatetimeToDate,
+      disableSelection,
+      highestAvailableCount,
+    ]
+  );
+
+  // OPTYMALIZACJA: Memoizacja komórek czasowych - główna optymalizacja!
+  const timeCells = useMemo(() => {
+    if (!timeRange) return [];
+
+    console.log("🔧 OPTYMALIZACJA: Renderowanie komórek czasowych", {
+      minimumTimeHour: timeRange.minimumTimeHour,
+      maximumTimeHour: timeRange.maximumTimeHour,
       timestamp: new Date().toISOString(),
     });
-  };
 
-  const flatTimes: number[] = datesInfo.flatMap((date: any) => date.times);
-
-  // DEBUG: Logowanie analizy wszystkich czasów
-  React.useEffect(() => {
-    console.log("🕐 DEBUG AnswerMeeting: Analiza wszystkich czasów", {
-      totalTimesCount: flatTimes.length,
-      datesInfoCount: datesInfo.length,
-      datesBreakdown: datesInfo.map((date: any, index: number) => ({
-        dayIndex: index,
-        date: new Date(date.date).toLocaleDateString(),
-        timesCount: date.times?.length || 0,
-        firstTime: date.times?.[0]
-          ? new Date(date.times[0]).toLocaleString()
-          : null,
-        lastTime: date.times?.[date.times.length - 1]
-          ? new Date(date.times[date.times.length - 1]).toLocaleString()
-          : null,
-        hourRange:
-          date.times?.length > 0
-            ? {
-                firstHour: moment(Math.min(...date.times)).hour(),
-                firstMinute: moment(Math.min(...date.times)).minute(),
-                lastHour: moment(Math.max(...date.times)).hour(),
-                lastMinute: moment(Math.max(...date.times)).minute(),
-              }
-            : null,
-      })),
-      globalTimeRange: {
-        earliest:
-          flatTimes.length > 0
-            ? new Date(Math.min(...flatTimes)).toLocaleString()
-            : null,
-        latest:
-          flatTimes.length > 0
-            ? new Date(Math.max(...flatTimes)).toLocaleString()
-            : null,
-        earliestHour:
-          flatTimes.length > 0 ? moment(Math.min(...flatTimes)).hour() : null,
-        latestHour:
-          flatTimes.length > 0 ? moment(Math.max(...flatTimes)).hour() : null,
-      },
-      timestamp: new Date().toISOString(),
-    });
-  }, [flatTimes, datesInfo]);
-
-  const getMinimumTimeInDates = (): moment.Moment => {
-    const minTime = Math.min(...flatTimes);
-    console.log("⏰ DEBUG AnswerMeeting: Najwcześniejszy czas", {
-      minTimeRaw: minTime,
-      minTimeFormatted: new Date(minTime).toLocaleString(),
-      hour: moment(minTime).hour(),
-      minute: moment(minTime).minute(),
-      timestamp: new Date().toISOString(),
-    });
-    return moment(minTime);
-  };
-
-  const getMaximumTimeInDates = (): moment.Moment => {
-    const maxTime = Math.max(...flatTimes);
-    console.log("⏰ DEBUG AnswerMeeting: Najpóźniejszy czas", {
-      maxTimeRaw: maxTime,
-      maxTimeFormatted: new Date(maxTime).toLocaleString(),
-      hour: moment(maxTime).hour(),
-      minute: moment(maxTime).minute(),
-      timestamp: new Date().toISOString(),
-    });
-    return moment(maxTime);
-  };
-
-  const isMinimumTimeHalfHour = (): boolean => {
-    const result = getMinimumTimeInDates().minute() === 30;
-    console.log(
-      "🕐 DEBUG AnswerMeeting: Czy najwcześniejszy czas to półgodzina?",
-      {
-        result,
-        minute: getMinimumTimeInDates().minute(),
-        timestamp: new Date().toISOString(),
-      }
-    );
-    return result;
-  };
-
-  const isMaximumTimeHalfHour = (): boolean => {
-    const result = getMaximumTimeInDates().minute() === 30;
-    console.log(
-      "🕐 DEBUG AnswerMeeting: Czy najpóźniejszy czas to półgodzina?",
-      {
-        result,
-        minute: getMaximumTimeInDates().minute(),
-        timestamp: new Date().toISOString(),
-      }
-    );
-    return result;
-  };
-
-  const renderTimeCells = () => {
     const disabledTimecell = () => (
       <td>
         <div className="rounded-lg h-12 w-24 lg:h-6 lg:w-12 bg-light-gray cursor-default"></div>
       </td>
     );
 
-    // POPRAWKA: Używamy globalnego minimum i maximum zamiast pierwszego dnia
-    const minimumTimeHour = getMinimumTimeInDates().hour();
-    const maximumTimeHour = getMaximumTimeInDates().hour();
+    var cells: JSX.Element[] = [];
 
-    console.log("📊 DEBUG AnswerMeeting: Renderowanie komórek czasowych", {
-      minimumTimeHour,
-      maximumTimeHour,
-      isMinimumHalfHour: isMinimumTimeHalfHour(),
-      isMaximumHalfHour: isMaximumTimeHalfHour(),
-      hourRange: `${minimumTimeHour}:00 - ${maximumTimeHour}:00`,
-      totalHoursSpan: maximumTimeHour - minimumTimeHour + 1,
-      datesCount: dates.length,
-      timestamp: new Date().toISOString(),
-    });
-
-    var timeCells: JSX.Element[] = [];
-
-    for (let i = minimumTimeHour; i <= maximumTimeHour; i++) {
+    for (
+      let i = timeRange.minimumTimeHour;
+      i <= timeRange.maximumTimeHour;
+      i++
+    ) {
       for (let h = 0; h < 2; h++) {
-        // Handle half hours
         const isHalfHour = h === 1;
 
-        // POPRAWKA: Sprawdzamy warunki na podstawie globalnych minimum i maximum
-        if (i == maximumTimeHour && isHalfHour && !isMaximumTimeHalfHour()) {
-          console.log("⏭️ DEBUG: Pomijanie ostatniej półgodziny", {
-            hour: i,
-            isHalfHour,
-            reason: "Maksymalny czas nie jest półgodziną",
-          });
+        if (
+          i == timeRange.maximumTimeHour &&
+          isHalfHour &&
+          !timeRange.isMaximumTimeHalfHour
+        ) {
           break;
         }
 
-        if (i == minimumTimeHour && !isHalfHour && isMinimumTimeHalfHour()) {
-          console.log("⏭️ DEBUG: Pomijanie pierwszej pełnej godziny", {
-            hour: i,
-            isHalfHour,
-            reason: "Minimalny czas zaczyna się od półgodziny",
-          });
+        if (
+          i == timeRange.minimumTimeHour &&
+          !isHalfHour &&
+          timeRange.isMinimumTimeHalfHour
+        ) {
           continue;
         }
 
         let timeRow: JSX.Element[] = [];
         let validTimesInRow = 0;
 
-        for (const date of dates) {
+        for (const date of staticMeetingData.dates) {
           const dateTime = moment(date.date)
             .hour(i)
             .minute(isHalfHour ? 30 : 0)
@@ -401,33 +919,28 @@ export default function AnswerMeeting({
           }
         }
 
-        console.log("📋 DEBUG AnswerMeeting: Wygenerowany rząd czasu", {
-          hour: i,
-          minute: isHalfHour ? 30 : 0,
-          timeDisplay: `${i.toString().padStart(2, "0")}:${
-            isHalfHour ? "30" : "00"
-          }`,
-          validTimesInRow,
-          totalCellsInRow: timeRow.length,
-          timestamp: new Date().toISOString(),
-        });
-
-        timeCells.push(
+        cells.push(
           <tr
             key={`${i}${isHalfHour ? "30" : "00"}`}
             className="cursor-pointer"
           >
             {((h === 0 &&
-              !(i === minimumTimeHour && isMinimumTimeHalfHour())) ||
-              (h === 1 && i === minimumTimeHour && isMinimumTimeHalfHour()) ||
+              !(
+                i === timeRange.minimumTimeHour &&
+                timeRange.isMinimumTimeHalfHour
+              )) ||
               (h === 1 &&
-                i === maximumTimeHour &&
-                !isMaximumTimeHalfHour())) && (
+                i === timeRange.minimumTimeHour &&
+                timeRange.isMinimumTimeHalfHour) ||
+              (h === 1 &&
+                i === timeRange.maximumTimeHour &&
+                !timeRange.isMaximumTimeHalfHour)) && (
               <th
                 rowSpan={isHalfHour ? 1 : 2}
                 className="text-right text-dark align-top bg-light sticky left-0 pr-2"
               >
-                {i === minimumTimeHour && isMinimumTimeHalfHour()
+                {i === timeRange.minimumTimeHour &&
+                timeRange.isMinimumTimeHalfHour
                   ? `${i.toString().padStart(2, "0")}:30`
                   : isHalfHour
                   ? `${i.toString().padStart(2, "0")}:30`
@@ -440,260 +953,54 @@ export default function AnswerMeeting({
       }
     }
 
-    // Add end hour row only if maximum time is half hour
-    if (isMaximumTimeHalfHour()) {
-      const endHour = maximumTimeHour + 1;
-      const endMinute = "00";
-      const key = `${endHour}${endMinute}`;
-
-      console.log("🔚 DEBUG AnswerMeeting: Dodawanie końcowego rzędu godziny", {
-        endHour,
-        endMinute,
-        key,
-        reason: "Maksymalny czas jest półgodziną",
-        timestamp: new Date().toISOString(),
-      });
-
-      timeCells.push(
-        <tr key={key} className="cursor-pointer">
+    if (timeRange.isMaximumTimeHalfHour) {
+      const endHour = timeRange.maximumTimeHour + 1;
+      cells.push(
+        <tr key={`${endHour}00`} className="cursor-pointer">
           <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2">
-            {`${endHour.toString().padStart(2, "0")}:${endMinute}`}
+            {`${endHour.toString().padStart(2, "0")}:00`}
           </th>
         </tr>
       );
     }
 
-    console.log("✅ DEBUG AnswerMeeting: Zakończono renderowanie tabeli", {
-      totalRows: timeCells.length,
-      hourRange: `${minimumTimeHour}:${
-        isMinimumTimeHalfHour() ? "30" : "00"
-      } - ${maximumTimeHour}:${isMaximumTimeHalfHour() ? "30" : "00"}`,
+    console.log("✅ OPTYMALIZACJA: Zakończono renderowanie tabeli", {
+      totalRows: cells.length,
       timestamp: new Date().toISOString(),
     });
 
-    return timeCells;
-  };
+    return cells;
+  }, [
+    timeRange,
+    staticMeetingData.dates,
+    flatTimes,
+    availableTimecell,
+    availabilityInfo,
+    highestAvailableCount,
+  ]); // KLUCZOWA OPTYMALIZACJA: Memoizacja całej tabeli
 
-  const availableTimecell = (dateTime: number, isEndOfWeek: boolean) => {
-    const isMobileAnsweringMode = isMobile && mobileAnsweringMode;
-    const isDesktop = !isMobile;
-    const selectedTimecell = getSelectedTimecell(dateTime);
-    const dateVotes = availabilityInfo[dateTime]?.usersInfo.length || 0;
-    const isSelected = isDateSelected(dateTime);
-    const isAnsweredDate = isAnswered(dateTime);
-
-    const handleMouseDown = () => {
-      if ((isMobileAnsweringMode || isDesktop) && !unselectMode) {
-        toggleTimecell(dateTime);
-      } else if (!isMobileAnsweringMode && !isDesktop && !unselectMode) {
-        setLookedUpDatetime(dateTime);
-        convertDatetimeToDate(dateTime);
-      }
-      if (isDesktop) {
-        setSelectionMode(true);
-      }
-    };
-
-    const handleMouseUp = () => {
-      if (isDesktop) {
-        setSelectionMode(false);
-        setUnselectMode(false);
-      }
-    };
-
-    const handleMouseOver = () => {
-      if (selectionMode) {
-        toggleTimecell(dateTime);
-      }
-      setLookedUpDatetime(dateTime);
-      convertDatetimeToDate(dateTime);
-      disableSelection();
-    };
-
-    return (
-      <td key={dateTime}>
-        <div
-          data-date={dateTime}
-          date-votes={dateVotes}
-          onMouseDown={handleMouseDown}
-          onMouseUp={handleMouseUp}
-          onMouseOver={handleMouseOver}
-          className={`rounded-lg h-12 w-24 lg:h-6 lg:w-12 transition-colors ${
-            isEndOfWeek && "mr-4"
-          } ${
-            isAnsweredDate
-              ? `border-none ${
-                  isSelected
-                    ? `${
-                        selectedTimecell?.isOnline
-                          ? `bg-gold ${!isMobile && "hover:bg-gold/50"}`
-                          : `bg-primary ${!isMobile && "hover:bg-primary/50"}`
-                      } selected`
-                    : `answered  ${!isMobile && "active:animate-cell-select"} ${
-                        availabilityInfo[dateTime].onlineCount >=
-                          highestAvailableCount * 0.5 &&
-                        availabilityInfo[dateTime].usersInfo.length ==
-                          highestAvailableCount
-                          ? `bg-gold-dark ${
-                              !isMobile && "hover:bg-gold-dark/50"
-                            }`
-                          : availabilityInfo[dateTime].usersInfo.length ==
-                            highestAvailableCount
-                          ? `bg-green ${!isMobile && "hover:bg-green/50"}`
-                          : `bg-light-green ${
-                              !isMobile && "hover:bg-light-green/50"
-                            }`
-                      }`
-                }`
-              : `border border-gray ${!isMobile && "hover:border-gray/50"} ${
-                  isSelected
-                    ? `border-none ${
-                        selectedTimecell?.isOnline
-                          ? `bg-gold ${!isMobile && "hover:bg-gold/50"}`
-                          : `bg-primary ${!isMobile && "hover:bg-primary/50"}`
-                      }`
-                    : `${
-                        (isMobileAnsweringMode || isDesktop) &&
-                        !isMobile &&
-                        !unselectMode &&
-                        "hover:border-none active:animate-cell-select hover:bg-primary"
-                      }`
-                }`
-          }`}
-        ></div>
-      </td>
-    );
-  };
-
-  const isAnswered = (datetime: number) =>
-    answers.some((answer: any) =>
-      answer.dates.some((date: any) => date.meetDate === datetime)
-    );
-
-  const renderDaysHeadings = () => {
-    const daysHeadings = dates.map((day: any) => {
-      const dateMoment = moment(day.date);
-      const date = dateMoment.date();
-      const month = dateMoment.month() + 1;
-      const dayOfWeek = dateMoment.day();
-      const classNames = dayOfWeek === 0 ? "pr-4" : "";
-
-      return (
-        <th
-          key={day.date}
-          className={`bg-light sticky top-0 z-10 ${classNames}`}
-        >
-          <p className="text-sm text-dark font-medium">
-            {`${date.toString().padStart(2, "0")}.${month
-              .toString()
-              .padStart(2, "0")}`}
-          </p>
-          <p className="text-dark">{_.capitalize(dateMoment.format("ddd"))}</p>
-        </th>
-      );
-    });
-
-    return daysHeadings;
-  };
-
-  const renderAvailabilityInfo = () => {
-    if (lookedUpDatetime) {
-      if (!availabilityInfo[lookedUpDatetime]) {
-        return (
-          <span className="text-dark">
-            {dict.page.answerMeeting.nobodyAvailable}
-          </span>
-        );
-      } else {
-        const dayAvailabilityInfo = availabilityInfo[lookedUpDatetime];
-        const availableUsers = dayAvailabilityInfo?.usersInfo;
-
-        // Sort avaulable users by username alphabetically
-        availableUsers?.sort((a: any, b: any) =>
-          a.userData.username.localeCompare(b.userData.username)
-        );
-
-        const onlineAvailableUsers = availableUsers?.filter(
-          (user: any) => user.isOnline === true
-        );
-
-        const listOfOnlineAvailableUsers = onlineAvailableUsers?.map(
-          (userData: any) => (
-            <li key={userData.userData.userId} className="flex items-center">
-              <span className="block h-3 w-3 rounded-full bg-gold mr-2"></span>
-              <span>{userData.userData.username}</span>
-            </li>
-          )
-        );
-
-        const offlineAvailableUsers = availableUsers?.filter(
-          (user: any) => user.isOnline === false
-        );
-
-        const listOfOfflineAvailableUsers = offlineAvailableUsers?.map(
-          (userData: any) => (
-            <li key={userData.userData.userId} className="flex items-center">
-              <span className="block h-3 w-3 rounded-full bg-primary mr-2"></span>
-              <span>{userData.userData.username}</span>
-            </li>
-          )
-        );
-
-        const unavailableUsers = getUnavailableUsersInfo(
-          answers,
-          availableUsers
-        );
-
-        const listOfUnavailableUsers = unavailableUsers?.map(
-          (userData: any) => (
-            <li key={userData._id} className="text-gray flex items-center">
-              <span className="block h-3 w-3 rounded-full bg-gray mr-2"></span>
-              <s>{userData.username}</s>
-            </li>
-          )
-        );
-
-        const listOfAvailability = (
-          <ul>
-            {listOfOnlineAvailableUsers}
-            {listOfOfflineAvailableUsers}
-            {listOfUnavailableUsers}
-          </ul>
-        );
-
-        const listOfUsernames = listOfAvailability;
-
-        return listOfUsernames;
-      }
-    } else {
-      if (isMobile) {
-        return <span>{dict.page.answerMeeting.clickToReveal}</span>;
-      }
-      return <span>{dict.page.answerMeeting.hoverToReveal}</span>;
-    }
-  };
-
-  function clearFormData() {
+  // OPTYMALIZACJA: Funkcje wysyłania z useCallback
+  const clearFormData = useCallback(() => {
     setUsername("");
     setSelectedTimecells([]);
-  }
+  }, []);
 
-  const [isSendingReq, setIsSendingReq] = useState(false);
-  const sendAnswer: SubmitHandler<Inputs> = async () => {
+  const sendAnswer: SubmitHandler<any> = useCallback(async () => {
     try {
+      console.log("📤 DEBUG AnswerMeeting: Wysyłanie odpowiedzi");
       if (isSendingReq || !username) return;
 
       setIsSendingReq(true);
 
       const answerResponse = await axios.patch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${staticMeetingData.appointmentId}`,
         { username, dates: selectedTimecells }
       );
 
       if (answerResponse.status !== 200) return;
 
       const updatedMeetResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${staticMeetingData.appointmentId}`
       );
 
       if (updatedMeetResponse.status === 200) {
@@ -706,23 +1013,30 @@ export default function AnswerMeeting({
     } finally {
       setIsSendingReq(false);
     }
-  };
+  }, [
+    isSendingReq,
+    username,
+    selectedTimecells,
+    staticMeetingData.appointmentId,
+    clearFormData,
+  ]);
 
-  const sendAnswerLoggedIn = async () => {
+  const sendAnswerLoggedIn = useCallback(async () => {
     try {
+      console.log("📤 DEBUG AnswerMeeting: Wysyłanie odpowiedzi (zalogowany)");
       if (isSendingReq) return;
 
       setIsSendingReq(true);
 
       const answerResponse = await axios.patch(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`,
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${staticMeetingData.appointmentId}`,
         { username, dates: selectedTimecells }
       );
 
       if (answerResponse.status !== 200) return;
 
       const updatedMeetResponse = await axios.get(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${meetingData.appointmentId}`
+        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/${staticMeetingData.appointmentId}`
       );
 
       if (updatedMeetResponse.status === 200) {
@@ -735,8 +1049,14 @@ export default function AnswerMeeting({
     } finally {
       setIsSendingReq(false);
     }
-  };
+  }, [
+    isSendingReq,
+    username,
+    selectedTimecells,
+    staticMeetingData.appointmentId,
+  ]);
 
+  // OPTYMALIZACJA: Efekt tylko dla dostępności
   useEffect(() => {
     if (lookedUpDatetime && availabilityInfo[lookedUpDatetime]) {
       setAvailableCount(availabilityInfo[lookedUpDatetime].usersInfo.length);
@@ -744,6 +1064,75 @@ export default function AnswerMeeting({
       setAvailableCount(0);
     }
   }, [lookedUpDatetime, availabilityInfo]);
+
+  // OPTYMALIZACJA: Memoizacja informacji o dostępności
+  const availabilityInfoContent = useMemo(() => {
+    if (!lookedUpDatetime) {
+      return isMobile ? (
+        <span>{dict.page.answerMeeting.clickToReveal}</span>
+      ) : (
+        <span>{dict.page.answerMeeting.hoverToReveal}</span>
+      );
+    }
+
+    if (!availabilityInfo[lookedUpDatetime]) {
+      return (
+        <span className="text-dark">
+          {dict.page.answerMeeting.nobodyAvailable}
+        </span>
+      );
+    }
+
+    const dayAvailabilityInfo = availabilityInfo[lookedUpDatetime];
+    const availableUsers = dayAvailabilityInfo?.usersInfo;
+
+    availableUsers?.sort((a: any, b: any) =>
+      a.userData.username.localeCompare(b.userData.username)
+    );
+
+    const onlineAvailableUsers = availableUsers?.filter(
+      (user: any) => user.isOnline === true
+    );
+
+    const listOfOnlineAvailableUsers = onlineAvailableUsers?.map(
+      (userData: any) => (
+        <li key={userData.userData.userId} className="flex items-center">
+          <span className="block h-3 w-3 rounded-full bg-gold mr-2"></span>
+          <span>{userData.userData.username}</span>
+        </li>
+      )
+    );
+
+    const offlineAvailableUsers = availableUsers?.filter(
+      (user: any) => user.isOnline === false
+    );
+
+    const listOfOfflineAvailableUsers = offlineAvailableUsers?.map(
+      (userData: any) => (
+        <li key={userData.userData.userId} className="flex items-center">
+          <span className="block h-3 w-3 rounded-full bg-primary mr-2"></span>
+          <span>{userData.userData.username}</span>
+        </li>
+      )
+    );
+
+    const unavailableUsers = getUnavailableUsersInfo(answers, availableUsers);
+
+    const listOfUnavailableUsers = unavailableUsers?.map((userData: any) => (
+      <li key={userData._id} className="text-gray flex items-center">
+        <span className="block h-3 w-3 rounded-full bg-gray mr-2"></span>
+        <s>{userData.username}</s>
+      </li>
+    ));
+
+    return (
+      <ul>
+        {listOfOnlineAvailableUsers}
+        {listOfOfflineAvailableUsers}
+        {listOfUnavailableUsers}
+      </ul>
+    );
+  }, [lookedUpDatetime, availabilityInfo, answers, isMobile, dict]);
 
   // Forms
   const formSchema = yup.object().shape({
@@ -769,12 +1158,18 @@ export default function AnswerMeeting({
     <main className="flex md:flex-1 flex-col px-5 py-10 pt-24 lg:p-24 lg:pt-28 h-smd:pt-30 lg:m-0 w-[356px] md:w-auto lg:w-[900px]">
       <Title text={meetName} />
       {/* Meeting details */}
-      {(meetPlace || meetLink) && (
+      {(staticMeetingData.meetPlace || staticMeetingData.meetLink) && (
         <div className="mb-10">
-          {meetPlace && <p className="text-dark">🏢 {meetPlace}</p>}
-          {meetLink && (
+          {staticMeetingData.meetPlace && (
+            <p className="text-dark">🏢 {staticMeetingData.meetPlace}</p>
+          )}
+          {staticMeetingData.meetLink && (
             <p>
-              🔗 <LinkButton href={meetLink} text="Link do spotkania" />
+              🔗{" "}
+              <LinkButton
+                href={staticMeetingData.meetLink}
+                text="Link do spotkania"
+              />
             </p>
           )}
         </div>
@@ -788,14 +1183,14 @@ export default function AnswerMeeting({
               {lookedUpDate} {lookedUpTime}
             </p>
             {lookedUpDate && (
-              <Heading text={`${availableCount}/${answersCount}`} />
+              <Heading text={`${availableCount}/${answers.length}`} />
             )}
             <div
               className={`overflow-auto ${
                 isMobile && "max-h-[100px]"
               } h-hd:max-h-[300px]`}
             >
-              {renderAvailabilityInfo()}
+              {availabilityInfoContent}
             </div>
           </section>
         ) : null}
@@ -843,10 +1238,10 @@ export default function AnswerMeeting({
                   <thead>
                     <tr>
                       <th className="bg-light sticky top-0 left-0 z-20"></th>
-                      {renderDaysHeadings()}
+                      {daysHeadings}
                     </tr>
                   </thead>
-                  <tbody>{renderTimeCells()}</tbody>
+                  <tbody>{timeCells}</tbody>
                 </table>
               </div>
             </div>
@@ -911,11 +1306,7 @@ export default function AnswerMeeting({
                 </div>
 
                 <Button text={dict.page.answerMeeting.button.submit} />
-                <CopyLinkButton
-                  link={currentUrl}
-                  dict={dict}
-                  className="ml-6"
-                />
+                <CopyLinkButton link={pathname} dict={dict} className="ml-6" />
               </div>
             ) : null}
           </form>

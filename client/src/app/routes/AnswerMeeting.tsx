@@ -382,116 +382,272 @@ export default function AnswerMeeting({
       })
       .filter(Boolean);
 
-    // Znajdź globalne minimum i maximum
+    // Znajdź globalne minimum i maximum - POPRAWKA: Porównuj tylko godziny, nie timestampy
     const allMinTimes = dailyMinMax.map((day) => day.dayMinTime);
     const allMaxTimes = dailyMinMax.map((day) => day.dayMaxTime);
 
-    const globalMinTime = Math.min(...allMinTimes);
-    const globalMaxTime = Math.max(...allMaxTimes);
-
-    // Znajdź które dni mają globalne extrema
-    const dayWithGlobalMin = dailyMinMax.find(
-      (day) => day.dayMinTime === globalMinTime
-    );
-    const dayWithGlobalMax = dailyMinMax.find(
-      (day) => day.dayMaxTime === globalMaxTime
-    );
-
-    console.log("⚖️ DEBUG: Porównanie metod obliczania globalnego zakresu", {
-      methodComparison: {
-        flatTimesMethod: {
-          minTime: Math.min(...flatTimes),
-          maxTime: Math.max(...flatTimes),
-          minFormatted: moment(Math.min(...flatTimes)).format(
-            "YYYY-MM-DD HH:mm"
-          ),
-          maxFormatted: moment(Math.max(...flatTimes)).format(
-            "YYYY-MM-DD HH:mm"
-          ),
-        },
-        dailyAnalysisMethod: {
-          minTime: globalMinTime,
-          maxTime: globalMaxTime,
-          minFormatted: moment(globalMinTime).format("YYYY-MM-DD HH:mm"),
-          maxFormatted: moment(globalMaxTime).format("YYYY-MM-DD HH:mm"),
-        },
+    console.log("📊 DEBUG: Analiza globalnego zakresu czasowego", {
+      allMinTimes,
+      allMaxTimes,
+      // DODAJ: Analiza godzin zamiast timestampów
+      hourAnalysis: {
+        allMinHours: dailyMinMax.map((day) => ({
+          day: day.date,
+          hour: day.minHour,
+          minute: day.minMinute,
+          fullTime: `${day.minHour}:${day.minMinute
+            .toString()
+            .padStart(2, "0")}`,
+        })),
+        allMaxHours: dailyMinMax.map((day) => ({
+          day: day.date,
+          hour: day.maxHour,
+          minute: day.maxMinute,
+          fullTime: `${day.maxHour}:${day.maxMinute
+            .toString()
+            .padStart(2, "0")}`,
+        })),
       },
-      extremaSources: {
-        globalMinFrom: dayWithGlobalMin
-          ? {
-              day: dayWithGlobalMin.date,
-              dayName: dayWithGlobalMin.dayName,
-              time: dayWithGlobalMin.minFormatted,
-            }
-          : null,
-        globalMaxFrom: dayWithGlobalMax
-          ? {
-              day: dayWithGlobalMax.date,
-              dayName: dayWithGlobalMax.dayName,
-              time: dayWithGlobalMax.maxFormatted,
-            }
-          : null,
-      },
-      dailyRanges: dailyMinMax.map((day) => ({
-        date: day.date,
-        range: day.timeSpan,
-        timesCount: day.timesCount,
-      })),
       timestamp: new Date().toISOString(),
     });
+
+    // POPRAWKA: Znajdź globalne minimum i maksimum na podstawie GODZIN, nie timestampów
+    const globalMinHour = Math.min(...dailyMinMax.map((day) => day.minHour));
+    const globalMaxHour = Math.max(...dailyMinMax.map((day) => day.maxHour));
+
+    // POPRAWKA: Znajdź najwcześniejszą minutę dla globalnej minimalnej godziny
+    const daysWithMinHour = dailyMinMax.filter(
+      (day) => day.minHour === globalMinHour
+    );
+    const globalMinMinute = Math.min(
+      ...daysWithMinHour.map((day) => day.minMinute)
+    );
+
+    // POPRAWKA: Znajdź najpóźniejszą minutę dla globalnej maksymalnej godziny
+    const daysWithMaxHour = dailyMinMax.filter(
+      (day) => day.maxHour === globalMaxHour
+    );
+    const globalMaxMinute = Math.max(
+      ...daysWithMaxHour.map((day) => day.maxMinute)
+    );
+
+    // POPRAWKA: Znajdź reprezentatywne timestampy dla globalnych ekstremów
+    const dayWithGlobalMinHour = daysWithMinHour.find(
+      (day) => day.minMinute === globalMinMinute
+    );
+    const dayWithGlobalMaxHour = daysWithMaxHour.find(
+      (day) => day.maxMinute === globalMaxMinute
+    );
+
+    const globalMinTime =
+      dayWithGlobalMinHour?.dayMinTime || Math.min(...allMinTimes);
+    const globalMaxTime =
+      dayWithGlobalMaxHour?.dayMaxTime || Math.max(...allMaxTimes);
+
+    console.log(
+      "🌍 DEBUG: Globalne minimum i maksimum czasu spotkania - POPRAWIONA WERSJA",
+      {
+        // STARA METODA (błędna)
+        oldMethod: {
+          globalMinTime: Math.min(...allMinTimes),
+          globalMaxTime: Math.max(...allMaxTimes),
+          globalMinFormatted: moment(Math.min(...allMinTimes)).format(
+            "YYYY-MM-DD HH:mm"
+          ),
+          globalMaxFormatted: moment(Math.max(...allMaxTimes)).format(
+            "YYYY-MM-DD HH:mm"
+          ),
+        },
+        // NOWA METODA (poprawna)
+        newMethod: {
+          globalMinHour,
+          globalMaxHour,
+          globalMinMinute,
+          globalMaxMinute,
+          globalMinTime,
+          globalMaxTime,
+          globalMinFormatted: moment(globalMinTime).format("YYYY-MM-DD HH:mm"),
+          globalMaxFormatted: moment(globalMaxTime).format("YYYY-MM-DD HH:mm"),
+          globalHourRange: `${globalMinHour}:${globalMinMinute
+            .toString()
+            .padStart(2, "0")} - ${globalMaxHour}:${globalMaxMinute
+            .toString()
+            .padStart(2, "0")}`,
+        },
+        // SZCZEGÓŁY ŹRÓDEŁ
+        sources: {
+          minHourSources: daysWithMinHour.map((day) => ({
+            day: day.date,
+            hour: day.minHour,
+            minute: day.minMinute,
+            timestamp: day.dayMinTime,
+          })),
+          maxHourSources: daysWithMaxHour.map((day) => ({
+            day: day.date,
+            hour: day.maxHour,
+            minute: day.maxMinute,
+            timestamp: day.dayMaxTime,
+          })),
+          selectedMinSource: dayWithGlobalMinHour
+            ? {
+                day: dayWithGlobalMinHour.date,
+                time: `${
+                  dayWithGlobalMinHour.minHour
+                }:${dayWithGlobalMinHour.minMinute
+                  .toString()
+                  .padStart(2, "0")}`,
+                timestamp: dayWithGlobalMinHour.dayMinTime,
+              }
+            : null,
+          selectedMaxSource: dayWithGlobalMaxHour
+            ? {
+                day: dayWithGlobalMaxHour.date,
+                time: `${
+                  dayWithGlobalMaxHour.maxHour
+                }:${dayWithGlobalMaxHour.maxMinute
+                  .toString()
+                  .padStart(2, "0")}`,
+                timestamp: dayWithGlobalMaxHour.dayMaxTime,
+              }
+            : null,
+        },
+        timestamp: new Date().toISOString(),
+      }
+    );
+
+    // Znajdź które dni mają globalne extrema - POPRAWIONA WERSJA
+    const dayWithGlobalMin = dayWithGlobalMinHour;
+    const dayWithGlobalMax = dayWithGlobalMaxHour;
+
+    console.log(
+      "⚖️ DEBUG: Porównanie metod obliczania globalnego zakresu - POPRAWIONA WERSJA",
+      {
+        methodComparison: {
+          flatTimesMethod: {
+            minTime: Math.min(...flatTimes),
+            maxTime: Math.max(...flatTimes),
+            minFormatted: moment(Math.min(...flatTimes)).format(
+              "YYYY-MM-DD HH:mm"
+            ),
+            maxFormatted: moment(Math.max(...flatTimes)).format(
+              "YYYY-MM-DD HH:mm"
+            ),
+            minHour: moment(Math.min(...flatTimes)).hour(),
+            maxHour: moment(Math.max(...flatTimes)).hour(),
+          },
+          timestampAnalysisMethod: {
+            minTime: Math.min(...allMinTimes),
+            maxTime: Math.max(...allMaxTimes),
+            minFormatted: moment(Math.min(...allMinTimes)).format(
+              "YYYY-MM-DD HH:mm"
+            ),
+            maxFormatted: moment(Math.max(...allMaxTimes)).format(
+              "YYYY-MM-DD HH:mm"
+            ),
+            minHour: moment(Math.min(...allMinTimes)).hour(),
+            maxHour: moment(Math.max(...allMaxTimes)).hour(),
+          },
+          // NOWA POPRAWNA METODA
+          hourComparisonMethod: {
+            minTime: globalMinTime,
+            maxTime: globalMaxTime,
+            minFormatted: moment(globalMinTime).format("YYYY-MM-DD HH:mm"),
+            maxFormatted: moment(globalMaxTime).format("YYYY-MM-DD HH:mm"),
+            minHour: globalMinHour,
+            maxHour: globalMaxHour,
+            minMinute: globalMinMinute,
+            maxMinute: globalMaxMinute,
+          },
+        },
+        extremaSources: {
+          globalMinFrom: dayWithGlobalMin
+            ? {
+                day: dayWithGlobalMin.date,
+                dayName: dayWithGlobalMin.dayName,
+                time: dayWithGlobalMin.minFormatted,
+                hour: dayWithGlobalMin.minHour,
+                minute: dayWithGlobalMin.minMinute,
+              }
+            : null,
+          globalMaxFrom: dayWithGlobalMax
+            ? {
+                day: dayWithGlobalMax.date,
+                dayName: dayWithGlobalMax.dayName,
+                time: dayWithGlobalMax.maxFormatted,
+                hour: dayWithGlobalMax.maxHour,
+                minute: dayWithGlobalMax.maxMinute,
+              }
+            : null,
+        },
+        dailyRanges: dailyMinMax.map((day) => ({
+          date: day.date,
+          range: day.timeSpan,
+          timesCount: day.timesCount,
+          hourRange: `${day.minHour}:${day.minMinute
+            .toString()
+            .padStart(2, "0")} - ${day.maxHour}:${day.maxMinute
+            .toString()
+            .padStart(2, "0")}`,
+        })),
+        timestamp: new Date().toISOString(),
+      }
+    );
 
     const result = {
       minTime: globalMinTime,
       maxTime: globalMaxTime,
-      minimumTimeHour: moment(globalMinTime).hour(),
-      maximumTimeHour: moment(globalMaxTime).hour(),
-      isMinimumTimeHalfHour: moment(globalMinTime).minute() === 30,
-      isMaximumTimeHalfHour: moment(globalMaxTime).minute() === 30,
+      minimumTimeHour: globalMinHour, // POPRAWKA: Użyj globalMinHour zamiast moment(globalMinTime).hour()
+      maximumTimeHour: globalMaxHour, // POPRAWKA: Użyj globalMaxHour zamiast moment(globalMaxTime).hour()
+      isMinimumTimeHalfHour: globalMinMinute === 30, // POPRAWKA: Użyj globalMinMinute
+      isMaximumTimeHalfHour: globalMaxMinute === 30, // POPRAWKA: Użyj globalMaxMinute
     };
 
-    console.log("🔧 OPTYMALIZACJA: Finalne obliczanie zakresu czasu", {
-      result,
-      detailedBreakdown: {
-        globalMinTime: {
-          timestamp: globalMinTime,
-          formatted: moment(globalMinTime).format("YYYY-MM-DD HH:mm:ss"),
-          hour: result.minimumTimeHour,
-          minute: moment(globalMinTime).minute(),
-          isHalfHour: result.isMinimumTimeHalfHour,
-          sourceDay: dayWithGlobalMin?.date,
+    console.log(
+      "🔧 OPTYMALIZACJA: Finalne obliczanie zakresu czasu - POPRAWIONA WERSJA",
+      {
+        result,
+        detailedBreakdown: {
+          globalMinTime: {
+            timestamp: globalMinTime,
+            formatted: moment(globalMinTime).format("YYYY-MM-DD HH:mm:ss"),
+            hour: result.minimumTimeHour,
+            minute: globalMinMinute, // POPRAWKA: Użyj globalMinMinute
+            isHalfHour: result.isMinimumTimeHalfHour,
+            sourceDay: dayWithGlobalMin?.date,
+          },
+          globalMaxTime: {
+            timestamp: globalMaxTime,
+            formatted: moment(globalMaxTime).format("YYYY-MM-DD HH:mm:ss"),
+            hour: result.maximumTimeHour,
+            minute: globalMaxMinute, // POPRAWKA: Użyj globalMaxMinute
+            isHalfHour: result.isMaximumTimeHalfHour,
+            sourceDay: dayWithGlobalMax?.date,
+          },
+          hourSpan: {
+            from: `${result.minimumTimeHour}:${
+              result.isMinimumTimeHalfHour ? "30" : "00"
+            }`,
+            to: `${result.maximumTimeHour}:${
+              result.isMaximumTimeHalfHour ? "30" : "00"
+            }`,
+            totalHours: result.maximumTimeHour - result.minimumTimeHour + 1,
+            expectedTableRows:
+              (result.maximumTimeHour - result.minimumTimeHour + 1) * 2,
+          },
         },
-        globalMaxTime: {
-          timestamp: globalMaxTime,
-          formatted: moment(globalMaxTime).format("YYYY-MM-DD HH:mm:ss"),
-          hour: result.maximumTimeHour,
-          minute: moment(globalMaxTime).minute(),
-          isHalfHour: result.isMaximumTimeHalfHour,
-          sourceDay: dayWithGlobalMax?.date,
+        qualityCheck: {
+          hasValidRange: result.maximumTimeHour >= result.minimumTimeHour,
+          hourSpanReasonable:
+            result.maximumTimeHour - result.minimumTimeHour <= 24,
+          coversAllDays: dailyMinMax.every(
+            (day) =>
+              day.minHour >= result.minimumTimeHour &&
+              day.maxHour <= result.maximumTimeHour
+          ),
         },
-        hourSpan: {
-          from: `${result.minimumTimeHour}:${
-            result.isMinimumTimeHalfHour ? "30" : "00"
-          }`,
-          to: `${result.maximumTimeHour}:${
-            result.isMaximumTimeHalfHour ? "30" : "00"
-          }`,
-          totalHours: result.maximumTimeHour - result.minimumTimeHour + 1,
-          expectedTableRows:
-            (result.maximumTimeHour - result.minimumTimeHour + 1) * 2,
-        },
-      },
-      qualityCheck: {
-        hasValidRange: result.maximumTimeHour >= result.minimumTimeHour,
-        hourSpanReasonable:
-          result.maximumTimeHour - result.minimumTimeHour <= 24,
-        coversAllDays: dailyMinMax.every(
-          (day) =>
-            day.minHour >= result.minimumTimeHour &&
-            day.maxHour <= result.maximumTimeHour
-        ),
-      },
-      timestamp: new Date().toISOString(),
-    });
+        timestamp: new Date().toISOString(),
+      }
+    );
 
     return result;
   }, [flatTimes, staticMeetingData.dates]);

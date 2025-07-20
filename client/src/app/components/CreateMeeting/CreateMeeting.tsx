@@ -65,12 +65,13 @@ export default function CreateMeeting({
 
   // DEBUG: Logowanie wybranych dat
   React.useEffect(() => {
+    const sortedDates = [...selectedDates].sort((a, b) => a - b);
     console.log("📅 DEBUG CreateMeeting: Zaktualizowane wybrane daty", {
       selectedDatesCount: selectedDates.length,
-      selectedDates: selectedDates.map((date) =>
+      selectedDates: sortedDates.map((date) =>
         new Date(date).toLocaleDateString()
       ),
-      selectedDatesRaw: selectedDates,
+      selectedDatesRaw: sortedDates,
       timestamp: new Date().toISOString(),
     });
   }, [selectedDates]);
@@ -154,22 +155,25 @@ export default function CreateMeeting({
 
   // DEBUG: Wrapper dla setSelectedDates z logowaniem
   const handleSetSelectedDates = (dates: number[]) => {
+    const sortedDates = [...dates].sort((a, b) => a - b);
+    const sortedSelectedDates = [...selectedDates].sort((a, b) => a - b);
+
     console.log("📅 DEBUG CreateMeeting: Ręczne ustawienie dat", {
       oldDatesCount: selectedDates.length,
-      newDatesCount: dates.length,
-      oldDates: selectedDates.map((date) =>
+      newDatesCount: sortedDates.length,
+      oldDates: sortedSelectedDates.map((date) =>
         new Date(date).toLocaleDateString()
       ),
-      newDates: dates.map((date) => new Date(date).toLocaleDateString()),
-      addedDates: dates
+      newDates: sortedDates.map((date) => new Date(date).toLocaleDateString()),
+      addedDates: sortedDates
         .filter((date) => !selectedDates.includes(date))
         .map((date) => new Date(date).toLocaleDateString()),
-      removedDates: selectedDates
-        .filter((date) => !dates.includes(date))
+      removedDates: sortedSelectedDates
+        .filter((date) => !sortedDates.includes(date))
         .map((date) => new Date(date).toLocaleDateString()),
       timestamp: new Date().toISOString(),
     });
-    setSelectedDates(dates);
+    setSelectedDates(sortedDates);
   };
 
   if (isRequestInProgress) {
@@ -209,7 +213,7 @@ export default function CreateMeeting({
           {currStep === 1 && (
             <DateSelectionStep
               delta={delta}
-              selectedDates={selectedDates}
+              selectedDates={[...selectedDates].sort((a, b) => a - b)}
               setSelectedDates={handleSetSelectedDates}
               dateError={dateError}
               dateErrorText={dateErrorText}

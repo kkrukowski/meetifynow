@@ -27,6 +27,28 @@ import { getUnavailableUsersInfo } from "@/utils/meeting/answer/getUnavailableUs
 import useMouseDown from "@/utils/useIsMouseDown";
 import { Locale } from "@root/i18n.config";
 
+interface DayTimeCount {
+  date: string;
+  count: number;
+}
+
+interface TimeGap {
+  date: string;
+  hasGaps: boolean;
+  expectedSlots: number;
+  actualSlots: number;
+}
+
+interface PatternsAnalysis {
+  hasOnlyFullHours: boolean;
+  hasOnlyHalfHours: boolean;
+  hasQuarterHours: boolean;
+  hasFiveMinuteIntervals: boolean;
+  daysWithMostTimes: DayTimeCount[];
+  daysWithLeastTimes: DayTimeCount[];
+  timeGaps: TimeGap[];
+}
+
 export default function AnswerMeeting({
   lang,
   dict,
@@ -106,10 +128,12 @@ export default function AnswerMeeting({
           timesCount: dayTimes.length,
           timesRaw: dayTimes,
           timesDetailed: timesWithDetails,
-          timeSlots: timesWithDetails.map((t) => t.timeOnly).sort(),
-          uniqueHours: [...new Set(timesWithDetails.map((t) => t.hour))].sort(),
+          timeSlots: timesWithDetails.map((t: any) => t.timeOnly).sort(),
+          uniqueHours: [
+            ...new Set(timesWithDetails.map((t: any) => t.hour)),
+          ].sort(),
           uniqueMinutes: [
-            ...new Set(timesWithDetails.map((t) => t.minute)),
+            ...new Set(timesWithDetails.map((t: any) => t.minute)),
           ].sort(),
           hourRange:
             dayTimes.length > 0
@@ -150,7 +174,7 @@ export default function AnswerMeeting({
 
     console.log("📋 DEBUG: Zestawienie wszystkich dni spotkania", {
       totalDays: detailedDayAnalysis.length,
-      daysOverview: detailedDayAnalysis.map((day) => ({
+      daysOverview: detailedDayAnalysis.map((day: any) => ({
         date: day.dateFormatted,
         dayName: day.dayName,
         timesCount: day.timesCount,
@@ -179,7 +203,7 @@ export default function AnswerMeeting({
         dayOfWeek: timeMoment.format("dddd"),
         whichDay:
           detailedDayAnalysis.findIndex(
-            (day) =>
+            (day: any) =>
               timeMoment.format("YYYY-MM-DD") ===
               moment(day.originalDate).format("YYYY-MM-DD")
           ) + 1,
@@ -193,25 +217,30 @@ export default function AnswerMeeting({
         times.length / staticMeetingData.dates.length
       ).toFixed(2),
       allTimesBreakdown: allTimesAnalysis.slice(0, 15), // pierwsze 15 jako przykład
-      timesByDay: detailedDayAnalysis.reduce((acc, day) => {
-        acc[`Dzień ${day.dayIndex + 1} (${day.dateFormatted})`] =
-          day.timesCount;
-        return acc;
-      }, {} as Record<string, number>),
+      timesByDay: detailedDayAnalysis.reduce(
+        (acc: Record<string, number>, day: any) => {
+          acc[`Dzień ${day.dayIndex + 1} (${day.dateFormatted})`] =
+            day.timesCount;
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
       timestamp: new Date().toISOString(),
     });
 
     // DEBUG: Globalne statystyki czasowe
-    const globalTimeStats = {
-      allUniqueHours: [...new Set(allTimesAnalysis.map((t) => t.hour))].sort(),
+    const globalTimeStats: any = {
+      allUniqueHours: [
+        ...new Set(allTimesAnalysis.map((t: any) => t.hour)),
+      ].sort(),
       allUniqueMinutes: [
-        ...new Set(allTimesAnalysis.map((t) => t.minute)),
+        ...new Set(allTimesAnalysis.map((t: any) => t.minute)),
       ].sort(),
       allUniqueDates: [
-        ...new Set(allTimesAnalysis.map((t) => t.dateOnly)),
+        ...new Set(allTimesAnalysis.map((t: any) => t.dateOnly)),
       ].sort(),
       allUniqueTimeSlots: [
-        ...new Set(allTimesAnalysis.map((t) => t.timeOnly)),
+        ...new Set(allTimesAnalysis.map((t: any) => t.timeOnly)),
       ].sort(),
       earliestGlobalTime: times.length > 0 ? Math.min(...times) : null,
       latestGlobalTime: times.length > 0 ? Math.max(...times) : null,
@@ -245,48 +274,67 @@ export default function AnswerMeeting({
             }:59`
           : "Brak",
       minuteDistribution: globalTimeStats.allUniqueMinutes.reduce(
-        (acc, minute) => {
+        (acc: Record<string, number>, minute: any) => {
           acc[`${minute.toString().padStart(2, "0")}min`] =
-            allTimesAnalysis.filter((t) => t.minute === minute).length;
+            allTimesAnalysis.filter((t: any) => t.minute === minute).length;
           return acc;
         },
         {} as Record<string, number>
       ),
-      dateDistribution: globalTimeStats.allUniqueDates.reduce((acc, date) => {
-        acc[date] = allTimesAnalysis.filter((t) => t.dateOnly === date).length;
-        return acc;
-      }, {} as Record<string, number>),
+      dateDistribution: globalTimeStats.allUniqueDates.reduce(
+        (acc: Record<string, number>, date: any) => {
+          acc[date] = allTimesAnalysis.filter(
+            (t: any) => t.dateOnly === date
+          ).length;
+          return acc;
+        },
+        {} as Record<string, number>
+      ),
       timestamp: new Date().toISOString(),
     });
 
     // DEBUG: Wykrywanie wzorców i anomalii
-    const patterns = {
-      hasOnlyFullHours: globalTimeStats.allUniqueMinutes.every((m) => m === 0),
+    const patterns: PatternsAnalysis = {
+      hasOnlyFullHours: globalTimeStats.allUniqueMinutes.every(
+        (m: number) => m === 0
+      ),
       hasOnlyHalfHours: globalTimeStats.allUniqueMinutes.every(
-        (m) => m === 0 || m === 30
+        (m: number) => m === 0 || m === 30
       ),
       hasQuarterHours: globalTimeStats.allUniqueMinutes.every(
-        (m) => m % 15 === 0
+        (m: number) => m % 15 === 0
       ),
       hasFiveMinuteIntervals: globalTimeStats.allUniqueMinutes.every(
-        (m) => m % 5 === 0
+        (m: number) => m % 5 === 0
       ),
       daysWithMostTimes: detailedDayAnalysis
-        .sort((a, b) => b.timesCount - a.timesCount)
+        .sort((a: any, b: any) => b.timesCount - a.timesCount)
         .slice(0, 3)
-        .map((day) => ({ date: day.dateFormatted, count: day.timesCount })),
+        .map(
+          (day: any): DayTimeCount => ({
+            date: day.dateFormatted,
+            count: day.timesCount,
+          })
+        ),
       daysWithLeastTimes: detailedDayAnalysis
-        .sort((a, b) => a.timesCount - b.timesCount)
+        .sort((a: any, b: any) => a.timesCount - b.timesCount)
         .slice(0, 3)
-        .map((day) => ({ date: day.dateFormatted, count: day.timesCount })),
-      timeGaps: detailedDayAnalysis.map((day) => ({
-        date: day.dateFormatted,
-        hasGaps: day.hourRange
-          ? day.hourRange.totalHours * 2 !== day.timesCount
-          : false,
-        expectedSlots: day.hourRange ? day.hourRange.totalHours * 2 : 0,
-        actualSlots: day.timesCount,
-      })),
+        .map(
+          (day: any): DayTimeCount => ({
+            date: day.dateFormatted,
+            count: day.timesCount,
+          })
+        ),
+      timeGaps: detailedDayAnalysis.map(
+        (day: any): TimeGap => ({
+          date: day.dateFormatted,
+          hasGaps: day.hourRange
+            ? day.hourRange.totalHours * 2 !== day.timesCount
+            : false,
+          expectedSlots: day.hourRange ? day.hourRange.totalHours * 2 : 0,
+          actualSlots: day.timesCount,
+        })
+      ),
     };
 
     console.log("🔍 DEBUG: Wzorce i anomalie w danych spotkania", {
@@ -298,9 +346,9 @@ export default function AnswerMeeting({
           ? "Tabela 15-minutowa"
           : "Tabela dynamiczna",
         potentialIssues: patterns.timeGaps
-          .filter((gap) => gap.hasGaps)
+          .filter((gap: any) => gap.hasGaps)
           .map(
-            (gap) =>
+            (gap: any) =>
               `${gap.date}: brakuje ${
                 gap.expectedSlots - gap.actualSlots
               } slotów czasowych`
@@ -321,7 +369,7 @@ export default function AnswerMeeting({
           : "Brak",
       timesSample: times
         .slice(0, 10)
-        .map((t) => moment(t).format("YYYY-MM-DD HH:mm")),
+        .map((t: any) => moment(t).format("YYYY-MM-DD HH:mm")),
       timestamp: new Date().toISOString(),
     });
 
@@ -374,7 +422,7 @@ export default function AnswerMeeting({
 
         console.log(`📅 DEBUG: Min/Max analiza dla dnia ${index + 1}`, {
           ...analysis,
-          timeSlots: analysis.allTimesForDay.map((t) => t.formatted),
+          timeSlots: analysis.allTimesForDay.map((t: any) => t.formatted),
           timestamp: new Date().toISOString(),
         });
 
@@ -383,15 +431,15 @@ export default function AnswerMeeting({
       .filter(Boolean);
 
     // Znajdź globalne minimum i maximum - POPRAWKA: Porównuj tylko godziny, nie timestampy
-    const allMinTimes = dailyMinMax.map((day) => day.dayMinTime);
-    const allMaxTimes = dailyMinMax.map((day) => day.dayMaxTime);
+    const allMinTimes = dailyMinMax.map((day: any) => day.dayMinTime);
+    const allMaxTimes = dailyMinMax.map((day: any) => day.dayMaxTime);
 
     console.log("📊 DEBUG: Analiza globalnego zakresu czasowego", {
       allMinTimes,
       allMaxTimes,
       // DODAJ: Analiza godzin zamiast timestampów
       hourAnalysis: {
-        allMinHours: dailyMinMax.map((day) => ({
+        allMinHours: dailyMinMax.map((day: any) => ({
           day: day.date,
           hour: day.minHour,
           minute: day.minMinute,
@@ -399,7 +447,7 @@ export default function AnswerMeeting({
             .toString()
             .padStart(2, "0")}`,
         })),
-        allMaxHours: dailyMinMax.map((day) => ({
+        allMaxHours: dailyMinMax.map((day: any) => ({
           day: day.date,
           hour: day.maxHour,
           minute: day.maxMinute,
@@ -412,31 +460,35 @@ export default function AnswerMeeting({
     });
 
     // POPRAWKA: Znajdź globalne minimum i maksimum na podstawie GODZIN, nie timestampów
-    const globalMinHour = Math.min(...dailyMinMax.map((day) => day.minHour));
-    const globalMaxHour = Math.max(...dailyMinMax.map((day) => day.maxHour));
+    const globalMinHour = Math.min(
+      ...dailyMinMax.map((day: any) => day.minHour)
+    );
+    const globalMaxHour = Math.max(
+      ...dailyMinMax.map((day: any) => day.maxHour)
+    );
 
     // POPRAWKA: Znajdź najwcześniejszą minutę dla globalnej minimalnej godziny
     const daysWithMinHour = dailyMinMax.filter(
-      (day) => day.minHour === globalMinHour
+      (day: any) => day.minHour === globalMinHour
     );
     const globalMinMinute = Math.min(
-      ...daysWithMinHour.map((day) => day.minMinute)
+      ...daysWithMinHour.map((day: any) => day.minMinute)
     );
 
     // POPRAWKA: Znajdź najpóźniejszą minutę dla globalnej maksymalnej godziny
     const daysWithMaxHour = dailyMinMax.filter(
-      (day) => day.maxHour === globalMaxHour
+      (day: any) => day.maxHour === globalMaxHour
     );
     const globalMaxMinute = Math.max(
-      ...daysWithMaxHour.map((day) => day.maxMinute)
+      ...daysWithMaxHour.map((day: any) => day.maxMinute)
     );
 
     // POPRAWKA: Znajdź reprezentatywne timestampy dla globalnych ekstremów
     const dayWithGlobalMinHour = daysWithMinHour.find(
-      (day) => day.minMinute === globalMinMinute
+      (day: any) => day.minMinute === globalMinMinute
     );
     const dayWithGlobalMaxHour = daysWithMaxHour.find(
-      (day) => day.maxMinute === globalMaxMinute
+      (day: any) => day.maxMinute === globalMaxMinute
     );
 
     const globalMinTime =
@@ -476,13 +528,13 @@ export default function AnswerMeeting({
         },
         // SZCZEGÓŁY ŹRÓDEŁ
         sources: {
-          minHourSources: daysWithMinHour.map((day) => ({
+          minHourSources: daysWithMinHour.map((day: any) => ({
             day: day.date,
             hour: day.minHour,
             minute: day.minMinute,
             timestamp: day.dayMinTime,
           })),
-          maxHourSources: daysWithMaxHour.map((day) => ({
+          maxHourSources: daysWithMaxHour.map((day: any) => ({
             day: day.date,
             hour: day.maxHour,
             minute: day.maxMinute,
@@ -579,7 +631,7 @@ export default function AnswerMeeting({
               }
             : null,
         },
-        dailyRanges: dailyMinMax.map((day) => ({
+        dailyRanges: dailyMinMax.map((day: any) => ({
           date: day.date,
           range: day.timeSpan,
           timesCount: day.timesCount,
@@ -640,7 +692,7 @@ export default function AnswerMeeting({
           hourSpanReasonable:
             result.maximumTimeHour - result.minimumTimeHour <= 24,
           coversAllDays: dailyMinMax.every(
-            (day) =>
+            (day: any) =>
               day.minHour >= result.minimumTimeHour &&
               day.maxHour <= result.maximumTimeHour
           ),
@@ -727,7 +779,7 @@ export default function AnswerMeeting({
   const toggleAnsweringMode = useCallback(() => {
     console.log("🔄 DEBUG AnswerMeeting: Przełączanie trybu odpowiadania");
     setMobileAnsweringMode((prevMode) => !prevMode);
-    setToggleButtonName((prevMode) =>
+    setToggleButtonName((prevMode: any) =>
       prevMode === mobileAnsweringMode
         ? dict.page.answerMeeting.toggleButton.answerMeeting
         : dict.page.answerMeeting.toggleButton.showAvailability

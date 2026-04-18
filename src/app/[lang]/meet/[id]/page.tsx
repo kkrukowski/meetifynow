@@ -1,10 +1,10 @@
 import { getDictionary } from "@/lib/dictionary";
 import AnswerMeeting from "@/routes/AnswerMeeting";
-import { api } from "../../../../../convex/_generated/api";
 import { Locale } from "@root/i18n.config";
 import { fetchQuery } from "convex/nextjs";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { api } from "../../../../../convex/_generated/api";
 
 export async function generateMetadata({
   params,

@@ -38,14 +38,20 @@ export const useCreateMeeting = ({
   const [prevStep, setPrevStep] = useState(0);
   const [currStep, setCurrStep] = useState(0);
   const [timepickerIndex, setTimepickerIndex] = useState(0);
-  const [meetDetails, setMeetDetails] = useState({ name: "", place: "", link: "" });
+  const [meetDetails, setMeetDetails] = useState({
+    name: "",
+    place: "",
+    link: "",
+  });
   const [dailyTimeRanges, setDailyTimeRanges] = useState<DailyTimeRange[]>([]);
   const [selectedDates, setSelectedDates] = useState<number[]>([]);
   const [dateError, setDateError] = useState(false);
   const [dateErrorText, setDateErrorText] = useState("");
   const [isRequestInProgress, setIsRequestInProgress] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
-  const [createdAppointmentId, setCreatedAppointmentId] = useState<string | null>(null);
+  const [createdAppointmentId, setCreatedAppointmentId] = useState<
+    string | null
+  >(null);
   const [dailyHours, setDailyHours] = useState<DailyHours>({});
   const [mainFromTime, setMainFromTime] = useState(8);
   const [mainToTime, setMainToTime] = useState(9);
@@ -85,14 +91,23 @@ export const useCreateMeeting = ({
   const convertDatetimeToTime = (datetime: number) => moment(datetime);
   const isDatetime = (datetime: number) => datetime.toString().length === 13;
 
-  const getTimeRangeDatetimes = (datetime: number, from: number, to: number) => {
+  const getTimeRangeDatetimes = (
+    datetime: number,
+    from: number,
+    to: number,
+  ) => {
     const datetimes: number[] = [];
     if (isDatetime(from)) from = convertDatetimeToTime(from).hour();
     if (isDatetime(to)) to = convertDatetimeToTime(to).hour() + 1;
 
     for (let i = from; i < to; i++) {
       for (let hourHalf = 0; hourHalf < 2; hourHalf++) {
-        datetimes.push(moment(datetime).hour(i).minute(hourHalf * 30).valueOf());
+        datetimes.push(
+          moment(datetime)
+            .hour(i)
+            .minute(hourHalf * 30)
+            .valueOf(),
+        );
       }
     }
     return datetimes;
@@ -105,7 +120,10 @@ export const useCreateMeeting = ({
       allFromTimes.push(from);
       allToTimes.push(to);
     });
-    return { globalFrom: Math.min(...allFromTimes), globalTo: Math.max(...allToTimes) };
+    return {
+      globalFrom: Math.min(...allFromTimes),
+      globalTo: Math.max(...allToTimes),
+    };
   };
 
   const fillDailyTimeRanges = () => {
@@ -114,13 +132,21 @@ export const useCreateMeeting = ({
       const dayHours = dailyHours[date];
       return {
         date,
-        times: getTimeRangeDatetimes(date, dayHours?.from ?? globalFrom, dayHours?.to ?? globalTo),
+        times: getTimeRangeDatetimes(
+          date,
+          dayHours?.from ?? globalFrom,
+          dayHours?.to ?? globalTo,
+        ),
       };
     });
     setDailyTimeRanges(timeRanges);
   };
 
-  const updateDailyTimeRanges = (dayDateTime: number, dateTime: number, add: boolean) => {
+  const updateDailyTimeRanges = (
+    dayDateTime: number,
+    dateTime: number,
+    add: boolean,
+  ) => {
     setDailyTimeRanges((prev) => {
       const index = prev.findIndex((range) => range.date === dayDateTime);
       if (index === -1) return prev;
@@ -139,7 +165,11 @@ export const useCreateMeeting = ({
   const popUnselectedTimecell = (dayDateTime: number, dateTime: number) =>
     updateDailyTimeRanges(dayDateTime, dateTime, false);
 
-  const handleDailyHourChange = (date: number, type: "from" | "to", value: number) => {
+  const handleDailyHourChange = (
+    date: number,
+    type: "from" | "to",
+    value: number,
+  ) => {
     setDailyHours((prev) => {
       const current = prev[date] || { from: mainFromTime, to: mainToTime };
       let { from, to } = current;
@@ -188,16 +218,21 @@ export const useCreateMeeting = ({
       setCreatedAppointmentId(appointmentId);
       setIsRequestInProgress(false);
     } catch (error: any) {
-      setCreateError(error?.message || dict.page.createMeeting.error.createFailed);
+      setCreateError(
+        error?.message || dict.page.createMeeting.error.createFailed,
+      );
       setIsRequestInProgress(false);
     }
   };
 
   const next = async () => {
     if (currStep === 0) {
-      const valid = await trigger(["meeting__name", "meeting__place", "meeting__link"], {
-        shouldFocus: true,
-      });
+      const valid = await trigger(
+        ["meeting__name", "meeting__place", "meeting__link"],
+        {
+          shouldFocus: true,
+        },
+      );
       if (!valid) return;
     }
     if (currStep === 1 && !validateDate()) return;

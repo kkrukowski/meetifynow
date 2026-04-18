@@ -1,15 +1,16 @@
 "use client";
 
 import Button from "@/components/Button";
+import CopyLinkButton from "@/components/CopyLinkButton";
 import DateSelectionStep from "@/components/CreateMeeting/DateSelectionStep";
 import StepsIndicator from "@/components/CreateMeeting/StepsIndicator";
 import TimeSelectionStep from "@/components/CreateMeeting/TimeSelectionStep";
 import Title from "@/components/Title";
-import AnswerMeetingLoader from "../../routes/AnswerMeetingLoader";
-import MeetingDetailsStep from "./MeetingDetailsStep";
-
 import { useCreateMeeting } from "@/hooks/useCreateMeeting";
 import { Locale } from "@root/i18n.config";
+import { useRouter } from "next/navigation";
+import AnswerMeetingLoader from "../../routes/AnswerMeetingLoader";
+import MeetingDetailsStep from "./MeetingDetailsStep";
 
 export default function CreateMeeting({
   lang,
@@ -18,6 +19,7 @@ export default function CreateMeeting({
   lang: Locale;
   dict: any;
 }) {
+  const router = useRouter();
   const {
     currStep,
     delta,
@@ -29,6 +31,7 @@ export default function CreateMeeting({
     errors,
     isRequestInProgress,
     createError,
+    createdAppointmentId,
     dailyTimeRanges,
     mainFromTime,
     mainToTime,
@@ -49,6 +52,42 @@ export default function CreateMeeting({
 
   if (isRequestInProgress) {
     return <AnswerMeetingLoader />;
+  }
+
+  if (createdAppointmentId) {
+    const meetingUrl =
+      typeof window !== "undefined"
+        ? `${window.location.origin}/${lang}/meet/${createdAppointmentId}`
+        : `/${lang}/meet/${createdAppointmentId}`;
+
+    return (
+      <main className="flex md:flex-1 h-full flex-col items-center justify-center px-5 py-10 pt-24 lg:p-24 lg:pt-28">
+        <div className="flex flex-col items-center text-center max-w-md">
+          <div className="text-5xl mb-4">🎉</div>
+          <Title text={dict.page.createMeeting.success.title} />
+          <p className="text-dark mt-2 mb-4">
+            {dict.page.createMeeting.success.subtitle}
+          </p>
+          <div className="w-full bg-light border border-light-gray rounded-lg px-4 py-2 mb-2 break-all text-sm text-dark select-all">
+            {meetingUrl}
+          </div>
+          <CopyLinkButton url={meetingUrl} dict={dict} className="mt-2" />
+          <div className="flex flex-col sm:flex-row gap-3 mt-6">
+            <Button
+              text={dict.page.createMeeting.success.goToMeeting}
+              onClick={() => router.push(`/${lang}/meet/${createdAppointmentId}`)}
+            />
+            <button
+              type="button"
+              onClick={() => router.push(`/${lang}/meet/new`)}
+              className="text-sm text-gray hover:text-dark underline underline-offset-2 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded"
+            >
+              {dict.page.createMeeting.success.createAnother}
+            </button>
+          </div>
+        </div>
+      </main>
+    );
   }
 
   return (

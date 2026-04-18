@@ -143,6 +143,12 @@
       "error": {
         "createFailed": "Nie udało się utworzyć spotkania. Spróbuj ponownie."
       },
+      "success": {
+        "title": "Spotkanie stworzone!",
+        "subtitle": "Podziel się linkiem z uczestnikami:",
+        "goToMeeting": "Przejdź do spotkania",
+        "createAnother": "Utwórz nowe spotkanie"
+      },
       "step": {
         "one": {
           "title": "Szczegóły spotkania"
@@ -208,6 +214,9 @@
         "alreadyAnswered": "Już odpowiedziałeś na to spotkanie.",
         "submitFailed": "Nie udało się wysłać odpowiedzi. Spróbuj ponownie."
       },
+      "success": "Twoja dostępność została wysłana!",
+      "firstToAnswer": "Bądź pierwszym! Zaznacz swoją dostępność po prawej stronie.",
+      "responseCount": "odpowiedzi",
       "help_popup": {
         "line1": {
           "segment1": "Nie wiesz, co oznaczają dane",

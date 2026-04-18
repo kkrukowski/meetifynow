@@ -125,6 +125,7 @@ export default function AnswerMeeting({
   const [unselectMode, setUnselectMode] = useState(false);
   const [isSendingReq, setIsSendingReq] = useState(false);
   const [sendError, setSendError] = useState<string | null>(null);
+  const [answerSent, setAnswerSent] = useState(false);
   const [username, setUsername] = useState("");
   const [availableCount, setAvailableCount] = useState(0);
 
@@ -432,6 +433,8 @@ export default function AnswerMeeting({
       });
       setUsername("");
       setSelectedTimecells([]);
+      setAnswerSent(true);
+      setTimeout(() => setAnswerSent(false), 4000);
     } catch (error: any) {
       const msg = error?.message || "";
       if (msg.includes("already answered")) {
@@ -531,10 +534,21 @@ export default function AnswerMeeting({
       <div className="flex flex-1 lg:flex-none items-center lg:items-start flex-col-reverse justify-end lg:justify-start lg:flex-row">
         {(!mobileAnsweringMode && isMobile) || !isMobile ? (
           <section className="availability__info w-full lg:w-1/2 lg:mr-10">
-            <p className="text-dark">
-              {lookedUpDate} {lookedUpTime}
+            <p className="text-sm text-gray mb-3">
+              {answers.length} {dict.page.answerMeeting.responseCount}
             </p>
-            {lookedUpDate && <Heading text={`${availableCount}/${answers.length}`} />}
+            {answers.length === 0 && !lookedUpDate ? (
+              <p className="text-dark italic text-sm mb-3">
+                {dict.page.answerMeeting.firstToAnswer}
+              </p>
+            ) : (
+              <>
+                <p className="text-dark">
+                  {lookedUpDate} {lookedUpTime}
+                </p>
+                {lookedUpDate && <Heading text={`${availableCount}/${answers.length}`} />}
+              </>
+            )}
             <div className={`overflow-auto ${isMobile ? "max-h-[100px]" : ""} h-hd:max-h-[300px]`}>
               {availabilityInfoContent}
             </div>
@@ -590,6 +604,11 @@ export default function AnswerMeeting({
 
             {(mobileAnsweringMode && isMobile) || !isMobile ? (
               <div>
+                {answerSent && (
+                  <p className="text-green font-medium text-sm mb-2 text-center animate-fade-in">
+                    ✓ {dict.page.answerMeeting.success}
+                  </p>
+                )}
                 {sendError && (
                   <p className="text-red-500 text-sm mb-2 text-center">{sendError}</p>
                 )}
@@ -643,7 +662,11 @@ export default function AnswerMeeting({
                     </div>
                   </Popup>
                 </div>
-                <Button text={dict.page.answerMeeting.button.submit} />
+                <Button
+                  text={isSendingReq ? "..." : dict.page.answerMeeting.button.submit}
+                  type="submit"
+                  disabled={isSendingReq}
+                />
                 <CopyLinkButton link={pathname} dict={dict} className="ml-6" />
               </div>
             ) : null}

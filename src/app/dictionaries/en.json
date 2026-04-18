@@ -140,6 +140,12 @@
       "error": {
         "createFailed": "Failed to create meeting. Please try again."
       },
+      "success": {
+        "title": "Meeting created!",
+        "subtitle": "Share this link with your participants:",
+        "goToMeeting": "Go to meeting",
+        "createAnother": "Create another meeting"
+      },
       "step": {
         "one": {
           "title": "Meeting Details"
@@ -205,6 +211,9 @@
         "alreadyAnswered": "You have already answered this meeting.",
         "submitFailed": "Failed to send your answer. Please try again."
       },
+      "success": "Your availability has been sent!",
+      "firstToAnswer": "Be the first to respond! Select your availability on the right.",
+      "responseCount": "responses",
       "help_popup": {
         "line1": {
           "segment1": "Not sure what the",

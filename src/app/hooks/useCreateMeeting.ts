@@ -45,6 +45,7 @@ export const useCreateMeeting = ({
   const [dateErrorText, setDateErrorText] = useState("");
   const [isRequestInProgress, setIsRequestInProgress] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
+  const [createdAppointmentId, setCreatedAppointmentId] = useState<string | null>(null);
   const [dailyHours, setDailyHours] = useState<DailyHours>({});
   const [mainFromTime, setMainFromTime] = useState(8);
   const [mainToTime, setMainToTime] = useState(9);
@@ -184,7 +185,8 @@ export const useCreateMeeting = ({
         meetLink: data.meeting__link || undefined,
         dates: dailyTimeRanges,
       });
-      router.push(`/${lang}/meet/${appointmentId}`);
+      setCreatedAppointmentId(appointmentId);
+      setIsRequestInProgress(false);
     } catch (error: any) {
       setCreateError(error?.message || dict.page.createMeeting.error.createFailed);
       setIsRequestInProgress(false);
@@ -231,6 +233,7 @@ export const useCreateMeeting = ({
     errors,
     isRequestInProgress,
     createError,
+    createdAppointmentId,
     dailyTimeRanges,
     mainFromTime,
     mainToTime,

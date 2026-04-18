@@ -2,35 +2,36 @@ import { faLink } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 export default function CopyLinkButton(props: {
-  link: string;
+  link?: string;
+  url?: string;
   className?: string;
   dict: any;
 }) {
   const copyToClipboard = () => {
-    const currentUrl = window.location.href;
-    const urlObject = new URL(currentUrl);
-    const domainName = urlObject.hostname;
+    let urlToCopy: string;
 
-    const segment = "/meet/";
-
-    const segmentIndex = currentUrl.indexOf(segment);
-
-    let urlWithoutSegment;
-    if (segmentIndex !== -1) {
-      urlWithoutSegment = currentUrl.slice(segmentIndex + segment.length);
+    if (props.url) {
+      urlToCopy = props.url;
     } else {
-      urlWithoutSegment = currentUrl;
+      const currentUrl = window.location.href;
+      const urlObject = new URL(currentUrl);
+      const domainName = urlObject.hostname;
+      const segment = "/meet/";
+      const segmentIndex = currentUrl.indexOf(segment);
+      const urlWithoutSegment =
+        segmentIndex !== -1
+          ? currentUrl.slice(segmentIndex + segment.length)
+          : currentUrl;
+      urlToCopy = `https://${domainName}/meet/${urlWithoutSegment}`;
     }
 
-    const link = `https://${domainName}/meet/${urlWithoutSegment}`;
-
-    navigator.clipboard.writeText(link);
+    navigator.clipboard.writeText(urlToCopy);
   };
 
   return (
     <button
       type="button"
-      className={`group relative display bg-light-primary hover:bg-light-primary-hover active:bg-light-primary-active text-dark font-medium w-fit px-4 py-2 rounded-lg mt-5 self-center transition-colors ${props.className}`}
+      className={`group relative display bg-light-primary hover:bg-light-primary-hover active:bg-light-primary-active text-dark font-medium w-fit px-4 py-2 rounded-lg mt-5 self-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${props.className ?? ""}`}
       onClick={copyToClipboard}
     >
       <p className="absolute opacity-0 group-focus:animate-copy-button-success w-full left-0">

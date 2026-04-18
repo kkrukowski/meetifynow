@@ -1,14 +1,14 @@
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Locale } from "@root/i18n.config";
-import axios from "axios";
+import { useMutation } from "convex/react";
 import moment from "moment";
 import "moment/locale/pl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
+import { api } from "@root/convex/_generated/api";
 
-// Definicje typów
 interface DailyTimeRange {
   date: number;
   times: number[];
@@ -24,28 +24,21 @@ type DailyHours = {
   [date: number]: { from: number; to: number };
 };
 
-// Hook
 export const useCreateMeeting = ({
   lang,
   dict,
-  auth,
 }: {
   lang: Locale;
   dict: any;
-  auth: any;
 }) => {
   moment.locale(lang);
   const router = useRouter();
+  const createMeetingMutation = useMutation(api.meetings.create);
 
-  // Stan
   const [prevStep, setPrevStep] = useState(0);
   const [currStep, setCurrStep] = useState(0);
   const [timepickerIndex, setTimepickerIndex] = useState(0);
-  const [meetDetails, setMeetDetails] = useState({
-    name: "",
-    place: "",
-    link: "",
-  });
+  const [meetDetails, setMeetDetails] = useState({ name: "", place: "", link: "" });
   const [dailyTimeRanges, setDailyTimeRanges] = useState<DailyTimeRange[]>([]);
   const [selectedDates, setSelectedDates] = useState<number[]>([]);
   const [dateError, setDateError] = useState(false);
@@ -57,7 +50,6 @@ export const useCreateMeeting = ({
 
   const delta = currStep - prevStep;
 
-  // Formularz
   const formSchema = yup.object().shape({
     meeting__name: yup
       .string()
@@ -88,77 +80,55 @@ export const useCreateMeeting = ({
     { title: dict.page.createMeeting.step.three.title },
   ];
 
-  // Logika czasu
   const convertDatetimeToTime = (datetime: number) => moment(datetime);
   const isDatetime = (datetime: number) => datetime.toString().length === 13;
 
-  const getTimeRangeDatetimes = (
-    datetime: number,
-    from: number,
-    to: number
-  ) => {
+  const getTimeRangeDatetimes = (datetime: number, from: number, to: number) => {
     const datetimes: number[] = [];
     if (isDatetime(from)) from = convertDatetimeToTime(from).hour();
     if (isDatetime(to)) to = convertDatetimeToTime(to).hour() + 1;
 
     for (let i = from; i < to; i++) {
       for (let hourHalf = 0; hourHalf < 2; hourHalf++) {
-        const time = moment(datetime)
-          .hour(i)
-          .minute(hourHalf * 30)
-          .valueOf();
-        datetimes.push(time);
+        datetimes.push(moment(datetime).hour(i).minute(hourHalf * 30).valueOf());
       }
     }
     return datetimes;
   };
 
   const getGlobalTimeRange = () => {
-    const allFromTimes: number[] = [mainFromTime];
-    const allToTimes: number[] = [mainToTime];
-
+    const allFromTimes = [mainFromTime];
+    const allToTimes = [mainToTime];
     Object.values(dailyHours).forEach(({ from, to }) => {
       allFromTimes.push(from);
       allToTimes.push(to);
     });
-
-    return {
-      globalFrom: Math.min(...allFromTimes),
-      globalTo: Math.max(...allToTimes),
-    };
+    return { globalFrom: Math.min(...allFromTimes), globalTo: Math.max(...allToTimes) };
   };
 
   const fillDailyTimeRanges = () => {
-    const timeRanges: DailyTimeRange[] = [];
     const { globalFrom, globalTo } = getGlobalTimeRange();
-
-    selectedDates.forEach((date) => {
+    const timeRanges: DailyTimeRange[] = selectedDates.map((date) => {
       const dayHours = dailyHours[date];
-      const fromHour = dayHours ? dayHours.from : globalFrom;
-      const toHour = dayHours ? dayHours.to : globalTo;
-      timeRanges.push({
-        date: date,
-        times: getTimeRangeDatetimes(date, fromHour, toHour),
-      });
+      return {
+        date,
+        times: getTimeRangeDatetimes(date, dayHours?.from ?? globalFrom, dayHours?.to ?? globalTo),
+      };
     });
     setDailyTimeRanges(timeRanges);
   };
 
-  const updateDailyTimeRanges = (
-    dayDateTime: number,
-    dateTime: number,
-    add: boolean
-  ) => {
+  const updateDailyTimeRanges = (dayDateTime: number, dateTime: number, add: boolean) => {
     setDailyTimeRanges((prev) => {
       const index = prev.findIndex((range) => range.date === dayDateTime);
       if (index === -1) return prev;
       const timeRange = prev[index];
       const newTimes = add
         ? [...timeRange.times, dateTime].sort()
-        : timeRange.times.filter((time) => time !== dateTime);
-      const updatedTimeRanges = [...prev];
-      updatedTimeRanges[index] = { ...timeRange, times: newTimes };
-      return updatedTimeRanges;
+        : timeRange.times.filter((t) => t !== dateTime);
+      const updated = [...prev];
+      updated[index] = { ...timeRange, times: newTimes };
+      return updated;
     });
   };
 
@@ -167,15 +137,10 @@ export const useCreateMeeting = ({
   const popUnselectedTimecell = (dayDateTime: number, dateTime: number) =>
     updateDailyTimeRanges(dayDateTime, dateTime, false);
 
-  const handleDailyHourChange = (
-    date: number,
-    type: "from" | "to",
-    value: number
-  ) => {
+  const handleDailyHourChange = (date: number, type: "from" | "to", value: number) => {
     setDailyHours((prev) => {
-      const currentHours = prev[date] || { from: mainFromTime, to: mainToTime };
-      let { from, to } = currentHours;
-
+      const current = prev[date] || { from: mainFromTime, to: mainToTime };
+      let { from, to } = current;
       if (type === "from") {
         from = value;
         if (from >= to) to = Math.min(from + 1, 24);
@@ -191,7 +156,6 @@ export const useCreateMeeting = ({
     fillDailyTimeRanges();
   }, [dailyHours, mainFromTime, mainToTime]);
 
-  // Walidacja i nawigacja
   const validateDate = () => {
     if (selectedDates.length < 1) {
       setDateError(true);
@@ -212,18 +176,13 @@ export const useCreateMeeting = ({
     if (isRequestInProgress || !validateDate()) return;
     setIsRequestInProgress(true);
     try {
-      const meetData = {
+      const appointmentId = await createMeetingMutation({
         meetName: data.meeting__name,
-        authorId: auth?.user.id,
-        meetPlace: data.meeting__place,
-        meetLink: data.meeting__link,
+        meetPlace: data.meeting__place || undefined,
+        meetLink: data.meeting__link || undefined,
         dates: dailyTimeRanges,
-      };
-      const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_SERVER_URL}/meet/new`,
-        meetData
-      );
-      router.push(`/meet/${response.data.appointmentId}`);
+      });
+      router.push(`/${lang}/meet/${appointmentId}`);
     } catch (error) {
       console.error(error);
       setIsRequestInProgress(false);
@@ -232,11 +191,10 @@ export const useCreateMeeting = ({
 
   const next = async () => {
     if (currStep === 0) {
-      const output = await trigger(
-        ["meeting__name", "meeting__place", "meeting__link"],
-        { shouldFocus: true }
-      );
-      if (!output) return;
+      const valid = await trigger(["meeting__name", "meeting__place", "meeting__link"], {
+        shouldFocus: true,
+      });
+      if (!valid) return;
     }
     if (currStep === 1 && !validateDate()) return;
 
@@ -247,7 +205,7 @@ export const useCreateMeeting = ({
         setSelectedDates((d) => [...d].sort());
         fillDailyTimeRanges();
       }
-    } else if (currStep === stepsInfo.length - 1) {
+    } else {
       await handleSubmit(createMeeting)();
     }
   };
@@ -261,7 +219,6 @@ export const useCreateMeeting = ({
   };
 
   return {
-    // Stan
     currStep,
     delta,
     timepickerIndex,
@@ -275,7 +232,6 @@ export const useCreateMeeting = ({
     mainFromTime,
     mainToTime,
     dailyHours,
-    // Metody
     setMeetDetails,
     setTimepickerIndex,
     setSelectedDates,

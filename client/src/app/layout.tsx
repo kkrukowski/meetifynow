@@ -1,6 +1,9 @@
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar/Navbar.tsx";
+import ConvexClientProvider from "@/components/ConvexClientProvider";
 import "@/global.css";
+import { config } from "@fortawesome/fontawesome-svg-core";
+import "@fortawesome/fontawesome-svg-core/styles.css";
 import { Locale, i18n } from "@root/i18n.config";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
@@ -9,18 +12,21 @@ import { headers } from "next/headers";
 import Script from "next/script";
 import { cache } from "react";
 import { getDictionary } from "./lib/dictionary";
+config.autoAddCss = false;
 
 export async function generateStaticParams() {
   return i18n.locales.map((locale: Locale) => ({ lang: locale }));
 }
 
-const getLocale = cache((): Locale => {
-  const preference = headers().get("X-Language-Preference");
+const getLocale = cache(async (): Promise<Locale> => {
+  const expectedHeaders = await headers();
+  const preference = expectedHeaders.get("X-Language-Preference");
   return (preference ?? "en") as Locale;
 });
 
 export async function generateMetadata() {
-  const dict = await getDictionary(getLocale() as Locale);
+  const locale = await getLocale();
+  const dict = await getDictionary(locale);
 
   const metadata: Metadata = {
     title: dict.website.title,
@@ -51,8 +57,12 @@ export async function generateMetadata() {
   return metadata;
 }
 
-export default function Layout({ children }: { children: React.ReactNode }) {
-  const locale = getLocale();
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const locale = await getLocale();
 
   return (
     <html lang={locale}>
@@ -70,9 +80,11 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         </Script>
       </head>
       <body>
-        <Navbar lang={locale} />
-        {children}
-        <Footer />
+        <ConvexClientProvider>
+          <Navbar lang={locale} />
+          {children}
+          <Footer />
+        </ConvexClientProvider>
         <Analytics />
         <SpeedInsights />
       </body>

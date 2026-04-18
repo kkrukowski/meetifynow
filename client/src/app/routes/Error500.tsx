@@ -1,14 +1,15 @@
 import BigText from "@/components/BigText";
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
-import { getDictionary } from "@/lib/dictionary";
+import enDict from "@/dictionaries/en.json";
+import React from "react";
 
 import { Locale } from "@root/i18n.config";
 import Link from "next/link";
 
-export default async function Error500() {
+export default function Error500() {
   const lang = "en" as Locale;
-  const dict = await getDictionary(lang);
+  const dict = enDict;
 
   return (
     <div className="flex flex-1 flex-col justify-center items-center h-full">

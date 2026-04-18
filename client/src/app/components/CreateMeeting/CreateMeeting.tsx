@@ -19,11 +19,9 @@ import { Locale } from "@root/i18n.config";
 export default function CreateMeeting({
   lang,
   dict,
-  auth,
 }: {
   lang: Locale;
   dict: any;
-  auth: any;
 }) {
   const {
     currStep,
@@ -51,7 +49,7 @@ export default function CreateMeeting({
     setMainFromTime,
     setMainToTime,
     handleDailyHourChange,
-  } = useCreateMeeting({ lang, dict, auth });
+  } = useCreateMeeting({ lang, dict });
 
   // DEBUG: Logowanie zmian stanu kroków
   React.useEffect(() => {

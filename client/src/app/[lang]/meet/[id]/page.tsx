@@ -1,66 +1,37 @@
 import { getDictionary } from "@/lib/dictionary";
 import AnswerMeeting from "@/routes/AnswerMeeting";
+import { api } from "@root/convex/_generated/api";
 import { Locale } from "@root/i18n.config";
-import axios from "axios";
+import { fetchQuery } from "convex/nextjs";
 import type { Metadata } from "next";
-import {notFound} from "next/navigation";
-import {auth} from "@src/auth.ts";
-
-let meetingData;
+import { notFound } from "next/navigation";
 
 export async function generateMetadata({
-  params: { id },
+  params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }): Promise<Metadata> {
-  const url = process.env.NEXT_PUBLIC_SERVER_URL + `/meet/${id}`;
-  console.log(url)
-  meetingData = await axios
-    .get(url)
-    .then((res) => res)
-    .catch((err) => err.response);
+  const { id } = await params;
+  const meeting = await fetchQuery(api.meetings.getByAppointmentId, {
+    appointmentId: id,
+  });
 
-  let title = "Answer Not Found - MeetifyNow";
-
-  console.log(meetingData)
-
-  if (!meetingData) return notFound()
-
-  if (meetingData.status === 200) {
-    title = meetingData.data.meetName + ` - MeetifyNow`;
-  }
-
-  return {
-    title: title,
-  };
+  if (!meeting) return { title: "Meeting Not Found - MeetifyNow" };
+  return { title: meeting.meetName + " - MeetifyNow" };
 }
 
 export default async function Page({
-  params: { lang, id },
+  params,
 }: {
-  params: { lang: Locale; id: string };
+  params: Promise<{ lang: Locale; id: string }>;
 }) {
-  const session = await auth()
+  const { lang, id } = await params;
+  const [dict, meeting] = await Promise.all([
+    getDictionary(lang),
+    fetchQuery(api.meetings.getByAppointmentId, { appointmentId: id }),
+  ]);
 
-  // Get the dictionary for the given language
-  const dict = await getDictionary(lang);
+  if (!meeting) return notFound();
 
-  // Check if the meeting exists
-  const url = process.env.NEXT_PUBLIC_SERVER_URL + `/meet/${id}`;
-  console.log(url)
-
-  const res = await axios
-    .get(url)
-    .then((res) => res)
-    .catch((err) => err.response);
-
-  console.log(res)
-
-  if (!res) return notFound();
-
-  if (res.status === 200) {
-    return <AnswerMeeting lang={lang} dict={dict} meetingData={res.data} session={session} />;
-  }
-
-  return notFound();
+  return <AnswerMeeting lang={lang} dict={dict} meetingData={meeting} />;
 }

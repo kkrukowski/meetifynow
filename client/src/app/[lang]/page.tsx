@@ -1,10 +1,11 @@
 import HomePage from "@/routes/HomePage";
 import { Locale } from "@root/i18n.config";
 
-export default function Page({
-  params: { lang },
+export default async function Page({
+  params,
 }: {
-  params: { lang: Locale };
+  params: Promise<{ lang: Locale }>;
 }) {
+  const { lang } = await params;
   return <HomePage lang={lang} />;
 }

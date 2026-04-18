@@ -10,7 +10,7 @@ import Link from "next/link";
 
 export default async function Error404() {
   // Should get the language from the URL but it't not possible with params here
-  const lang = getLocale() as Locale;
+  const lang = (await getLocale()) as Locale;
   const dict = await getDictionary(lang);
 
   return (

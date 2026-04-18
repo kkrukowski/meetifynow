@@ -1,6 +1,4 @@
 import { NextRequest, NextResponse } from "next/server";
-export { auth as authMiddleware } from "@src/auth"
-
 import { match as matchLocale } from "@formatjs/intl-localematcher";
 import { i18n } from "@root/i18n.config";
 import Negotiator from "negotiator";
@@ -18,7 +16,7 @@ function getLocale(req: NextRequest): string | "" {
   return locale;
 }
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
   const locales: string[] = i18n.locales;
   let siteLocale = i18n.defaultLocale;
 
@@ -36,7 +34,8 @@ export async function middleware(req: NextRequest) {
   }
 
   // Skip middleware for public assets
-  const isPublicAsset = pathname.startsWith('/imgs') || pathname === '/imgs/og-image.webp';
+  const isPublicAsset =
+    pathname.startsWith("/imgs") || pathname === "/imgs/og-image.webp";
   if (isPublicAsset) {
     return NextResponse.next();
   }

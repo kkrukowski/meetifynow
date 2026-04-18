@@ -2,8 +2,9 @@ import { Locale } from "@root/i18n.config";
 import { headers } from "next/headers";
 import { cache } from "react";
 
-export const getLocale = cache((): Locale => {
-  const preference = headers().get("X-Language-Preference");
+export const getLocale = cache(async (): Promise<Locale> => {
+  const expectedHeaders = await headers();
+  const preference = expectedHeaders.get("X-Language-Preference");
   return (preference ?? "en") as Locale;
 });
 

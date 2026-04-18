@@ -43,6 +43,8 @@
   },
   "include": [
     "./src",
+    "./convex/**/*.ts",
+    "./convex/**/*.js",
     "./dist/types/**/*.ts",
     "./next-env.d.ts",
     ".next/types/**/*.ts",

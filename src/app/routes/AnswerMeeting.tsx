@@ -1,7 +1,7 @@
 "use client";
 
 import { yupResolver } from "@hookform/resolvers/yup";
-import { api } from "@root/convex/_generated/api";
+import { api } from "../../../convex/_generated/api";
 import { useMutation, useQuery } from "convex/react";
 import _ from "lodash";
 import moment from "moment";

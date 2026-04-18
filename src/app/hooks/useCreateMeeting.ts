@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import * as yup from "yup";
-import { api } from "@root/convex/_generated/api";
+import { api } from "../../../convex/_generated/api";
 
 interface DailyTimeRange {
   date: number;

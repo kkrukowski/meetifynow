@@ -14,6 +14,7 @@ import React from "react";
 // ... (definicje interfejsów DailyTimeRange, DailyHours)
 
 interface TimeSelectionStepProps {
+  dict: any;
   delta: number;
   timepickerIndex: number;
   setTimepickerIndex: (index: number) => void;
@@ -26,13 +27,14 @@ interface TimeSelectionStepProps {
   handleDailyHourChange: (
     date: number,
     type: "from" | "to",
-    value: number
+    value: number,
   ) => void;
   pushSelectedTimecell: (dayDateTime: number, dateTime: number) => void;
   popUnselectedTimecell: (dayDateTime: number, dateTime: number) => void;
 }
 
 const TimeSelectionStep: React.FC<TimeSelectionStepProps> = ({
+  dict,
   delta,
   timepickerIndex,
   setTimepickerIndex,
@@ -55,8 +57,8 @@ const TimeSelectionStep: React.FC<TimeSelectionStepProps> = ({
       transition={{ duration: 0.3, ease: "easeInOut" }}
     >
       <div className="flex justify-center mb-5">
-        <div className="flex flex-col justify-center items-center">
-          <div className="mb-6">
+        <div className="flex flex-col justify-center items-center w-full">
+          <div className="flex flex-row justify-center items-center gap-4 md:gap-6 mb-8 p-3 rounded-[24px]">
             <IconButton
               icon={faCalendar}
               onClick={() => setTimepickerIndex(0)}
@@ -64,49 +66,52 @@ const TimeSelectionStep: React.FC<TimeSelectionStepProps> = ({
             />
             <IconButton
               icon={faCalendarDay}
-              className="ml-6"
               onClick={() => setTimepickerIndex(1)}
               isCurrent={timepickerIndex === 1}
             />
             <IconButton
               icon={faCalendarDays}
-              className="ml-6"
               onClick={() => setTimepickerIndex(2)}
               isCurrent={timepickerIndex === 2}
             />
           </div>
           <div
-            className={`self-center overflow-y-auto h-[300px] ${
+            className={`self-center overflow-y-auto h-[300px] w-full flex justify-center ${
               timepickerIndex !== 2 && "p-2"
             }`}
           >
             {timepickerIndex === 0 && (
-              <>
-                <Timepicker
-                  from={true}
-                  value={mainFromTime}
-                  onChange={(e) => {
-                    const newFrom = +e.target.value;
-                    setMainFromTime(newFrom);
-                    if (newFrom >= mainToTime)
-                      setMainToTime(Math.min(newFrom + 1, 24));
-                  }}
-                />
-                <span className="m-4"> - </span>
-                <Timepicker
-                  from={false}
-                  value={mainToTime}
-                  onChange={(e) => {
-                    const newTo = +e.target.value;
-                    setMainToTime(newTo);
-                    if (newTo <= mainFromTime)
-                      setMainFromTime(Math.max(newTo - 1, 0));
-                  }}
-                />
-              </>
+              <div className="flex flex-col items-center justify-center gap-6 w-full max-w-md">
+                <p className="text-gray text-center font-medium px-4 leading-relaxed bg-[#f0f4f8] py-3 rounded-[16px] border border-dark/5 shadow-sm">
+                  {dict.page.createMeeting.step.three.description}
+                </p>
+                <div className="flex items-center justify-center gap-4">
+                  <Timepicker
+                    from={true}
+                    value={mainFromTime}
+                    onChange={(e) => {
+                      const newFrom = +e.target.value;
+                      setMainFromTime(newFrom);
+                      if (newFrom >= mainToTime)
+                        setMainToTime(Math.min(newFrom + 1, 24));
+                    }}
+                  />
+                  <span className="text-gray/50 font-medium"> - </span>
+                  <Timepicker
+                    from={false}
+                    value={mainToTime}
+                    onChange={(e) => {
+                      const newTo = +e.target.value;
+                      setMainToTime(newTo);
+                      if (newTo <= mainFromTime)
+                        setMainFromTime(Math.max(newTo - 1, 0));
+                    }}
+                  />
+                </div>
+              </div>
             )}
             {timepickerIndex === 1 && (
-              <>
+              <div className="flex flex-col gap-4 mt-2">
                 {dailyTimeRanges.map((dayTimeRange) => {
                   const dateObj = moment(dayTimeRange.date);
                   const { from, to } = dailyHours[dayTimeRange.date] || {
@@ -116,13 +121,13 @@ const TimeSelectionStep: React.FC<TimeSelectionStepProps> = ({
                   return (
                     <div
                       key={dayTimeRange.date}
-                      className="flex justify-between w-[310px] md:w-[400px] items-center mb-4 px-2"
+                      className="flex justify-between w-[310px] md:w-[400px] items-center px-4 py-3 bg-white rounded-[16px] border border-gray/10 shadow-sm"
                     >
-                      <div className="flex flex-col h-14 w-14 bg-primary rounded-lg justify-center">
-                        <p className="text-3xl text-center text-light leading-none">
+                      <div className="flex flex-col h-12 w-12 bg-primary/10 rounded-[12px] justify-center items-center">
+                        <p className="text-xl font-bold text-primary leading-none">
                           {dateObj.date()}
                         </p>
-                        <p className="text-center text-light leading-none">
+                        <p className="text-xs font-semibold text-primary/70 leading-none mt-1 uppercase">
                           {
                             shortDaysNames[
                               dateObj.day() === 0 ? 6 : dateObj.day() - 1
@@ -130,7 +135,7 @@ const TimeSelectionStep: React.FC<TimeSelectionStepProps> = ({
                           }
                         </p>
                       </div>
-                      <div>
+                      <div className="flex items-center gap-2">
                         <Timepicker
                           from={true}
                           value={from}
@@ -138,11 +143,11 @@ const TimeSelectionStep: React.FC<TimeSelectionStepProps> = ({
                             handleDailyHourChange(
                               dayTimeRange.date,
                               "from",
-                              +e.target.value
+                              +e.target.value,
                             )
                           }
                         />
-                        <span className="m-2 md:m-4"> - </span>
+                        <span className="text-gray/50 font-medium"> - </span>
                         <Timepicker
                           from={false}
                           value={to}
@@ -150,7 +155,7 @@ const TimeSelectionStep: React.FC<TimeSelectionStepProps> = ({
                             handleDailyHourChange(
                               dayTimeRange.date,
                               "to",
-                              +e.target.value
+                              +e.target.value,
                             )
                           }
                         />
@@ -158,7 +163,7 @@ const TimeSelectionStep: React.FC<TimeSelectionStepProps> = ({
                     </div>
                   );
                 })}
-              </>
+              </div>
             )}
             {timepickerIndex === 2 && (
               <div className="w-auto max-w-[330px] md:max-w-[700px] lg:max-w-[350px]">

@@ -31,6 +31,7 @@ const MeetingDetailsStep: React.FC<MeetingDetailsStepProps> = ({
       initial={{ x: delta >= 0 ? "50%" : "-50%", opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.3, ease: "easeInOut" }}
+      className="flex flex-col gap-6 w-full max-w-3xl mx-auto px-4 sm:px-0"
     >
       <Input
         label={dict.page.createMeeting.input.meeting__name.label}

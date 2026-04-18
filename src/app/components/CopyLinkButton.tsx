@@ -31,7 +31,7 @@ export default function CopyLinkButton(props: {
   return (
     <button
       type="button"
-      className={`group relative display bg-light-primary hover:bg-light-primary-hover active:bg-light-primary-active text-dark font-medium w-fit px-4 py-2 rounded-lg mt-5 self-center transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${props.className ?? ""}`}
+      className={`group relative display bg-white hover:bg-gray/5 active:bg-gray/10 text-dark font-medium w-fit px-5 py-2.5 rounded-[16px] self-center border border-gray/10 shadow-sm transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${props.className ?? ""}`}
       onClick={copyToClipboard}
     >
       <p className="absolute opacity-0 group-focus:animate-copy-button-success w-full left-0">

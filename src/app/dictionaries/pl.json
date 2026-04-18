@@ -53,16 +53,16 @@
       }
     },
     "profile": {
-        "title": "Profil użytkownika",
-        "userInfo": {
-          "title": "Twoje informacje",
-          "name": "Nazwa",
-          "email": "Email"
-        },
-        "meetings": {
-          "title": "Twoje spotkania",
-          "noMeetings": "Nie masz żadnych spotkań."
-        }
+      "title": "Profil użytkownika",
+      "userInfo": {
+        "title": "Twoje informacje",
+        "name": "Nazwa",
+        "email": "Email"
+      },
+      "meetings": {
+        "title": "Twoje spotkania",
+        "noMeetings": "Nie masz żadnych spotkań."
+      }
     },
     "login": {
       "title": "Zaloguj się",
@@ -157,7 +157,8 @@
           "title": "Wybierz daty spotkania"
         },
         "three": {
-          "title": "Wybierz godziny spotkania"
+          "title": "Wybierz godziny spotkania",
+          "description": "Wybierz jednolity przedział godzinowy, w którym uczestnicy będą mogli deklarować swoją dostępność w wybrane wcześniej dni."
         }
       },
       "validate": {

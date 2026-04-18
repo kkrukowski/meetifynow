@@ -34,7 +34,7 @@ const Input = ({
   autocomplete = "off",
 }: Props) => {
   return (
-    <div className="flex flex-col w-[300px] gap-2 relative z-0">
+    <div className="flex flex-col w-full gap-2 relative z-0">
       <div className="flex justify-between">
         <label htmlFor={id} className="font-medium text-gray">
           {label}
@@ -47,8 +47,9 @@ const Input = ({
         {...register(id, { ...options })}
         type={type}
         className={
-          `w-full p-3 text-dark font-medium border border-gray focus:outline-none focus:ring focus:border-primary rounded-lg placeholder:opacity-60 transition-all` +
-          (error ? " border-red focus:ring-red/50 focus:border-red" : "")
+          `w-full p-4 text-dark font-medium bg-white border border-dark/10 rounded-[16px] placeholder-gray/50 transition-all duration-300 outline-none ` +
+          "focus:ring-4 focus:ring-[#0096E0]/20 focus:border-[#0096E0]/40 hover:border-dark/20 shadow-sm " +
+          (error ? "border-red focus:ring-red/20" : "")
         }
         placeholder={placeholder}
         onChange={onChange}

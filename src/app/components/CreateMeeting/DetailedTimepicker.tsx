@@ -16,7 +16,8 @@ export default function DetailedTimepicker(props: {
     return props.dates.flatMap((dateInfo: DayTimesData) => dateInfo.times);
   };
 
-  const [selectedTimecells, setSelectedTimecells] = useState<number[]>(getPickedTimes());
+  const [selectedTimecells, setSelectedTimecells] =
+    useState<number[]>(getPickedTimes());
   const [selectionMode, setSelectionMode] = useState(false);
   const [unselectMode, setUnselectMode] = useState(false);
 
@@ -124,24 +125,27 @@ export default function DetailedTimepicker(props: {
                     : `border border-gray ${!isMobile() ? "hover:border-none hover:bg-gray" : ""}`
                 }`}
               />
-            </td>
+            </td>,
           );
         }
 
         if (h === 0) {
           timeCells.push(
             <tr key={i + "00"} className="cursor-pointer">
-              <th rowSpan={2} className="text-right text-dark align-top bg-light sticky left-0 pr-2">
+              <th
+                rowSpan={2}
+                className="text-right text-dark align-top bg-white sticky left-0 pr-2"
+              >
                 {i.toString().padStart(2, "0")}:00
               </th>
               {timeRow}
-            </tr>
+            </tr>,
           );
         } else {
           timeCells.push(
             <tr key={i + "30"} className="cursor-pointer">
               {timeRow}
-            </tr>
+            </tr>,
           );
         }
       }
@@ -149,10 +153,10 @@ export default function DetailedTimepicker(props: {
 
     timeCells.push(
       <tr key="2400" className="cursor-pointer">
-        <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2">
+        <th className="text-right text-dark align-bottom bg-white sticky left-0 pr-2">
           24:00
         </th>
-      </tr>
+      </tr>,
     );
 
     return timeCells;
@@ -164,14 +168,16 @@ export default function DetailedTimepicker(props: {
     days.map((day: any) => (
       <th
         key={moment(day).date()}
-        className={`bg-light sticky top-0 z-10 ${moment(day).day() === 0 ? "pr-4" : ""}`}
+        className={`bg-white sticky top-0 z-10 ${moment(day).day() === 0 ? "pr-4" : ""}`}
       >
         <p className="text-sm text-dark font-medium">
           {moment(day).date().toString().padStart(2, "0") +
             "." +
             (moment(day).month() + 1).toString().padStart(2, "0")}
         </p>
-        <p className="text-dark">{daysNaming[moment(day).day() - 1]}</p>
+        <p className="text-dark">
+          {moment(day).day() === 0 ? "Nd" : daysNaming[moment(day).day() - 1]}
+        </p>
       </th>
     ));
 
@@ -179,7 +185,7 @@ export default function DetailedTimepicker(props: {
     <table className="time__seclection--table w-fit self-center select-none">
       <thead>
         <tr>
-          <th className="bg-light sticky top-0 left-0 z-20" />
+          <th className="bg-white sticky top-0 left-0 z-20" />
           {renderDaysHeadings()}
         </tr>
       </thead>

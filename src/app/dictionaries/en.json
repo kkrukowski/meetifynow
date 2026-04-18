@@ -154,7 +154,8 @@
           "title": "Choose Meeting Dates"
         },
         "three": {
-          "title": "Choose Meeting Times"
+          "title": "Choose Meeting Times",
+          "description": "Select a uniform time range during which participants can declare their availability on the previously chosen days."
         }
       },
       "validate": {

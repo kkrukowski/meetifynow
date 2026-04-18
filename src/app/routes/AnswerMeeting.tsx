@@ -59,14 +59,17 @@ export default function AnswerMeeting({
       appointmentId: currentMeeting.appointmentId,
       meetPlace: currentMeeting.meetPlace,
       meetLink: currentMeeting.meetLink,
-      dates: currentMeeting.dates?.slice().sort((a: any, b: any) => a.date - b.date) ?? [],
+      dates:
+        currentMeeting.dates
+          ?.slice()
+          .sort((a: any, b: any) => a.date - b.date) ?? [],
     }),
-    [currentMeeting]
+    [currentMeeting],
   );
 
   const flatTimes = useMemo(
     () => staticMeetingData.dates.flatMap((d: any) => d.times as number[]),
-    [staticMeetingData.dates]
+    [staticMeetingData.dates],
   );
 
   const timeRange = useMemo(() => {
@@ -90,13 +93,25 @@ export default function AnswerMeeting({
     const globalMinHour = Math.min(...dailyMinMax.map((d: any) => d.minHour));
     const globalMaxHour = Math.max(...dailyMinMax.map((d: any) => d.maxHour));
 
-    const daysWithMinHour = dailyMinMax.filter((d: any) => d.minHour === globalMinHour);
-    const daysWithMaxHour = dailyMinMax.filter((d: any) => d.maxHour === globalMaxHour);
-    const globalMinMinute = Math.min(...daysWithMinHour.map((d: any) => d.minMinute));
-    const globalMaxMinute = Math.max(...daysWithMaxHour.map((d: any) => d.maxMinute));
+    const daysWithMinHour = dailyMinMax.filter(
+      (d: any) => d.minHour === globalMinHour,
+    );
+    const daysWithMaxHour = dailyMinMax.filter(
+      (d: any) => d.maxHour === globalMaxHour,
+    );
+    const globalMinMinute = Math.min(
+      ...daysWithMinHour.map((d: any) => d.minMinute),
+    );
+    const globalMaxMinute = Math.max(
+      ...daysWithMaxHour.map((d: any) => d.maxMinute),
+    );
 
-    const dayWithMin = daysWithMinHour.find((d: any) => d.minMinute === globalMinMinute);
-    const dayWithMax = daysWithMaxHour.find((d: any) => d.maxMinute === globalMaxMinute);
+    const dayWithMin = daysWithMinHour.find(
+      (d: any) => d.minMinute === globalMinMinute,
+    );
+    const dayWithMax = daysWithMaxHour.find(
+      (d: any) => d.maxMinute === globalMaxMinute,
+    );
 
     return {
       minTime: dayWithMin?.dayMinTime ?? Math.min(...flatTimes),
@@ -132,15 +147,20 @@ export default function AnswerMeeting({
   const isMobile = useMediaQuery({ query: "(max-width: 1023px)" });
   const isMouseDown = useMouseDown();
 
-  const availabilityInfo = useMemo(() => getAvailabilityInfo(answers), [answers]);
+  const availabilityInfo = useMemo(
+    () => getAvailabilityInfo(answers),
+    [answers],
+  );
 
   const highestAvailableCount = useMemo(() => {
-    const counts = Object.values(availabilityInfo).map((info: any) => info.usersInfo.length);
+    const counts = Object.values(availabilityInfo).map(
+      (info: any) => info.usersInfo.length,
+    );
     return counts.length > 0 ? Math.max(0, ...counts) : 0;
   }, [availabilityInfo]);
 
   const [toggleButtonName, setToggleButtonName] = useState(
-    dict.page.answerMeeting.toggleButton.showAvailability
+    dict.page.answerMeeting.toggleButton.showAvailability,
   );
 
   const toggleAnsweringMode = useCallback(() => {
@@ -148,32 +168,36 @@ export default function AnswerMeeting({
     setToggleButtonName((prev: any) =>
       prev === dict.page.answerMeeting.toggleButton.showAvailability
         ? dict.page.answerMeeting.toggleButton.answerMeeting
-        : dict.page.answerMeeting.toggleButton.showAvailability
+        : dict.page.answerMeeting.toggleButton.showAvailability,
     );
   }, [dict]);
 
   const isDateSelected = useCallback(
-    (dateTime: number) => selectedTimecells.some((m) => m.meetDate === dateTime),
-    [selectedTimecells]
+    (dateTime: number) =>
+      selectedTimecells.some((m) => m.meetDate === dateTime),
+    [selectedTimecells],
   );
 
   const getSelectedTimecell = useCallback(
-    (dateTime: number) => selectedTimecells.find((m) => m.meetDate === dateTime),
-    [selectedTimecells]
+    (dateTime: number) =>
+      selectedTimecells.find((m) => m.meetDate === dateTime),
+    [selectedTimecells],
   );
 
   const updateTimecell = useCallback((dateTime: number, isOnline: boolean) => {
     setSelectedTimecells((prev) =>
-      prev.map((m) => (m.meetDate === dateTime ? { ...m, isOnline } : m))
+      prev.map((m) => (m.meetDate === dateTime ? { ...m, isOnline } : m)),
     );
   }, []);
 
   const unselectTimecell = useCallback(
     (dateTime: number) => {
       if (!isMobile) setUnselectMode(true);
-      setSelectedTimecells((prev) => prev.filter((m) => m.meetDate !== dateTime));
+      setSelectedTimecells((prev) =>
+        prev.filter((m) => m.meetDate !== dateTime),
+      );
     },
-    [isMobile]
+    [isMobile],
   );
 
   const toggleTimecell = useCallback(
@@ -192,14 +216,19 @@ export default function AnswerMeeting({
           }
         } else {
           if (!unselectMode) {
-            if (onlineSelectionMode && !cell?.isOnline) updateTimecell(dateTime, true);
-            else if (!onlineSelectionMode && cell?.isOnline) updateTimecell(dateTime, false);
+            if (onlineSelectionMode && !cell?.isOnline)
+              updateTimecell(dateTime, true);
+            else if (!onlineSelectionMode && cell?.isOnline)
+              updateTimecell(dateTime, false);
           } else {
             unselectTimecell(dateTime);
           }
         }
       } else if (!unselectMode) {
-        setSelectedTimecells((prev) => [...prev, new MeetingDate(dateTime, onlineSelectionMode)]);
+        setSelectedTimecells((prev) => [
+          ...prev,
+          new MeetingDate(dateTime, onlineSelectionMode),
+        ]);
       }
     },
     [
@@ -210,7 +239,7 @@ export default function AnswerMeeting({
       unselectMode,
       unselectTimecell,
       updateTimecell,
-    ]
+    ],
   );
 
   const disableSelection = useCallback(() => {
@@ -223,14 +252,18 @@ export default function AnswerMeeting({
 
   const convertDatetimeToDate = useCallback((datetime: number) => {
     const date = moment(datetime);
-    setLookedUpDate(`${date.format("DD.MM")} ${_.capitalize(date.format("dddd"))}`);
+    setLookedUpDate(
+      `${date.format("DD.MM")} ${_.capitalize(date.format("dddd"))}`,
+    );
     setLookedUpTime(date.format("HH:mm"));
   }, []);
 
   const isAnswered = useCallback(
     (datetime: number) =>
-      answers.some((a: any) => a.dates.some((d: any) => d.meetDate === datetime)),
-    [answers]
+      answers.some((a: any) =>
+        a.dates.some((d: any) => d.meetDate === datetime),
+      ),
+    [answers],
   );
 
   const daysHeadings = useMemo(
@@ -240,7 +273,7 @@ export default function AnswerMeeting({
         return (
           <th
             key={day.date}
-            className={`bg-light sticky top-0 z-10 ${d.day() === 0 ? "pr-4" : ""}`}
+            className={`bg-[#f0f4f8] sticky top-0 z-10 ${d.day() === 0 ? "pr-4" : ""}`}
           >
             <p className="text-sm text-dark font-medium">
               {`${d.date().toString().padStart(2, "0")}.${(d.month() + 1).toString().padStart(2, "0")}`}
@@ -249,7 +282,7 @@ export default function AnswerMeeting({
           </th>
         );
       }),
-    [staticMeetingData.dates]
+    [staticMeetingData.dates],
   );
 
   const availableTimecell = useCallback(
@@ -303,12 +336,15 @@ export default function AnswerMeeting({
                         ? `bg-gold ${!isMobile ? "hover:bg-gold/50" : ""}`
                         : `bg-primary ${!isMobile ? "hover:bg-primary/50" : ""}`
                       : `answered ${!isMobile ? "active:animate-cell-select" : ""} ${
-                          availabilityInfo[dateTime].onlineCount >= highestAvailableCount * 0.5 &&
-                          availabilityInfo[dateTime].usersInfo.length === highestAvailableCount
+                          availabilityInfo[dateTime].onlineCount >=
+                            highestAvailableCount * 0.5 &&
+                          availabilityInfo[dateTime].usersInfo.length ===
+                            highestAvailableCount
                             ? `bg-gold-dark ${!isMobile ? "hover:bg-gold-dark/50" : ""}`
-                            : availabilityInfo[dateTime].usersInfo.length === highestAvailableCount
-                            ? `bg-green ${!isMobile ? "hover:bg-green/50" : ""}`
-                            : `bg-light-green ${!isMobile ? "hover:bg-light-green/50" : ""}`
+                            : availabilityInfo[dateTime].usersInfo.length ===
+                                highestAvailableCount
+                              ? `bg-green ${!isMobile ? "hover:bg-green/50" : ""}`
+                              : `bg-light-green ${!isMobile ? "hover:bg-light-green/50" : ""}`
                         }`
                   }`
                 : `border border-gray ${!isMobile ? "hover:border-gray/50" : ""} ${
@@ -344,7 +380,7 @@ export default function AnswerMeeting({
       convertDatetimeToDate,
       disableSelection,
       highestAvailableCount,
-    ]
+    ],
   );
 
   const timeCells = useMemo(() => {
@@ -358,44 +394,76 @@ export default function AnswerMeeting({
 
     const cells: JSX.Element[] = [];
 
-    for (let i = timeRange.minimumTimeHour; i <= timeRange.maximumTimeHour; i++) {
+    for (
+      let i = timeRange.minimumTimeHour;
+      i <= timeRange.maximumTimeHour;
+      i++
+    ) {
       for (let h = 0; h < 2; h++) {
         const isHalfHour = h === 1;
 
-        if (i === timeRange.maximumTimeHour && isHalfHour && !timeRange.isMaximumTimeHalfHour) break;
-        if (i === timeRange.minimumTimeHour && !isHalfHour && timeRange.isMinimumTimeHalfHour) continue;
+        if (
+          i === timeRange.maximumTimeHour &&
+          isHalfHour &&
+          !timeRange.isMaximumTimeHalfHour
+        )
+          break;
+        if (
+          i === timeRange.minimumTimeHour &&
+          !isHalfHour &&
+          timeRange.isMinimumTimeHalfHour
+        )
+          continue;
 
         const timeRow: JSX.Element[] = [];
 
         for (const date of staticMeetingData.dates) {
-          const dateTime = moment(date.date).hour(i).minute(isHalfHour ? 30 : 0).valueOf();
+          const dateTime = moment(date.date)
+            .hour(i)
+            .minute(isHalfHour ? 30 : 0)
+            .valueOf();
           const isEndOfWeek = moment(dateTime).day() === 0;
           const isTimeAvailable = flatTimes.includes(dateTime);
 
-          timeRow.push(isTimeAvailable ? availableTimecell(dateTime, isEndOfWeek) : disabledTimecell());
+          timeRow.push(
+            isTimeAvailable
+              ? availableTimecell(dateTime, isEndOfWeek)
+              : disabledTimecell(),
+          );
         }
 
         const showLabel =
-          (h === 0 && !(i === timeRange.minimumTimeHour && timeRange.isMinimumTimeHalfHour)) ||
-          (h === 1 && i === timeRange.minimumTimeHour && timeRange.isMinimumTimeHalfHour) ||
-          (h === 1 && i === timeRange.maximumTimeHour && !timeRange.isMaximumTimeHalfHour);
+          (h === 0 &&
+            !(
+              i === timeRange.minimumTimeHour && timeRange.isMinimumTimeHalfHour
+            )) ||
+          (h === 1 &&
+            i === timeRange.minimumTimeHour &&
+            timeRange.isMinimumTimeHalfHour) ||
+          (h === 1 &&
+            i === timeRange.maximumTimeHour &&
+            !timeRange.isMaximumTimeHalfHour);
 
         cells.push(
-          <tr key={`${i}${isHalfHour ? "30" : "00"}`} className="cursor-pointer">
+          <tr
+            key={`${i}${isHalfHour ? "30" : "00"}`}
+            className="cursor-pointer"
+          >
             {showLabel && (
               <th
                 rowSpan={isHalfHour ? 1 : 2}
-                className="text-right text-dark align-top bg-light sticky left-0 pr-2"
+                className="text-right text-dark align-top bg-[#f0f4f8] sticky left-0 pr-2"
               >
-                {i === timeRange.minimumTimeHour && timeRange.isMinimumTimeHalfHour
+                {i === timeRange.minimumTimeHour &&
+                timeRange.isMinimumTimeHalfHour
                   ? `${i.toString().padStart(2, "0")}:30`
                   : isHalfHour
-                  ? `${i.toString().padStart(2, "0")}:30`
-                  : `${i.toString().padStart(2, "0")}:00`}
+                    ? `${i.toString().padStart(2, "0")}:30`
+                    : `${i.toString().padStart(2, "0")}:00`}
               </th>
             )}
             {timeRow}
-          </tr>
+          </tr>,
         );
       }
     }
@@ -404,10 +472,10 @@ export default function AnswerMeeting({
       const endHour = timeRange.maximumTimeHour + 1;
       cells.push(
         <tr key={`${endHour}00`} className="cursor-pointer">
-          <th className="text-right text-dark align-bottom bg-light sticky left-0 pr-2">
+          <th className="text-right text-dark align-bottom bg-[#f0f4f8] sticky left-0 pr-2">
             {`${endHour.toString().padStart(2, "0")}:00`}
           </th>
-        </tr>
+        </tr>,
       );
     }
 
@@ -429,7 +497,10 @@ export default function AnswerMeeting({
       await addAnswer({
         appointmentId: staticMeetingData.appointmentId,
         username,
-        dates: selectedTimecells.map((m) => ({ meetDate: m.meetDate, isOnline: m.isOnline })),
+        dates: selectedTimecells.map((m) => ({
+          meetDate: m.meetDate,
+          isOnline: m.isOnline,
+        })),
       });
       setUsername("");
       setSelectedTimecells([]);
@@ -445,7 +516,14 @@ export default function AnswerMeeting({
     } finally {
       setIsSendingReq(false);
     }
-  }, [isSendingReq, username, selectedTimecells, staticMeetingData.appointmentId, addAnswer, dict]);
+  }, [
+    isSendingReq,
+    username,
+    selectedTimecells,
+    staticMeetingData.appointmentId,
+    addAnswer,
+    dict,
+  ]);
 
   useEffect(() => {
     if (lookedUpDatetime && availabilityInfo[lookedUpDatetime]) {
@@ -465,12 +543,17 @@ export default function AnswerMeeting({
     }
 
     if (!availabilityInfo[lookedUpDatetime]) {
-      return <span className="text-dark">{dict.page.answerMeeting.nobodyAvailable}</span>;
+      return (
+        <span className="text-dark">
+          {dict.page.answerMeeting.nobodyAvailable}
+        </span>
+      );
     }
 
     const dayInfo = availabilityInfo[lookedUpDatetime];
-    const availableUsers = [...(dayInfo?.usersInfo ?? [])].sort((a: any, b: any) =>
-      a.userData.username.localeCompare(b.userData.username)
+    const availableUsers = [...(dayInfo?.usersInfo ?? [])].sort(
+      (a: any, b: any) =>
+        a.userData.username.localeCompare(b.userData.username),
     );
 
     const onlineUsers = availableUsers.filter((u: any) => u.isOnline);
@@ -525,7 +608,10 @@ export default function AnswerMeeting({
           {staticMeetingData.meetLink && (
             <p>
               🔗{" "}
-              <LinkButton href={staticMeetingData.meetLink} text="Link do spotkania" />
+              <LinkButton
+                href={staticMeetingData.meetLink}
+                text="Link do spotkania"
+              />
             </p>
           )}
         </div>
@@ -546,10 +632,14 @@ export default function AnswerMeeting({
                 <p className="text-dark">
                   {lookedUpDate} {lookedUpTime}
                 </p>
-                {lookedUpDate && <Heading text={`${availableCount}/${answers.length}`} />}
+                {lookedUpDate && (
+                  <Heading text={`${availableCount}/${answers.length}`} />
+                )}
               </>
             )}
-            <div className={`overflow-auto ${isMobile ? "max-h-[100px]" : ""} h-hd:max-h-[300px]`}>
+            <div
+              className={`overflow-auto ${isMobile ? "max-h-[100px]" : ""} h-hd:max-h-[300px]`}
+            >
               {availabilityInfoContent}
             </div>
           </section>
@@ -566,9 +656,9 @@ export default function AnswerMeeting({
             className="flex flex-1 flex-col place-content-start items-center"
             onSubmit={handleSubmit(sendAnswer)}
           >
-            <div className="flex flex-col-reverse lg:flex-col items-center lg:items-start">
+            <div className="flex flex-col-reverse lg:flex-col items-center lg:items-start w-full">
               {(mobileAnsweringMode && isMobile) || !isMobile ? (
-                <div>
+                <div className="w-full max-w-[365px] md:max-w-[500px]">
                   <Input
                     label={dict.page.answerMeeting.input.name.label}
                     type="text"
@@ -593,7 +683,7 @@ export default function AnswerMeeting({
                 <table className="time__seclection--table w-fit lg:mt-5 self-center select-none">
                   <thead>
                     <tr>
-                      <th className="bg-light sticky top-0 left-0 z-20" />
+                      <th className="bg-[#f0f4f8] sticky top-0 left-0 z-20" />
                       {daysHeadings}
                     </tr>
                   </thead>
@@ -603,71 +693,118 @@ export default function AnswerMeeting({
             </div>
 
             {(mobileAnsweringMode && isMobile) || !isMobile ? (
-              <div>
+              <div className="flex flex-col items-center mt-6 w-full">
                 {answerSent && (
-                  <p className="text-green font-medium text-sm mb-2 text-center animate-fade-in">
+                  <p className="text-green font-medium text-sm mb-4 text-center animate-fade-in">
                     ✓ {dict.page.answerMeeting.success}
                   </p>
                 )}
                 {sendError && (
-                  <p className="text-red-500 text-sm mb-2 text-center">{sendError}</p>
+                  <p className="text-red-500 text-sm mb-4 text-center">
+                    {sendError}
+                  </p>
                 )}
-                <div className="mr-6 inline">
-                  <Popup
-                    trigger={
-                      <button
-                        type="button"
-                        className="bg-primary hover:bg-primary-hover active:bg-primary-active text-light font-medium h-6 w-6 rounded-full transition-colors"
-                      >
-                        ?
-                      </button>
+
+                <div className="flex flex-row items-center justify-center gap-4 flex-wrap w-full max-w-[500px]">
+                  <div>
+                    <Popup
+                      trigger={
+                        <button
+                          type="button"
+                          className="bg-white hover:bg-gray/5 active:bg-gray/10 border border-gray/10 shadow-sm text-dark font-bold h-[46px] w-[46px] rounded-full transition-all duration-200 flex items-center justify-center"
+                        >
+                          ?
+                        </button>
+                      }
+                      modal
+                      nested
+                      closeOnDocumentClick
+                    >
+                      <div className="p-4 md:p-6 text-dark max-w-[400px]">
+                        <p className="mb-4 text-sm leading-relaxed">
+                          {dict.page.answerMeeting.help_popup.line1.segment1}
+                          <span className="font-semibold text-primary">
+                            {dict.page.answerMeeting.help_popup.line1.segment2}
+                          </span>
+                          {dict.page.answerMeeting.help_popup.line1.segment3}
+                        </p>
+                        <p className="mb-6 pb-4 border-b border-gray/10 text-sm leading-relaxed text-gray">
+                          {dict.page.answerMeeting.help_popup.line2}
+                        </p>
+
+                        <div className="space-y-4">
+                          <div>
+                            <p className="font-semibold mb-3 text-sm uppercase tracking-wide text-gray/80">
+                              {
+                                dict.page.answerMeeting.help_popup.showMode
+                                  .title
+                              }
+                            </p>
+                            <div className="flex flex-col gap-2.5">
+                              <p className="flex items-center text-sm">
+                                <span className="block h-4 w-4 rounded-full bg-primary/20 border-2 border-primary mr-3 shadow-sm" />
+                                {
+                                  dict.page.answerMeeting.help_popup.showMode
+                                    .green
+                                }
+                              </p>
+                              <p className="flex items-center text-sm">
+                                <span className="block h-4 w-4 rounded-full bg-gold/20 border-2 border-gold mr-3 shadow-sm" />
+                                {
+                                  dict.page.answerMeeting.help_popup.showMode
+                                    .gold
+                                }
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="pt-4 border-t border-gray/10">
+                            <p className="font-semibold mb-3 text-sm uppercase tracking-wide text-gray/80">
+                              {
+                                dict.page.answerMeeting.help_popup.answerMode
+                                  .title
+                              }
+                            </p>
+                            <div className="flex flex-col gap-2.5">
+                              <p className="flex items-center text-sm">
+                                <span className="block h-4 w-4 rounded-full bg-green border-2 border-green mr-3 shadow-sm" />
+                                {
+                                  dict.page.answerMeeting.help_popup.answerMode
+                                    .green
+                                }
+                              </p>
+                              <p className="flex items-center text-sm">
+                                <span className="block h-4 w-4 rounded-full bg-gold-dark border-2 border-gold mr-3 shadow-sm" />
+                                {
+                                  dict.page.answerMeeting.help_popup.answerMode
+                                    .gold
+                                }
+                              </p>
+                              <p className="flex items-center text-sm text-gray">
+                                <span className="block h-4 w-4 rounded-full bg-light-green border border-gray/20 mr-3 shadow-sm opacity-60" />
+                                {
+                                  dict.page.answerMeeting.help_popup.answerMode
+                                    .lightGreen
+                                }
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </Popup>
+                  </div>
+                  <Button
+                    text={
+                      isSendingReq
+                        ? "..."
+                        : dict.page.answerMeeting.button.submit
                     }
-                    modal
-                    nested
-                    closeOnDocumentClick
-                  >
-                    <div className="p-2 text-dark">
-                      <p>
-                        {dict.page.answerMeeting.help_popup.line1.segment1}
-                        <span className="font-medium">
-                          {dict.page.answerMeeting.help_popup.line1.segment2}
-                        </span>
-                        {dict.page.answerMeeting.help_popup.line1.segment3}
-                      </p>
-                      <p className="mb-2">{dict.page.answerMeeting.help_popup.line2}</p>
-                      <p className="font-medium">{dict.page.answerMeeting.help_popup.showMode.title}</p>
-                      <p className="flex items-center">
-                        <span className="block h-4 w-4 rounded-full bg-primary mr-2" />
-                        {dict.page.answerMeeting.help_popup.showMode.green}
-                      </p>
-                      <p className="flex items-center mb-2">
-                        <span className="block h-4 w-4 rounded-full bg-gold mr-2" />
-                        {dict.page.answerMeeting.help_popup.showMode.gold}
-                      </p>
-                      <p className="font-medium">
-                        {dict.page.answerMeeting.help_popup.answerMode.title}
-                      </p>
-                      <p className="flex items-center">
-                        <span className="block h-4 w-4 rounded-full bg-green mr-2" />
-                        {dict.page.answerMeeting.help_popup.answerMode.green}
-                      </p>
-                      <p className="flex items-center">
-                        <span className="block h-4 w-4 rounded-full bg-gold mr-2" />
-                        {dict.page.answerMeeting.help_popup.answerMode.gold}
-                      </p>
-                      <p className="flex items-center">
-                        <span className="block h-4 w-4 rounded-full bg-light-green mr-2" />
-                        {dict.page.answerMeeting.help_popup.answerMode.lightGreen}
-                      </p>
-                    </div>
-                  </Popup>
+                    type="submit"
+                    disabled={isSendingReq}
+                    className="m-0"
+                  />
+                  <CopyLinkButton link={pathname} dict={dict} className="m-0" />
                 </div>
-                <Button
-                  text={isSendingReq ? "..." : dict.page.answerMeeting.button.submit}
-                  type="submit"
-                  disabled={isSendingReq}
-                />
-                <CopyLinkButton link={pathname} dict={dict} className="ml-6" />
               </div>
             ) : null}
           </form>

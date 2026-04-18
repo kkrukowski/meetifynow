@@ -1,6 +1,6 @@
 import Image from "next/image";
-
 import Heading from "../Heading";
+import SpotlightCard from "../ui/SpotlightCard";
 
 const InfoBlock = (props: {
   img: any;
@@ -11,33 +11,31 @@ const InfoBlock = (props: {
   reverse: boolean;
 }) => {
   return (
-    <section
-      className={`flex flex-col-reverse items-center sm:flex-row justify-center mb-24 ${
-        props.reverse && "sm:flex-row-reverse"
-      }`}
-    >
-      <div className="flex justify-center sm:w-1/2">
-        <Image
-          src={props.img}
-          alt={props.img_alt}
-          title={props.img_title}
-          height={400}
-          width={400}
-          loading="lazy"
-          className={`m-0 ${
-            props.reverse && "sm:ml-10"
-          } mt-10 sm:mb-0 w-auto h-48 md:h-64 lg:h-auto`}
-        />
-      </div>
-      <div
-        className={`flex sm:w-1/2 flex-col items-centers justify-center ${
-          props.reverse ? "sm:mr-20" : "sm:ml-20"
-        }`}
+    <SpotlightCard className="w-full p-10 md:p-16 relative z-0">
+      <section
+        className={`flex flex-col-reverse items-center lg:flex-row justify-center ${
+          props.reverse && "lg:flex-row-reverse"
+        } gap-12 lg:gap-24`}
       >
-        <Heading text={props.title} />
-        <p className="mb-5 text-lg text-dark text-justify">{props.text}</p>
-      </div>
-    </section>
+        <div className="flex justify-center lg:w-1/2">
+          <Image
+            src={props.img}
+            alt={props.img_alt}
+            title={props.img_title}
+            height={500}
+            width={500}
+            loading="lazy"
+            className="w-full max-w-sm lg:max-w-md h-auto mix-blend-multiply"
+          />
+        </div>
+        <div className="flex lg:w-1/2 flex-col items-center text-center lg:text-left lg:items-start justify-center">
+          <Heading text={props.title} />
+          <p className="mt-6 text-lg text-gray/80 leading-relaxed font-light">
+            {props.text}
+          </p>
+        </div>
+      </section>
+    </SpotlightCard>
   );
 };
 

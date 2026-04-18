@@ -87,16 +87,18 @@ const DateSelectionStep: React.FC<DateSelectionStepProps> = ({
               key={dateTime}
               onMouseDown={() => !isPast && handleMouseDown(dateTime)}
               onMouseOver={() => !isPast && toggleTimecell(dateTime)}
-              className={`h-10 w-10 font-medium text-center ${
-                isPast ? "text-gray" : "cursor-pointer"
-              } ${isSelected ? "bg-primary text-light rounded-lg" : ""} ${
-                isToday && !isSelected
-                  ? "border-2 border-primary rounded-lg"
-                  : ""
-              }`}
+              className={`h-12 w-12 font-medium text-center transition-colors duration-200 border border-transparent rounded-[14px] select-none ${
+                isPast ? "text-gray/40 opacity-70" : "cursor-pointer"
+              } ${
+                isSelected
+                  ? "bg-primary !text-white shadow-md shadow-primary/30 hover:bg-primary/90"
+                  : isPast
+                    ? ""
+                    : "hover:bg-[#f0f6fa] text-dark"
+              } ${isToday && !isSelected ? "border-gray/20 bg-gray/5" : ""}`}
             >
               {day}
-            </td>
+            </td>,
           );
           day++;
         }
@@ -104,7 +106,7 @@ const DateSelectionStep: React.FC<DateSelectionStepProps> = ({
       tableRows.push(
         <tr key={i} onMouseUp={handleMouseUp}>
           {tableCells}
-        </tr>
+        </tr>,
       );
     }
     return tableRows;
@@ -123,45 +125,48 @@ const DateSelectionStep: React.FC<DateSelectionStepProps> = ({
       transition={{ duration: 0.3, ease: "easeInOut" }}
       onMouseUp={handleMouseUp}
     >
-      <div className="flex flex-col self-center">
-        <table
-          className={`date__selection--table border-separate border-spacing-0.5 box-content p-2 select-none w-[296px] ${
-            dateError ? "rounded-lg border-2 border-red" : "border-transparent"
+      <div className="flex flex-col self-center items-center">
+        <div
+          className={`p-4 sm:p-6 bg-white rounded-[24px] border border-gray/5 shadow-sm transition-all duration-300 w-full max-w-sm ${
+            dateError ? "ring-2 ring-red/50 shadow-red/10" : ""
           }`}
         >
-          <thead>
-            <tr>
-              <th colSpan={7}>
-                <div className="flex justify-between items-center">
-                  <button
-                    onClick={prevMonth}
-                    className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
-                  >
-                    <IoChevronBack />
-                  </button>
-                  <span className="text-dark">
-                    {_.capitalize(moment().month(month).format("MMMM"))} {year}
-                  </span>
-                  <button
-                    onClick={nextMonth}
-                    className="h-10 w-10 rounded-lg bg-light hover:bg-light-hover active:bg-light-active shadow-md transition-colors flex justify-center items-center"
-                  >
-                    <IoChevronForward />
-                  </button>
-                </div>
-              </th>
-            </tr>
-            <tr>
-              {shortDaysNames.map((day) => (
-                <th key={day} className="font-medium text-gray">
-                  {day}
+          <table className="date__selection--table border-separate border-spacing-1.5 mx-auto select-none w-full">
+            <thead>
+              <tr>
+                <th colSpan={7}>
+                  <div className="flex justify-between items-center">
+                    <button
+                      onClick={prevMonth}
+                      className="h-10 w-10 rounded-[12px] bg-white hover:bg-gray/5 active:bg-gray/10 border border-gray/10 shadow-sm transition-all duration-200 flex justify-center items-center text-dark"
+                    >
+                      <IoChevronBack />
+                    </button>
+                    <span className="text-dark font-semibold text-lg">
+                      {_.capitalize(moment().month(month).format("MMMM"))}{" "}
+                      {year}
+                    </span>
+                    <button
+                      onClick={nextMonth}
+                      className="h-10 w-10 rounded-[12px] bg-white hover:bg-gray/5 active:bg-gray/10 border border-gray/10 shadow-sm transition-all duration-200 flex justify-center items-center text-dark"
+                    >
+                      <IoChevronForward />
+                    </button>
+                  </div>
                 </th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>{showCalendar(month, year)}</tbody>
-        </table>
-        <p className="text-sm relative mt-2 text-red font-medium">
+              </tr>
+              <tr>
+                {shortDaysNames.map((day) => (
+                  <th key={day} className="font-medium text-gray">
+                    {day}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>{showCalendar(month, year)}</tbody>
+          </table>
+        </div>
+        <p className="text-sm relative mt-3 text-red font-medium text-center">
           {dateError && dateErrorText}
         </p>
       </div>

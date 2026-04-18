@@ -2,7 +2,6 @@ import BigText from "@/components/BigText";
 import Button from "@/components/Button";
 import Heading from "@/components/Heading";
 import enDict from "@/dictionaries/en.json";
-import React from "react";
 
 import { Locale } from "@root/i18n.config";
 import Link from "next/link";

@@ -75,7 +75,9 @@ export default function CreateMeeting({
           <div className="flex flex-col sm:flex-row gap-3 mt-6">
             <Button
               text={dict.page.createMeeting.success.goToMeeting}
-              onClick={() => router.push(`/${lang}/meet/${createdAppointmentId}`)}
+              onClick={() =>
+                router.push(`/${lang}/meet/${createdAppointmentId}`)
+              }
             />
             <button
               type="button"
@@ -92,66 +94,82 @@ export default function CreateMeeting({
 
   return (
     <main className="flex md:flex-1 h-full flex-col px-5 py-10 pt-24 lg:p-24 lg:pt-28 h-smd:pt-24 lg:m-0 justify-center">
-      <Title text={dict.page.createMeeting.title} />
-      <StepsIndicator steps={4} stepsData={stepsInfo} currIndex={currStep} />
-      <div
-        id="create-meeting-form-container"
-        className="flex flex-col justify-center md:h-[400px]"
-      >
-        <div className="self-center">
-          {currStep === 0 && (
-            <MeetingDetailsStep
-              delta={delta}
-              register={register}
-              errors={errors}
-              dict={dict}
-              setMeetDetails={setMeetDetails}
-              meetDetails={meetDetails}
-            />
-          )}
+      <div className="p-8 md:p-12 max-w-5xl mx-auto w-full bg-white rounded-xl shadow-sm border border-dark/5">
+        <Title text={dict.page.createMeeting.title} />
+        <StepsIndicator steps={4} stepsData={stepsInfo} currIndex={currStep} />
+        <div
+          id="create-meeting-form-container"
+          className="flex flex-col justify-center min-h-[400px]"
+        >
+          <div className="w-full h-full flex flex-col justify-center">
+            {currStep === 0 && (
+              <MeetingDetailsStep
+                delta={delta}
+                register={register}
+                errors={errors}
+                dict={dict}
+                setMeetDetails={setMeetDetails}
+                meetDetails={meetDetails}
+              />
+            )}
 
-          {currStep === 1 && (
-            <DateSelectionStep
-              delta={delta}
-              selectedDates={[...selectedDates].sort((a, b) => a - b)}
-              setSelectedDates={setSelectedDates}
-              dateError={dateError}
-              dateErrorText={dateErrorText}
-            />
-          )}
+            {currStep === 1 && (
+              <DateSelectionStep
+                delta={delta}
+                selectedDates={[...selectedDates].sort((a, b) => a - b)}
+                setSelectedDates={setSelectedDates}
+                dateError={dateError}
+                dateErrorText={dateErrorText}
+              />
+            )}
 
-          {currStep === 2 && (
-            <TimeSelectionStep
-              delta={delta}
-              timepickerIndex={timepickerIndex}
-              setTimepickerIndex={setTimepickerIndex}
-              mainFromTime={mainFromTime}
-              mainToTime={mainToTime}
-              setMainFromTime={setMainFromTime}
-              setMainToTime={setMainToTime}
-              dailyTimeRanges={dailyTimeRanges}
-              dailyHours={dailyHours}
-              handleDailyHourChange={handleDailyHourChange}
-              pushSelectedTimecell={pushSelectedTimecell}
-              popUnselectedTimecell={popUnselectedTimecell}
-            />
-          )}
+            {currStep === 2 && (
+              <TimeSelectionStep
+                dict={dict}
+                delta={delta}
+                timepickerIndex={timepickerIndex}
+                setTimepickerIndex={setTimepickerIndex}
+                mainFromTime={mainFromTime}
+                mainToTime={mainToTime}
+                setMainFromTime={setMainFromTime}
+                setMainToTime={setMainToTime}
+                dailyTimeRanges={dailyTimeRanges}
+                dailyHours={dailyHours}
+                handleDailyHourChange={handleDailyHourChange}
+                pushSelectedTimecell={pushSelectedTimecell}
+                popUnselectedTimecell={popUnselectedTimecell}
+              />
+            )}
+          </div>
         </div>
+
+        {createError && (
+          <p className="self-center mt-3 text-sm text-red-500">{createError}</p>
+        )}
+
+        {currStep < 3 && (
+          <div className="self-center mt-12 flex items-center gap-6 justify-center">
+            {currStep > 0 && (
+              <button
+                type="button"
+                onClick={prev}
+                className="px-6 py-3 font-semibold text-gray/80 hover:text-dark hover:bg-gray/5 active:bg-gray/10 rounded-[20px] transition-all duration-300 focus:outline-none focus:ring-4 focus:ring-gray/20"
+              >
+                {dict.button.back}
+              </button>
+            )}
+            <Button
+              text={
+                currStep === 2
+                  ? dict.page.createMeeting.createButton
+                  : dict.button.next
+              }
+              onClick={next}
+              className="px-10"
+            />
+          </div>
+        )}
       </div>
-
-      {createError && (
-        <p className="self-center mt-3 text-sm text-red-500">{createError}</p>
-      )}
-
-      {currStep < 3 && (
-        <div className="self-center mt-5">
-          <Button text={dict.button.back} onClick={prev} className="mr-10" />
-          <Button
-            text={currStep === 2 ? dict.page.createMeeting.createButton : dict.button.next}
-            onClick={next}
-          />
-        </div>
-      )}
     </main>
   );
 }

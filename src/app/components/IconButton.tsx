@@ -13,9 +13,9 @@ export default function IconButton(props: {
       className={
         `${
           props.isCurrent
-            ? "border-2 border-primary text-primary bg-none hover:text-light hover:border-transparent"
-            : "bg-primary text-light"
-        } hover:bg-primary-hover active:bg-primary-active text-lg w-10 h-10 rounded-lg mt-5 self-center transition-colors ` +
+            ? "border-2 border-primary bg-primary/10 text-primary shadow-sm hover:shadow-md"
+            : "bg-primary text-white shadow-sm hover:shadow-md shadow-primary/20"
+        } hover:bg-primary-hover active:bg-primary-active text-lg w-12 h-12 rounded-[14px] mt-5 self-center transition-all duration-300 ease-out flex items-center justify-center ` +
         props.className
       }
       onClick={() => !props.isCurrent && props.onClick(props.valueToChange)}

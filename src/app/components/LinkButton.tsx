@@ -1,25 +1,26 @@
 import Link from "next/link";
 
 type LinkButtonProps = {
-    href: string;
-    text: string;
-    className?: string;
-    target?: string;
+  href: string;
+  text: string;
+  className?: string;
+  target?: string;
 };
 
 export const LinkButton = ({
-    href,
-    text,
-    className,
-    target = "_blank",
+  href,
+  text,
+  className,
+  target = "_blank",
 }: LinkButtonProps) => {
   return (
     <Link
       href={href}
       target={target}
-      className={`text-primary hover:text-primary-hover active:text-primary-active font-medium ${className}`}
+      className={`relative inline-flex items-center justify-center font-medium text-primary hover:text-[#0096E0] active:text-primary-active transition-all duration-300 group ${className}`}
     >
-      {text}
+      <span className="relative z-10">{text}</span>
+      <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#0096E0] transition-all duration-300 ease-out group-hover:w-full"></span>
     </Link>
   );
-}
+};

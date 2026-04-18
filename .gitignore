@@ -28,5 +28,5 @@ yarn-error.log*
 *.suo
 *.sw?
 
-# Convex
-convex/_generated
+# Convex generated temporarily un-ignored for Vercel Turbopack
+# convex/_generated

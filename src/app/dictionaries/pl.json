@@ -1,0 +1,239 @@
+{
+  "website": {
+    "title": "MeetifyNow - Prosta platforma do planowania spotkań",
+    "description": "MeetifyNow to łatwa w obsłudze platforma do planowania spotkań bez potrzeby logowania. Idealne rozwiązanie dla szybkiego umawiania spotkań online!",
+    "url": "https://meetifynow.com/pl"
+  },
+  "button": {
+    "homePage": "Strona główna",
+    "copyLink": {
+      "copy": "Skopiuj link",
+      "copied": "Skopiowano!"
+    },
+    "back": "Wróć",
+    "next": "Dalej",
+    "submit": "Wyślij"
+  },
+  "page": {
+    "error": {
+      "404": {
+        "title": "Nie znaleziono takiej strony 😥",
+        "heading": "404"
+      },
+      "500": {
+        "title": "Coś poszło nie tak 😥",
+        "heading": "500"
+      }
+    },
+    "home": {
+      "headerText": "MeetifyNow to łatwa w obsłudze platforma do planowania spotkań bez potrzeby logowania.",
+      "title": "Planowanie spotkań nigdy nie było prostsze!",
+      "createButton": "Utwórz spotkanie",
+      "infoBlock": {
+        "fast": {
+          "title": "Szybkie i łatwe",
+          "text": "MeetifyNow to Twój sposób na szybkie i łatwe planowanie spotkań! Stworzysz je w kilka sekund. Nasza aplikacja zapewnia łatwość obsługi i uczyni organizację spotkań przyjemnością."
+        },
+        "everyone": {
+          "title": "Dla każdego",
+          "text": "Niezależnie od tego, czy organizujesz spotkanie biznesowe, czy towarzyskie, skorzystaj z MeetifyNow i ciesz się szybkim, prostym i przyjemnym procesem planowania!"
+        },
+        "time": {
+          "title": "Nie trać czasu na logowanie",
+          "text": "Z MeetifyNow planowanie spotkań staje się jeszcze łatwiejsze — możesz to robić bez konieczności logowania! Oszczędź cenny czas i błyskawicznie zaplanuj swoje spotkania!"
+        },
+        "online": {
+          "title": "Wybór dostępności online",
+          "text": "Nasza aplikacja umożliwia wybór dostępności na spotkaniu, nawet jeśli jesteś dostępny tylko zdalnie! W pełni dostosuj harmonogram spotkania do swoich potrzeb."
+        },
+        "flexibleHours": {
+          "title": "Niestandardowe godziny",
+          "text": "Nie bądź ograniczony standardowymi przedziałami godzin! MeetifyNow pozwala na tworzenie spotkań według dowolnych godzin, dostosowując się do Twojego indywidualnego grafiku."
+        }
+      }
+    },
+    "profile": {
+        "title": "Profil użytkownika",
+        "userInfo": {
+          "title": "Twoje informacje",
+          "name": "Nazwa",
+          "email": "Email"
+        },
+        "meetings": {
+          "title": "Twoje spotkania",
+          "noMeetings": "Nie masz żadnych spotkań."
+        }
+    },
+    "login": {
+      "title": "Zaloguj się",
+      "button": {
+        "login": "Zaloguj się",
+        "forgotPassword": "Nie pamiętasz hasła?",
+        "rememberMe": "Zapamiętaj mnie"
+      },
+      "socialLogin": {
+        "text": "Lub zaloguj się za pomocą"
+      },
+      "createAccount": {
+        "text": "Nie masz konta?",
+        "link": "Stwórz nowe!"
+      }
+    },
+    "register": {
+      "title": "Stwórz nowe konto",
+      "button": {
+        "register": "Stwórz konto"
+      },
+      "socialLogin": {
+        "text": "Lub zarejestruj się za pomocą"
+      },
+      "logIn": {
+        "text": "Posiadasz już konto?",
+        "link": "Zaloguj się!"
+      }
+    },
+    "auth": {
+      "hamburgerMenu": {
+        "profile": "Profil",
+        "createMeeting": "Utwórz spotkanie",
+        "logout": "Wyloguj się",
+        "login": "Zaloguj się"
+      },
+      "input": {
+        "name": {
+          "label": "Nazwa",
+          "placeholder": "Jan Kowalski"
+        },
+        "email": {
+          "label": "Email",
+          "placeholder": "nazwa@domena.pl"
+        },
+        "password": {
+          "label": "Hasło",
+          "placeholder": "******"
+        }
+      },
+      "error": {
+        "login": "Niepoprawny email lub hasło.",
+        "email": {
+          "required": "Email jest wymagany.",
+          "email": "Niepoprawny format emaila."
+        },
+        "password": {
+          "required": "Hasło jest wymagane.",
+          "min": "Hasło musi mieć co najmniej 8 znaków.",
+          "match": "Hasło musi zawierać co najmniej jedną dużą literę, małą literę, cyfrę i znak specjalny."
+        },
+        "name": {
+          "required": "Nazwa jest wymagana.",
+          "min": "Nazwa musi mieć co najmniej 2 znaki."
+        }
+      },
+      "success": {
+        "register": "Utworzono konto!",
+        "login": "Poprawnie zalogowano!"
+      },
+      "verifyEmail": {
+        "text": "Sprawdź swoją skrzynkę mailową i kliknij w link, aby zweryfikować swoje konto."
+      }
+    },
+    "createMeeting": {
+      "title": "Utwórz nowe spotkanie",
+      "createButton": "Utwórz spotkanie",
+      "error": {
+        "createFailed": "Nie udało się utworzyć spotkania. Spróbuj ponownie."
+      },
+      "step": {
+        "one": {
+          "title": "Szczegóły spotkania"
+        },
+        "two": {
+          "title": "Wybierz daty spotkania"
+        },
+        "three": {
+          "title": "Wybierz godziny spotkania"
+        }
+      },
+      "validate": {
+        "meeting__name": {
+          "required": "Nazwa spotkania jest wymagana.",
+          "min": "Nazwa spotkania musi mieć co najmniej 4 znaki.",
+          "max": "Nazwa spotkania może mieć maksymalnie 50 znaków."
+        },
+        "meeting__place": {
+          "max": "Miejsce spotkania może mieć maksymalnie 100 znaków."
+        },
+        "date": {
+          "required": "Wybierz datę spotkania.",
+          "max": "Możesz wybrać maksymalnie 15 dat."
+        },
+        "meeting__link": "Link do spotkania jest niepoprawny."
+      },
+      "input": {
+        "meeting__name": {
+          "label": "Nazwa spotkania",
+          "placeholder": "📝 Nazwa spotkania"
+        },
+        "meeting__place": {
+          "label": "Miejsce spotkania",
+          "placeholder": "🏢 Miejsce spotkania"
+        },
+        "meeting__link": {
+          "label": "Link do spotkania",
+          "placeholder": "🔗 Link do spotkania"
+        }
+      }
+    },
+    "answerMeeting": {
+      "nobodyAvailable": "Nikt nie jest dostępny w wybranym terminie 😥",
+      "clickToReveal": "Kliknij na godzinę, aby zobaczyć dostępność",
+      "hoverToReveal": "Najedź na godzinę, aby zobaczyć dostępność",
+      "toggleButton": {
+        "showAvailability": "Sprawdź dostępność 👀",
+        "answerMeeting": "Zaznacz dostępność ☑️"
+      },
+      "input": {
+        "name": {
+          "label": "Twoje imie",
+          "placeholder": "📝 Twoje imie"
+        }
+      },
+      "validate": {
+        "name": {
+          "required": "Twoje imię jest wymagane.",
+          "max": "Imię może mieć maksymalnie 20 znaków."
+        }
+      },
+      "error": {
+        "alreadyAnswered": "Już odpowiedziałeś na to spotkanie.",
+        "submitFailed": "Nie udało się wysłać odpowiedzi. Spróbuj ponownie."
+      },
+      "help_popup": {
+        "line1": {
+          "segment1": "Nie wiesz, co oznaczają dane",
+          "segment2": " kolory",
+          "segment3": "? To proste!"
+        },
+        "line2": "Oto co one reprezentują 👇",
+        "showMode": {
+          "title": "Podczas zaznaczania 👀:",
+          "green": "- Dostępność stacjonarna.",
+          "gold": "- Dostępność zdalna."
+        },
+        "answerMode": {
+          "title": "Podczas sprawdzania ☑️:",
+          "green": "- Najwięcej dostępnych osób.",
+          "gold": "- Najwięcej dostępnych osób zdalnie.",
+          "lightGreen": "- Data z mniejszą dostępnością."
+        }
+      },
+      "button": {
+        "submit": "Wyślij"
+      }
+    },
+    "answerNotFoundPage": {
+      "title": "Nie znaleziono takiego spotkania 😥",
+      "heading": "Zawsze możesz stworzyć własne 😎"
+    }
+  }
+}

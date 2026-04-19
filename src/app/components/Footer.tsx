@@ -1,8 +1,6 @@
 import meetifyNowLogo from "@/assets/imgs/meetifynow-logo.webp";
-import { faGithub } from "@fortawesome/free-brands-svg-icons";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import webdkwLogo from "@/assets/imgs/webdkw-logo.svg"; // Upewnij się, że logo jest tutaj zapisane
 import Image from "next/image";
-import Link from "next/link";
 
 export default function Footer() {
   return (
@@ -23,17 +21,23 @@ export default function Footer() {
         </div>
 
         <div className="flex flex-col items-center md:items-end gap-2">
-          <Link
-            href="https://github.com/kkrukowski"
+          <a
+            href="https://webdkw.net/"
             target="_blank"
-            className="flex items-center text-gray-500 hover:text-primary transition-colors hover:-translate-y-0.5 duration-200"
+            rel="noopener"
+            title="Tworzenie stron internetowych WebDKW"
+            className="flex items-center gap-2 mt-2 text-sm text-gray-500 hover:opacity-80 transition-opacity"
           >
-            <span className="font-medium mr-2">@kkrukowski</span>
-            <span className="h-5 w-5">
-              <FontAwesomeIcon icon={faGithub} />
-            </span>
-          </Link>
-          <p className="text-center text-gray-400 text-sm">
+            Aplikację stworzyła firma
+            <Image
+              src={webdkwLogo}
+              height={24}
+              width={100}
+              className="h-6 w-auto object-contain"
+              alt="Agencja interaktywna, tworzenie stron i sklepów internetowych WebDKW"
+            />
+          </a>
+          <p className="text-center text-gray-400 text-sm mt-3">
             {new Date().getFullYear()} © meetifynow.com
           </p>
         </div>

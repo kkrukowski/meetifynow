@@ -74,7 +74,7 @@ const DateSelectionStep: React.FC<DateSelectionStepProps> = ({
       let tableCells = [];
       for (let j = 0; j < 7; j++) {
         if ((i === 0 && j < firstDay - 1) || day > daysInMonth) {
-          tableCells.push(<td key={`${i}-${j}`}></td>);
+          tableCells.push(<td key={`${i}-${j}`} className="h-12 w-12"></td>);
         } else {
           const date = moment().year(y).month(m).date(day);
           const dateTime = date.startOf("day").valueOf();
@@ -131,7 +131,7 @@ const DateSelectionStep: React.FC<DateSelectionStepProps> = ({
             dateError ? "ring-2 ring-red/50 shadow-red/10" : ""
           }`}
         >
-          <table className="date__selection--table border-separate border-spacing-1.5 mx-auto select-none w-full">
+          <table className="date__selection--table table-fixed border-separate border-spacing-1.5 mx-auto select-none w-full">
             <thead>
               <tr>
                 <th colSpan={7}>

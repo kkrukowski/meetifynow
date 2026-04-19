@@ -81,7 +81,7 @@ const TimeSelectionStep: React.FC<TimeSelectionStepProps> = ({
             }`}
           >
             {timepickerIndex === 0 && (
-              <div className="flex flex-col items-center justify-center gap-6 w-full max-w-md">
+              <div className="flex flex-col items-center justify-start gap-6 w-full max-w-md pt-4">
                 <p className="text-gray text-center font-medium px-4 leading-relaxed bg-[#f0f4f8] py-3 rounded-[16px] border border-dark/5 shadow-sm">
                   {dict.page.createMeeting.step.three.description}
                 </p>

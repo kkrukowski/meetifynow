@@ -1,4 +1,4 @@
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { Locale } from "@root/i18n.config";
 import { useMutation } from "convex/react";
 import moment from "moment";
@@ -6,7 +6,7 @@ import "moment/locale/pl";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { SubmitHandler, useForm } from "react-hook-form";
-import * as yup from "yup";
+import { z } from "zod";
 import { api } from "../../../convex/_generated/api";
 
 interface DailyTimeRange {
@@ -58,18 +58,23 @@ export const useCreateMeeting = ({
 
   const delta = currStep - prevStep;
 
-  const formSchema = yup.object().shape({
-    meeting__name: yup
-      .string()
-      .required(dict.page.createMeeting.validate.meeting__name.required)
+  const formSchema = z.object({
+    meeting__name: z
+      .string({
+        required_error: dict.page.createMeeting.validate.meeting__name.required,
+      })
       .min(4, dict.page.createMeeting.validate.meeting__name.min)
       .max(50, dict.page.createMeeting.validate.meeting__name.max),
-    meeting__place: yup
+    meeting__place: z
       .string()
-      .max(100, dict.page.createMeeting.validate.meeting__place.max),
-    meeting__link: yup
+      .max(100, dict.page.createMeeting.validate.meeting__place.max)
+      .optional()
+      .or(z.literal("")),
+    meeting__link: z
       .string()
-      .url(dict.page.createMeeting.validate.meeting__link.url),
+      .url(dict.page.createMeeting.validate.meeting__link.url)
+      .optional()
+      .or(z.literal("")),
   });
 
   const {
@@ -77,7 +82,7 @@ export const useCreateMeeting = ({
     handleSubmit,
     trigger,
     formState: { errors },
-  } = useForm<Inputs>({ resolver: yupResolver(formSchema) });
+  } = useForm<Inputs>({ resolver: zodResolver(formSchema) });
 
   const stepsInfo = [
     {

@@ -238,7 +238,9 @@
         }
       },
       "button": {
-        "submit": "Wyślij"
+        "submit": "Wyślij",
+        "update": "Zaktualizuj odpowiedź",
+        "clearAnswers": "Odznacz wszystko"
       }
     },
     "answerNotFoundPage": {

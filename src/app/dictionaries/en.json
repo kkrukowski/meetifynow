@@ -235,7 +235,9 @@
         }
       },
       "button": {
-        "submit": "Send"
+        "submit": "Send",
+        "update": "Update answer",
+        "clearAnswers": "Unselect all"
       }
     },
 

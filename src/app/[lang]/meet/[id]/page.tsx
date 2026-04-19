@@ -1,5 +1,5 @@
 import { getDictionary } from "@/lib/dictionary";
-import AnswerMeeting from "@/routes/AnswerMeeting";
+import AnswerMeeting from "@/components/AnswerMeeting/AnswerMeeting";
 import { Locale } from "@root/i18n.config";
 import { fetchQuery } from "convex/nextjs";
 import type { Metadata } from "next";

@@ -1,7 +1,24 @@
 "use client";
 
-import Error500 from "./routes/Error500";
+import BigText from "@/components/BigText";
+import Button from "@/components/Button";
+import Heading from "@/components/Heading";
+import enDict from "@/dictionaries/en.json";
+
+import { Locale } from "@root/i18n.config";
+import Link from "next/link";
 
 export default function GlobalError() {
-  return <Error500 />;
+  const lang = "en" as Locale;
+  const dict = enDict;
+
+  return (
+    <div className="flex flex-1 flex-col justify-center items-center h-full">
+      <BigText text={dict.page.error[500].heading} />
+      <Heading text={dict.page.error[500].title} />
+      <Link href={`/${lang}`}>
+        <Button text={dict.button.homePage} />
+      </Link>
+    </div>
+  );
 }

@@ -9,7 +9,7 @@ import Title from "@/components/Title";
 import { useCreateMeeting } from "@/hooks/useCreateMeeting";
 import { Locale } from "@root/i18n.config";
 import { useRouter } from "next/navigation";
-import AnswerMeetingLoader from "../../routes/AnswerMeetingLoader";
+import AnswerMeetingLoader from "../AnswerMeeting/AnswerMeetingLoader";
 import MeetingDetailsStep from "./MeetingDetailsStep";
 
 export default function CreateMeeting({

@@ -1,4 +1,4 @@
-import AnswerNotFound from "@/routes/AnswerNotFound";
+import AnswerNotFound from "@/components/AnswerMeeting/AnswerNotFound";
 
 export default async function NotFound() {
   return <AnswerNotFound />;

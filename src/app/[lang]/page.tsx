@@ -1,5 +1,5 @@
 import { getDictionary } from "@/lib/dictionary";
-import HomePage from "@/routes/HomePage";
+import HomePage from "@/components/HomePage/HomePage";
 import { Locale } from "@root/i18n.config";
 
 export default async function Page({

@@ -11,18 +11,19 @@ export default defineSchema({
       v.object({
         date: v.number(),
         times: v.array(v.number()),
-      })
+      }),
     ),
     answers: v.array(
       v.object({
+        id: v.optional(v.string()),
         username: v.string(),
         dates: v.array(
           v.object({
             meetDate: v.number(),
             isOnline: v.boolean(),
-          })
+          }),
         ),
-      })
+      }),
     ),
   }).index("by_appointmentId", ["appointmentId"]),
 });

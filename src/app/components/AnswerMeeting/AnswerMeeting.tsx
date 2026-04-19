@@ -1,6 +1,6 @@
 "use client";
 
-import { yupResolver } from "@hookform/resolvers/yup";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation, useQuery } from "convex/react";
 import _ from "lodash";
 import moment from "moment";
@@ -11,8 +11,8 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { useMediaQuery } from "react-responsive";
 import Popup from "reactjs-popup";
 import "reactjs-popup/dist/index.css";
-import * as yup from "yup";
-import { api } from "../../../convex/_generated/api";
+import { z } from "zod";
+import { api } from "../../../../convex/_generated/api";
 
 import Button from "@/components/Button";
 import CopyLinkButton from "@/components/CopyLinkButton";
@@ -47,6 +47,7 @@ export default function AnswerMeeting({
   moment.locale(lang);
   const pathname = usePathname();
   const addAnswer = useMutation(api.meetings.addAnswer);
+  const updateAnswer = useMutation(api.meetings.updateAnswer);
 
   const liveData = useQuery(api.meetings.getByAppointmentId, {
     appointmentId: meetingData.appointmentId,
@@ -123,7 +124,7 @@ export default function AnswerMeeting({
     };
   }, [flatTimes, staticMeetingData.dates]);
 
-  const answers: any[] = currentMeeting.answers ?? [];
+  const rawAnswers: any[] = currentMeeting.answers ?? [];
   const [meetName, setMeetName] = useState(staticMeetingData.meetName);
 
   useEffect(() => {
@@ -142,7 +143,37 @@ export default function AnswerMeeting({
   const [sendError, setSendError] = useState<string | null>(null);
   const [answerSent, setAnswerSent] = useState(false);
   const [username, setUsername] = useState("");
+  const [editId, setEditId] = useState<string | null>(null);
   const [availableCount, setAvailableCount] = useState(0);
+
+  const answers = useMemo(() => {
+    let newAnswers = [...rawAnswers];
+    const previewDates = selectedTimecells.map((m) => ({
+      meetDate: m.meetDate,
+      isOnline: m.isOnline,
+    }));
+
+    if (editId) {
+      const idx = newAnswers.findIndex((a: any) => a.id === editId);
+      if (idx !== -1) {
+        newAnswers[idx] = {
+          ...newAnswers[idx],
+          username: username || newAnswers[idx].username,
+          dates: previewDates,
+        };
+      }
+    } else {
+      if (previewDates.length > 0 || username) {
+        newAnswers.push({
+          id: "preview-id",
+          username:
+            username || dict.page.answerMeeting.input.name.label || "Ty",
+          dates: previewDates,
+        });
+      }
+    }
+    return newAnswers;
+  }, [rawAnswers, editId, username, selectedTimecells, dict]);
 
   const isMobile = useMediaQuery({ query: "(max-width: 1023px)" });
   const isMouseDown = useMouseDown();
@@ -489,26 +520,77 @@ export default function AnswerMeeting({
     highestAvailableCount,
   ]);
 
+  useEffect(() => {
+    try {
+      const lsData = localStorage.getItem("meetifynow_answers");
+      if (lsData && currentMeeting?.answers) {
+        const storedAnswers = JSON.parse(lsData);
+        const myAnswerId = storedAnswers[staticMeetingData.appointmentId];
+        if (myAnswerId && !editId) {
+          const existingAnswer = currentMeeting.answers.find(
+            (a: any) => a.id === myAnswerId,
+          );
+          if (existingAnswer) {
+            setEditId(myAnswerId);
+            setUsername(existingAnswer.username);
+            setSelectedTimecells(
+              existingAnswer.dates.map(
+                (d: any) => new MeetingDate(d.meetDate, d.isOnline),
+              ),
+            );
+          }
+        }
+      }
+    } catch (e) {}
+  }, [currentMeeting?.answers, staticMeetingData.appointmentId, editId]);
+
   const sendAnswer: SubmitHandler<any> = useCallback(async () => {
     if (isSendingReq || !username) return;
     setSendError(null);
     setIsSendingReq(true);
     try {
-      await addAnswer({
-        appointmentId: staticMeetingData.appointmentId,
-        username,
-        dates: selectedTimecells.map((m) => ({
-          meetDate: m.meetDate,
-          isOnline: m.isOnline,
-        })),
-      });
-      setUsername("");
-      setSelectedTimecells([]);
+      if (editId) {
+        await updateAnswer({
+          appointmentId: staticMeetingData.appointmentId,
+          answerId: editId,
+          username,
+          dates: selectedTimecells.map((m) => ({
+            meetDate: m.meetDate,
+            isOnline: m.isOnline,
+          })),
+        });
+      } else {
+        const res = await addAnswer({
+          appointmentId: staticMeetingData.appointmentId,
+          username,
+          dates: selectedTimecells.map((m) => ({
+            meetDate: m.meetDate,
+            isOnline: m.isOnline,
+          })),
+        });
+
+        if (res?.answerId) {
+          setEditId(res.answerId);
+          try {
+            const lsData = JSON.parse(
+              localStorage.getItem("meetifynow_answers") || "{}",
+            );
+            lsData[staticMeetingData.appointmentId] = res.answerId;
+            localStorage.setItem("meetifynow_answers", JSON.stringify(lsData));
+          } catch (storageErr) {}
+        }
+      }
+
       setAnswerSent(true);
       setTimeout(() => setAnswerSent(false), 4000);
     } catch (error: any) {
       const msg = error?.message || "";
-      if (msg.includes("already answered")) {
+      if (msg.includes("already taken")) {
+        setSendError(
+          dict.page.answerMeeting.error.alreadyTaken ||
+            "This username is already taken.",
+        );
+      } else if (msg.includes("already answered")) {
         setSendError(dict.page.answerMeeting.error.alreadyAnswered);
       } else {
         setSendError(dict.page.answerMeeting.error.submitFailed);
@@ -521,7 +603,9 @@ export default function AnswerMeeting({
     username,
     selectedTimecells,
     staticMeetingData.appointmentId,
+    editId,
     addAnswer,
+    updateAnswer,
     dict,
   ]);
 
@@ -575,7 +659,7 @@ export default function AnswerMeeting({
           </li>
         ))}
         {unavailableUsers?.map((u: any) => (
-          <li key={u._id} className="text-gray flex items-center">
+          <li key={u.id || u.username} className="text-gray flex items-center">
             <span className="block h-3 w-3 rounded-full bg-gray mr-2" />
             <s>{u.username}</s>
           </li>
@@ -584,18 +668,27 @@ export default function AnswerMeeting({
     );
   }, [lookedUpDatetime, availabilityInfo, answers, isMobile, dict]);
 
-  const formSchema = yup.object().shape({
-    name: yup
-      .string()
-      .required(dict.page.answerMeeting.validate.name.required)
+  const formSchema = z.object({
+    name: z
+      .string({
+        required_error: dict.page.answerMeeting.validate.name.required,
+      })
       .max(20, dict.page.answerMeeting.validate.name.max),
   });
 
   const {
     register,
     handleSubmit,
+    setValue, // Added target: Extract setValue to manually update the RHF value
     formState: { errors },
-  } = useForm({ resolver: yupResolver(formSchema) });
+  } = useForm({ resolver: zodResolver(formSchema) });
+
+  // Sync react-hook-form value with localStorage restored value
+  useEffect(() => {
+    if (username) {
+      setValue("name", username);
+    }
+  }, [username, setValue]);
 
   return (
     <main className="flex md:flex-1 flex-col px-5 py-10 pt-24 lg:p-24 lg:pt-28 h-smd:pt-30 lg:m-0 w-[356px] md:w-auto lg:w-[900px]">
@@ -797,7 +890,10 @@ export default function AnswerMeeting({
                     text={
                       isSendingReq
                         ? "..."
-                        : dict.page.answerMeeting.button.submit
+                        : editId
+                          ? dict.page.answerMeeting.button.update ||
+                            "Update your answer"
+                          : dict.page.answerMeeting.button.submit
                     }
                     type="submit"
                     disabled={isSendingReq}

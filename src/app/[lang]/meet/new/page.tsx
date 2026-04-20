@@ -9,7 +9,16 @@ export async function generateMetadata({
 }) {
   const { lang } = await params;
   const dict = await getDictionary(lang);
-  return { title: dict.page.createMeeting.title + ` - MeetifyNow` };
+  return {
+    title: dict.page.createMeeting.title + ` - MeetifyNow`,
+    alternates: {
+      canonical: `https://meetifynow.com/${lang === "en" ? "" : lang}/meet/new`,
+      languages: {
+        en: "https://meetifynow.com/meet/new",
+        pl: "https://meetifynow.com/pl/meet/new",
+      },
+    },
+  };
 }
 
 export default async function Page({

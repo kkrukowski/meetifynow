@@ -31,6 +31,7 @@ export const create = mutation({
       throw new Error("Meeting place can have a maximum of 100 characters.");
     if (args.meetLink && args.meetLink.length > 200)
       throw new Error("Meeting link is too long.");
+    if (args.dates.length === 0)
       throw new Error("At least one date is required.");
     if (args.dates.length > 15)
       throw new Error("You can select up to 15 dates.");

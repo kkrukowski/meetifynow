@@ -1,6 +1,6 @@
+import ConvexClientProvider from "@/components/ConvexClientProvider";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar/Navbar.tsx";
-import ConvexClientProvider from "@/components/ConvexClientProvider";
 import "@/global.css";
 import { config } from "@fortawesome/fontawesome-svg-core";
 import "@fortawesome/fontawesome-svg-core/styles.css";
@@ -29,11 +29,12 @@ export async function generateMetadata() {
   const dict = await getDictionary(locale);
 
   const metadata: Metadata = {
+    metadataBase: new URL("https://meetifynow.com"),
     title: dict.website.title,
     description: dict.website.description,
     openGraph: {
-      images: "https://krukodudl.online/imgs/og-image.webp",
-      url: dict.website.url,
+      images: "/imgs/og-image.webp",
+      url: "/",
       description: dict.website.description,
       siteName: "MeetifyNow",
       type: "website",
@@ -43,14 +44,7 @@ export async function generateMetadata() {
       card: "summary_large_image",
       title: "MeetifyNow",
       description: dict.website.description,
-      images: "https://krukodudl.online/imgs/og-image.webp",
-    },
-    alternates: {
-      canonical: "https://krukodudl.online/en",
-      languages: {
-        en: "https://krukodudl.online/en",
-        pl: "https://krukodudl.online/pl",
-      },
+      images: "/imgs/og-image.webp",
     },
   };
 
@@ -63,6 +57,7 @@ export default async function Layout({
   children: React.ReactNode;
 }) {
   const locale = await getLocale();
+  const dict = await getDictionary(locale);
 
   return (
     <html lang={locale}>
@@ -74,7 +69,7 @@ export default async function Layout({
                 "@type" : "WebSite",
                 "name" : "MeetifyNow",
                 "alternateName" : "MN",
-                "url" : "https://krukodudl.online/"
+                "url" : "https://meetifynow.com/"
             }
         `}
         </Script>
@@ -83,7 +78,7 @@ export default async function Layout({
         <ConvexClientProvider>
           <Navbar lang={locale} />
           {children}
-          <Footer />
+          <Footer dict={dict.footer} />
         </ConvexClientProvider>
         <Analytics />
         <SpeedInsights />

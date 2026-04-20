@@ -1,5 +1,5 @@
-import { getDictionary } from "@/lib/dictionary";
 import AnswerMeeting from "@/components/AnswerMeeting/AnswerMeeting";
+import { getDictionary } from "@/lib/dictionary";
 import { Locale } from "@root/i18n.config";
 import { fetchQuery } from "convex/nextjs";
 import type { Metadata } from "next";
@@ -16,10 +16,24 @@ export async function generateMetadata({
     const meeting = await fetchQuery(api.meetings.getByAppointmentId, {
       appointmentId: id,
     });
-    if (!meeting) return { title: "Meeting Not Found - MeetifyNow" };
-    return { title: meeting.meetName + " - MeetifyNow" };
+    if (!meeting)
+      return {
+        title: "Meeting Not Found - MeetifyNow",
+        robots: "noindex, nofollow",
+      };
+    return {
+      title: meeting.meetName + " - MeetifyNow",
+      robots: "noindex, nofollow",
+      openGraph: {
+        title: meeting.meetName,
+        description:
+          "Dołącz do utworzonego spotkania i zaznacz swoją dostępność.",
+        url: `/meet/${id}`,
+        type: "website",
+      },
+    };
   } catch {
-    return { title: "MeetifyNow" };
+    return { title: "MeetifyNow", robots: "noindex, nofollow" };
   }
 }
 

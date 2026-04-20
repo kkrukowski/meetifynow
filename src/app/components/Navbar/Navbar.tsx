@@ -19,6 +19,7 @@ export default async function Navbar({ lang }: { lang: Locale }) {
             alt="Logo"
             title="MeetifyNow"
             className="h-6 md:h-7 w-auto opacity-90 transition-opacity hover:opacity-100"
+            style={{ width: "auto" }}
             priority
           />
         </Link>

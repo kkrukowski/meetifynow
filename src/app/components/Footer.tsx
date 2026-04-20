@@ -1,8 +1,8 @@
 import meetifyNowLogo from "@/assets/imgs/meetifynow-logo.webp";
-import webdkwLogo from "@/assets/imgs/webdkw-logo.svg"; // Upewnij się, że logo jest tutaj zapisane
+import webdkwLogo from "@/assets/imgs/webdkw-logo.svg";
 import Image from "next/image";
 
-export default function Footer() {
+export default function Footer({ dict }: { dict: any }) {
   return (
     <footer className="w-full bg-[#f8fafc] border-t border-gray-200/50 py-12 px-5">
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center md:items-start gap-8">
@@ -13,10 +13,10 @@ export default function Footer() {
             width={200}
             alt="MeetifyNow"
             className="h-7 w-auto opacity-80"
+            style={{ width: "auto" }}
           />
           <p className="text-gray-500 text-sm max-w-xs text-center md:text-left">
-            Proste i szybkie zaplanowanie wspólnych spotkań bez rejestracji i
-            niepotrzebnych kroków.
+            {dict?.description}
           </p>
         </div>
 
@@ -25,20 +25,21 @@ export default function Footer() {
             href="https://webdkw.net/"
             target="_blank"
             rel="noopener"
-            title="Tworzenie stron internetowych WebDKW"
+            title={dict?.developerTitle}
             className="flex items-center gap-2 mt-2 text-sm text-gray-500 hover:opacity-80 transition-opacity"
           >
-            Aplikację stworzyła firma
+            {dict?.createdBy}
             <Image
               src={webdkwLogo}
               height={24}
               width={100}
               className="h-6 w-auto object-contain"
-              alt="Agencja interaktywna, tworzenie stron i sklepów internetowych WebDKW"
+              style={{ width: "auto" }}
+              alt={dict?.developerAlt}
             />
           </a>
           <p className="text-center text-gray-400 text-sm mt-3">
-            {new Date().getFullYear()} © meetifynow.com
+            {new Date().getFullYear()} © {dict?.rights}
           </p>
         </div>
       </div>

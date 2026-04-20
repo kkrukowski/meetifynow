@@ -60,7 +60,7 @@ export default function HamburgerMenu({ dict }: HamburgerMenuProps) {
       >
         <div className="flex flex-col gap-2">
           <Link
-            href="/meet/new"
+            href={`/${pathname.startsWith("/pl") ? "pl/" : ""}meet/new`}
             onClick={() => setIsOpen(false)}
             className="text-dark/80 hover:text-dark hover:bg-[#f0f6fa] active:bg-[#e4eff7] px-4 py-3.5 rounded-[16px] transition-colors font-medium flex items-center"
           >

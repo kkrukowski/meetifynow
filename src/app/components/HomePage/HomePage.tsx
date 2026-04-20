@@ -132,7 +132,7 @@ export default function HomePage({ dict }: { lang: Locale; dict: any }) {
             </Link>
             <Link href="#features">
               <button className="text-base px-6 py-3 bg-gray-50 hover:bg-gray-100 border border-gray-200 text-gray-700 rounded-full transition-all duration-300 font-medium whitespace-nowrap shadow-sm hover:-translate-y-0.5">
-                Dowiedz się więcej
+                {dict.page.home.hero.learnMore}
               </button>
             </Link>
           </motion.div>
@@ -149,8 +149,12 @@ export default function HomePage({ dict }: { lang: Locale; dict: any }) {
               <CheckCircle2 className="w-5 h-5 text-green-600" />
             </div>
             <div>
-              <p className="text-sm font-bold text-gray-800">Czw, 18 Kwi</p>
-              <p className="text-xs text-gray-500">3 osoby dostepne</p>
+              <p className="text-sm font-bold text-gray-800">
+                {dict.page.home.demo.date}
+              </p>
+              <p className="text-xs text-gray-500">
+                {dict.page.home.demo.peopleAvailable}
+              </p>
             </div>
           </motion.div>
 
@@ -164,7 +168,9 @@ export default function HomePage({ dict }: { lang: Locale; dict: any }) {
             }}
             className="absolute right-10 top-10 bg-white/90 backdrop-blur border border-gray-200 shadow-xl rounded-2xl p-4 w-64"
           >
-            <p className="text-xs text-primary font-bold mb-2">Twój wybór</p>
+            <p className="text-xs text-primary font-bold mb-2">
+              {dict.page.home.demo.yourChoice}
+            </p>
             <div className="space-y-2">
               <motion.div
                 animate={{ backgroundColor: ["#f3f4f6", "#e0f2fe", "#f3f4f6"] }}
@@ -200,10 +206,10 @@ export default function HomePage({ dict }: { lang: Locale; dict: any }) {
         <div className="absolute top-0 left-0 w-full h-[500px] bg-gradient-to-b from-gray-50/50 to-transparent pointer-events-none" />
         <div className="max-w-6xl mx-auto text-center flex flex-col items-center relative z-10">
           <p className="text-primary font-semibold mb-4 tracking-wide uppercase text-sm">
-            Dlaczego MeetifyNow?
+            {dict.page.home.features.subtitle}
           </p>
           <BlurText
-            text="Planuj spotkania błyskawicznie"
+            text={dict.page.home.features.title}
             delay={0}
             className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight mb-16"
           />
@@ -211,21 +217,18 @@ export default function HomePage({ dict }: { lang: Locale; dict: any }) {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full max-w-5xl">
             {[
               {
-                title: "Brak logowania",
-                desc: "Zacznij planować od razu, bez tracenia czasu na tworzenie kont i haseł.",
+                ...dict.page.home.features.items[0],
                 icon: <Zap className="w-5 h-5 text-primary" />,
               },
               {
-                title: "Widok kalendarza",
-                desc: "Czytelny, intuicyjny interfejs ułatwiający szybkie znalezienie wspólnego terminu.",
+                ...dict.page.home.features.items[1],
                 icon: <CalendarDays className="w-5 h-5 text-primary" />,
               },
               {
-                title: "Inteligentne sugerowanie",
-                desc: "System sam podpowie optymalne okna czasowe dla całej grupy.",
+                ...dict.page.home.features.items[2],
                 icon: <CheckCircle2 className="w-5 h-5 text-primary" />,
               },
-            ].map((item, i) => (
+            ].map((item: any, i) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
@@ -299,7 +302,7 @@ export default function HomePage({ dict }: { lang: Locale; dict: any }) {
       <section className="py-20 md:py-32 px-5 bg-[#f8fafc] border-y border-gray-200/50 z-10 relative">
         <div className="max-w-6xl mx-auto flex flex-col items-center">
           <BlurText
-            text="Wszystko, czego potrzebujesz"
+            text={dict.page.home.benefits.title}
             delay={0}
             className="text-3xl md:text-4xl font-bold text-gray-900 tracking-tight mb-16 text-center"
           />
@@ -332,33 +335,19 @@ export default function HomePage({ dict }: { lang: Locale; dict: any }) {
       <section className="py-24 md:py-32 px-5 relative w-full flex justify-center bg-white">
         <div className="max-w-5xl w-full flex flex-col items-center text-center">
           <p className="text-primary font-semibold mb-4 tracking-wide uppercase text-sm">
-            Jak to działa?
+            {dict.page.home.howItWorks.subtitle}
           </p>
           <BlurText
-            text="Planuj. Wybieraj. Spotkaj się."
+            text={dict.page.home.howItWorks.title}
             delay={0}
             className="text-3xl md:text-5xl font-bold text-gray-900 tracking-tight mb-4"
           />
           <p className="text-gray-600 max-w-2xl mb-16">
-            Trzy proste kroki dzielą Cię i Twój zespół od idealnie dopasowanego
-            grafiku. Żadnego błądzenia w e-mailach.
+            {dict.page.home.howItWorks.description}
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full text-left">
-            {[
-              {
-                title: "1. Zaproponuj terminy",
-                desc: "Wybierasz kilka dogodnych dla siebie opcji i zamykasz je w wygenerowanym linku.",
-              },
-              {
-                title: "2. Prześlij i zagłosujcie",
-                desc: "Udostępniasz widok grupie. Wszyscy anonimowo i sprawnie oddają głos.",
-              },
-              {
-                title: "3. Idealny czas",
-                desc: "MeetifyNow w sekundy wskaże rozwiązanie pasujące największej liczbie osób.",
-              },
-            ].map((step, i) => (
+            {dict.page.home.howItWorks.steps.map((step: any, i: number) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 30 }}
@@ -390,18 +379,17 @@ export default function HomePage({ dict }: { lang: Locale; dict: any }) {
 
         <div className="max-w-3xl mx-auto text-center flex flex-col items-center relative z-10">
           <BlurText
-            text="Proste w użyciu. Potężne w działaniu."
+            text={dict.page.home.cta.title}
             delay={0}
             className="text-4xl md:text-6xl font-black text-gray-900 mb-6"
           />
           <p className="text-lg text-gray-600 mb-10 max-w-xl">
-            Przestańcie wymieniać dziesiątki wiadomości w poszukiwaniu jednego
-            pasującego terminu. Dołącz do zadowolonych użytkowników.
+            {dict.page.home.cta.description}
           </p>
           <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
             <Link href="meet/new">
               <button className="text-base px-8 py-3.5 bg-primary hover:bg-primary/90 text-white rounded-full font-bold shadow-[0_0_40px_-5px_rgba(var(--primary),0.4)] transition-all duration-300 group flex items-center gap-2">
-                Zacznij planować
+                {dict.page.home.cta.button}
                 <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </button>
             </Link>

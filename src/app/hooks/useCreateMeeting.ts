@@ -118,29 +118,15 @@ export const useCreateMeeting = ({
     return datetimes;
   };
 
-  const getGlobalTimeRange = () => {
-    const allFromTimes = [mainFromTime];
-    const allToTimes = [mainToTime];
-    Object.values(dailyHours).forEach(({ from, to }) => {
-      allFromTimes.push(from);
-      allToTimes.push(to);
-    });
-    return {
-      globalFrom: Math.min(...allFromTimes),
-      globalTo: Math.max(...allToTimes),
-    };
-  };
-
   const fillDailyTimeRanges = () => {
-    const { globalFrom, globalTo } = getGlobalTimeRange();
     const timeRanges: DailyTimeRange[] = selectedDates.map((date) => {
       const dayHours = dailyHours[date];
       return {
         date,
         times: getTimeRangeDatetimes(
           date,
-          dayHours?.from ?? globalFrom,
-          dayHours?.to ?? globalTo,
+          dayHours?.from ?? mainFromTime,
+          dayHours?.to ?? mainToTime,
         ),
       };
     });

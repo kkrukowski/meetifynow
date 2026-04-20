@@ -1,6 +1,24 @@
-import { getDictionary } from "@/lib/dictionary";
 import HomePage from "@/components/HomePage/HomePage";
+import { getDictionary } from "@/lib/dictionary";
 import { Locale } from "@root/i18n.config";
+import { Metadata } from "next";
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ lang: Locale }>;
+}): Promise<Metadata> {
+  const { lang } = await params;
+  return {
+    alternates: {
+      canonical: `https://meetifynow.com/${lang === "en" ? "" : lang}`,
+      languages: {
+        en: "https://meetifynow.com/",
+        pl: "https://meetifynow.com/pl",
+      },
+    },
+  };
+}
 
 export default async function Page({
   params,

@@ -50,6 +50,59 @@
           "title": "Niestandardowe godziny",
           "text": "Nie bądź ograniczony standardowymi przedziałami godzin! MeetifyNow pozwala na tworzenie spotkań według dowolnych godzin, dostosowując się do Twojego indywidualnego grafiku."
         }
+      },
+      "demo": {
+        "date": "Czw, 18 Kwi",
+        "peopleAvailable": "3 osoby dostępne",
+        "yourChoice": "Twój wybór"
+      },
+      "hero": {
+        "learnMore": "Dowiedz się więcej"
+      },
+      "features": {
+        "subtitle": "Dlaczego MeetifyNow?",
+        "title": "Planuj spotkania błyskawicznie",
+        "items": [
+          {
+            "title": "Brak logowania",
+            "desc": "Zacznij planować od razu, bez tracenia czasu na tworzenie kont i haseł."
+          },
+          {
+            "title": "Widok kalendarza",
+            "desc": "Czytelny, intuicyjny interfejs ułatwiający szybkie znalezienie wspólnego terminu."
+          },
+          {
+            "title": "Inteligentne sugerowanie",
+            "desc": "System sam podpowie optymalne okna czasowe dla całej grupy."
+          }
+        ]
+      },
+      "benefits": {
+        "title": "Wszystko, czego potrzebujesz"
+      },
+      "howItWorks": {
+        "subtitle": "Jak to działa?",
+        "title": "Planuj. Wybieraj. Spotkaj się.",
+        "description": "Trzy proste kroki dzielą Cię i Twój zespół od idealnie dopasowanego grafiku. Żadnego błądzenia w e-mailach.",
+        "steps": [
+          {
+            "title": "1. Zaproponuj terminy",
+            "desc": "Wybierasz kilka dogodnych dla siebie opcji i zamykasz je w wygenerowanym linku."
+          },
+          {
+            "title": "2. Prześlij i zagłosujcie",
+            "desc": "Udostępniasz widok grupie. Wszyscy anonimowo i sprawnie oddają głos."
+          },
+          {
+            "title": "3. Idealny czas",
+            "desc": "MeetifyNow w sekundy wskaże rozwiązanie pasujące największej liczbie osób."
+          }
+        ]
+      },
+      "cta": {
+        "title": "Proste w użyciu. Potężne w działaniu.",
+        "description": "Przestańcie wymieniać dziesiątki wiadomości w poszukiwaniu jednego pasującego terminu. Dołącz do zadowolonych użytkowników.",
+        "button": "Zacznij planować"
       }
     },
     "profile": {
@@ -247,5 +300,12 @@
       "title": "Nie znaleziono takiego spotkania 😥",
       "heading": "Zawsze możesz stworzyć własne 😎"
     }
+  },
+  "footer": {
+    "description": "Proste i szybkie zaplanowanie wspólnych spotkań bez rejestracji i niepotrzebnych kroków.",
+    "createdBy": "Aplikację stworzyła firma",
+    "developerTitle": "Tworzenie stron internetowych WebDKW",
+    "developerAlt": "Agencja interaktywna, tworzenie stron i sklepów internetowych WebDKW",
+    "rights": "meetifynow.com"
   }
 }
